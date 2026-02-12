@@ -160,7 +160,14 @@
     <!-- Load D3.js -->
     <script src="lib/d3.v7.min.js"></script>
     
-    <!-- Load Primitive Renderer -->
+    <!-- Renderer Implementations -->
+    <script src="js/renderer/canvas-renderer.js"></script>
+    <script src="js/renderer/d3-renderer.js"></script>
+    
+    <!-- Base Renderer (delegates to implementations) -->
+    <script src="js/renderer/base-renderer.js"></script>
+    
+    <!-- Primitive Renderer (backward compatibility) -->
     <script src="js/renderer/primitive-renderer.js"></script>
     
     <!-- Main Application -->
