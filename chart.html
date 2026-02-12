@@ -132,20 +132,22 @@
             <button id="btn-circle">Add Circle</button>
             <button id="btn-line">Add Line</button>
             <button id="btn-rectangle">Add Rectangle</button>
-            <button id="btn-wave">Add Wave</button>
-            <button id="btn-quantum">Quantum Wave</button>
+            <button id="btn-curve">Add Curve</button>
+            <button id="btn-axis">Add Axis</button>
             
             <div class="separator"></div>
             
             <button id="btn-clear">Clear</button>
             <button id="btn-random">Random Shapes</button>
-            <button id="btn-animate">Animate</button>
             
             <div class="separator"></div>
             
             <label>
-                Speed:
-                <input type="range" id="speed-slider" min="1" max="10" value="5" style="width: 100px;">
+                Renderer:
+                <select id="renderer-mode">
+                    <option value="svg">SVG</option>
+                    <option value="canvas">Canvas</option>
+                </select>
             </label>
         </div>
         
@@ -159,21 +161,20 @@
     <script src="lib/d3.v7.min.js"></script>
     
     <!-- Load Primitive Renderer -->
-    <script src="js/primitive-renderer.js"></script>
+    <script src="js/renderer/primitive-renderer.js"></script>
     
     <!-- Main Application -->
     <script>
         let renderer;
-        let animationId = null;
-        let time = 0;
-        let quantumWaveIds = [];
         
         // Initialize on page load
         window.addEventListener('DOMContentLoaded', () => {
             // Create renderer with full window size
+            const renderMode = document.getElementById('renderer-mode').value;
             renderer = new PrimitiveRenderer('chart', {
                 width: window.innerWidth,
-                height: window.innerHeight
+                height: window.innerHeight,
+                renderMode: renderMode
             });
             
             // Update controls background to match color scheme
@@ -225,32 +226,35 @@
                 renderer.addRectangle(x, y, width, height);
             });
             
-            // Add Wave
-            document.getElementById('btn-wave').addEventListener('click', () => {
-                const startX = 0;
-                const centerY = window.innerHeight / 2 + (Math.random() - 0.5) * 200;
-                const width = window.innerWidth;
-                const amplitude = 30 + Math.random() * 50;
-                const frequency = 2 + Math.random() * 4;
-                renderer.addWave(startX, centerY, width, amplitude, frequency);
+            // Add Curve
+            document.getElementById('btn-curve').addEventListener('click', () => {
+                const points = [];
+                const numPoints = 5 + Math.floor(Math.random() * 5);
+                for (let i = 0; i < numPoints; i++) {
+                    points.push({
+                        x: Math.random() * window.innerWidth,
+                        y: Math.random() * window.innerHeight
+                    });
+                }
+                renderer.addCurve(points);
             });
             
-            // Add Quantum Wave
-            document.getElementById('btn-quantum').addEventListener('click', () => {
-                const centerX = window.innerWidth / 2;
-                const centerY = window.innerHeight / 2;
-                quantumWaveIds = renderer.addQuantumWavePacket(centerX, centerY, time, {
-                    initialSpread: 100,
-                    wavelength: 20,
-                    numWaves: 7,
-                    maxAmplitude: 40
-                });
+            // Add Axis
+            document.getElementById('btn-axis').addEventListener('click', () => {
+                const type = Math.random() > 0.5 ? 'x' : 'y';
+                if (type === 'x') {
+                    const y = window.innerHeight / 2;
+                    renderer.addAxis('x', y, 0, 100, { ticks: 10 });
+                } else {
+                    const x = window.innerWidth / 2;
+                    renderer.addAxis('y', x, 0, 100, { ticks: 10 });
+                }
             });
             
             // Clear
             document.getElementById('btn-clear').addEventListener('click', () => {
                 renderer.clear();
-                quantumWaveIds = [];
+                addDemoContent();
             });
             
             // Random Shapes
@@ -283,52 +287,31 @@
                 }
             });
             
-            // Animate
-            document.getElementById('btn-animate').addEventListener('click', () => {
-                if (animationId) {
-                    cancelAnimationFrame(animationId);
-                    animationId = null;
-                    document.getElementById('btn-animate').textContent = 'Animate';
-                } else {
-                    startAnimation();
-                    document.getElementById('btn-animate').textContent = 'Stop';
-                }
+            // Renderer mode change
+            document.getElementById('renderer-mode').addEventListener('change', (e) => {
+                const renderMode = e.target.value;
+                renderer = new PrimitiveRenderer('chart', {
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                    renderMode: renderMode
+                });
+                addDemoContent();
             });
         }
         
-        function startAnimation() {
-            const speed = document.getElementById('speed-slider').value / 5;
-            
-            function animate() {
-                time += 0.05 * speed;
-                
-                // Clear and redraw quantum wave if exists
-                if (quantumWaveIds.length > 0) {
-                    quantumWaveIds.forEach(id => renderer.removeElement(id));
-                    
-                    const centerX = window.innerWidth / 2;
-                    const centerY = window.innerHeight / 2;
-                    quantumWaveIds = renderer.addQuantumWavePacket(centerX, centerY, time, {
-                        initialSpread: 100,
-                        wavelength: 20,
-                        numWaves: 7,
-                        maxAmplitude: 40
-                    });
-                }
-                
-                animationId = requestAnimationFrame(animate);
-            }
-            
-            animate();
-        }
-        
         function addDemoContent() {
-            // Add a centered title circle
+            // Add a centered visualization
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
             
-            // Add a sample wave
-            renderer.addWave(0, centerY - 100, window.innerWidth, 50, 3, {
+            // Add a smooth curve
+            const curvePoints = [];
+            for (let i = 0; i < 10; i++) {
+                const x = (i / 9) * window.innerWidth;
+                const y = centerY - 100 + Math.sin((i / 9) * Math.PI * 3) * 50;
+                curvePoints.push({ x, y });
+            }
+            renderer.addCurve(curvePoints, {
                 strokeWidth: 3,
                 opacity: 0.6
             });
