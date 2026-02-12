@@ -75,12 +75,11 @@ class GravitySimulation extends ISimulation {
         if (this.isRunning) return;
         
         this.isRunning = true;
-        const timeStep = 0.016; // ~60 FPS
         this.animationFrame = setInterval(() => {
             if (this.isRunning) {
                 this.step();
             }
-        }, timeStep * 1000);
+        }, this.engine.timeStep * 1000);
         
         this.notifyListeners();
     }
@@ -111,6 +110,15 @@ class GravitySimulation extends ISimulation {
      */
     setG(newG) {
         this.engine.setG(newG);
+    }
+
+    /**
+     * Update dimensions
+     */
+    setDimensions(width, height) {
+        this.width = width;
+        this.height = height;
+        this.engine.setDimensions(width, height);
     }
 
     /**

@@ -52,9 +52,7 @@ function initGravitySimulation() {
     // Handle window resize
     window.addEventListener('resize', () => {
         primitiveRenderer.resize(window.innerWidth, window.innerHeight);
-        gravitySimulation.width = window.innerWidth;
-        gravitySimulation.height = window.innerHeight;
-        gravitySimulation.engine.setDimensions(window.innerWidth, window.innerHeight);
+        gravitySimulation.setDimensions(window.innerWidth, window.innerHeight);
     });
     
     // Connect UI controls
