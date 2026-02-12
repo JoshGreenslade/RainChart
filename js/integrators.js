@@ -134,7 +134,7 @@ const Integrators = {
      *     const pos = s.slice(0, n);
      *     const vel = s.slice(n);
      *     const acc = computeAcceleration(pos, vel, t);
-     *     return [...vel, ...acc]; // [dx/dt, dy/dt, dvx/dt, dvy/dt]
+     *     return [...vel, ...acc]; // Returns [vx, vy, ax, ay]
      * };
      * const newState = Integrators.velocityVerlet(state, derivative, dt);
      */

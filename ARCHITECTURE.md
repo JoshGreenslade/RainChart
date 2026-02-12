@@ -98,9 +98,10 @@ const newState2 = Integrators.rk4(state, derivative, dt);  // Just swap the meth
 ```
 
 **State Format Examples:**
-- Euler/RK4: `[x, y, vx, vy]` - position and velocity
-- Verlet: `[x, y, prevX, prevY]` - current and previous positions
-- Velocity Verlet: `[x, y, vx, vy]` - position and velocity
+- Euler/RK4: `[x, y, vx, vy]` - position and velocity components
+- Verlet: `[x, y, prevX, prevY]` - current and previous positions (for single particle)  
+  For multiple particles: `[x1, y1, x2, y2, ..., prevX1, prevY1, prevX2, prevY2, ...]`
+- Velocity Verlet: `[x, y, vx, vy]` - position and velocity components
 ```
 
 **Benefits:**
