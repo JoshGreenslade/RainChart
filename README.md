@@ -110,6 +110,15 @@ Each simulation exposes parameters through the UI:
 
 Simply open `index.html` in a modern web browser. No build step required.
 
+## Novel AI Agent Uses
+
+This repository also explores creative applications of AI agents beyond traditional coding tasks. Check out:
+
+- **[Agent Novel Uses Documentation](AGENT_NOVEL_USES.md)** - Comprehensive guide on using AI agents for conversations, D&D, recipe generation, and more
+- **[Interactive Examples](agent-examples.html)** - Try interactive demonstrations of novel agent capabilities
+
+Discover how AI agents can serve as conversational partners, dungeon masters, personal chefs, tutors, and more!
+
 ## Future Plans
 
 - Extract physics layer to separate repository
