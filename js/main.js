@@ -6,6 +6,18 @@
 let gravitySimulation;
 let gravityRenderer;
 
+/**
+ * Helper function to convert HSL color to HSLA with transparency
+ */
+function toTransparentColor(hslColor, alpha = 0.85) {
+    // Check if color is already in HSL format
+    if (hslColor && hslColor.includes('hsl')) {
+        return hslColor.replace(')', `, ${alpha})`).replace('hsl', 'hsla');
+    }
+    // Fallback to default dark transparent background
+    return `rgba(0, 0, 0, ${alpha})`;
+}
+
 // Initialize simulation when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     initGravitySimulation();
@@ -29,7 +41,7 @@ function initGravitySimulation() {
     const scheme = gravityRenderer.getColorScheme();
     
     // Use the background color with transparency for controls
-    const controlsBg = scheme.background.replace(')', ', 0.85)').replace('hsl', 'hsla');
+    const controlsBg = toTransparentColor(scheme.background);
     controls.style.background = controlsBg;
     info.style.background = controlsBg;
     
@@ -85,7 +97,7 @@ function initGravitySimulation() {
         
         // Update background colors
         const scheme = gravityRenderer.getColorScheme();
-        const controlsBg = scheme.background.replace(')', ', 0.85)').replace('hsl', 'hsla');
+        const controlsBg = toTransparentColor(scheme.background);
         controls.style.background = controlsBg;
         info.style.background = controlsBg;
         
