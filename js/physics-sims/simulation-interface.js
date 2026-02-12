@@ -1,6 +1,10 @@
 /**
  * Simulation Interface - Base interface that all simulations must implement
  * This interface defines the contract between simulations and the application layer
+ * 
+ * Note: JavaScript doesn't have built-in interface enforcement. This is a convention-based
+ * interface that throws errors if methods are not overridden. All simulation classes should
+ * extend this class and implement all required methods.
  */
 
 class ISimulation {

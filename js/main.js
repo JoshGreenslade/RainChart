@@ -23,11 +23,13 @@ function initGravitySimulation() {
     const chartWidth = 800;
     const chartHeight = 600;
     
-    // Create primitive renderer (Canvas or SVG mode)
+    // Create primitive renderer
+    // Use PrimitiveRenderer with renderMode: 'canvas' for Canvas rendering
+    // Use PrimitiveRenderer with renderMode: 'svg' for D3/SVG rendering (requires D3.js)
     gravityRenderer = new PrimitiveRenderer('gravity-chart', {
         width: chartWidth,
         height: chartHeight,
-        renderMode: 'canvas' // Can be 'canvas' or 'svg'
+        renderMode: 'canvas'
     });
     
     // Create physics simulation (brings together physics, integrators, and rendering)
