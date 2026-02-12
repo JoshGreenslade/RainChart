@@ -27,7 +27,7 @@ The color scheme regenerates each time you reload the page.
 
 ## Available Drawing Commands
 
-The `PrimitiveRenderer` class provides the following methods:
+The `BaseRenderer` class provides the following methods:
 
 ### Basic Shapes
 
@@ -73,7 +73,7 @@ Adds an axis (X or Y) with tick marks and labels.
 
 ```javascript
 // Create renderer with SVG mode (default)
-const renderer = new PrimitiveRenderer('chart', {
+const renderer = new BaseRenderer('chart', {
     width: window.innerWidth,
     height: window.innerHeight,
     renderMode: 'svg' // or 'canvas'

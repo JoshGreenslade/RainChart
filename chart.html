@@ -170,9 +170,6 @@
     <!-- Base Renderer (delegates to implementations) -->
     <script src="js/renderer/base-renderer.js"></script>
     
-    <!-- Primitive Renderer (backward compatibility) -->
-    <script src="js/renderer/primitive-renderer.js"></script>
-    
     <!-- Main Application -->
     <script>
         let renderer;
@@ -181,7 +178,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             // Create renderer with full window size
             const renderMode = document.getElementById('renderer-mode').value;
-            renderer = new PrimitiveRenderer('chart', {
+            renderer = new BaseRenderer('chart', {
                 width: window.innerWidth,
                 height: window.innerHeight,
                 renderMode: renderMode
@@ -300,7 +297,7 @@
             // Renderer mode change
             document.getElementById('renderer-mode').addEventListener('change', (e) => {
                 const renderMode = e.target.value;
-                renderer = new PrimitiveRenderer('chart', {
+                renderer = new BaseRenderer('chart', {
                     width: window.innerWidth,
                     height: window.innerHeight,
                     renderMode: renderMode
