@@ -29,7 +29,8 @@ This project demonstrates a **clean architecture** with complete separation betw
 ## Physics Layer (Pure JavaScript)
 
 **Files:**
-- `js/physics-engine.js` - Core physics calculations
+- `js/integrators.js` - Numerical integration methods (Euler, finite difference, etc.)
+- `js/physics-engine.js` - Core physics calculations (forces, motion, etc.)
 - `js/gravity-sim.js` - Gravity simulation logic
 - `js/temperature-sim.js` - Heat diffusion logic  
 - `js/trajectory-sim.js` - Projectile motion logic
@@ -62,6 +63,52 @@ simulator.reset();
 1. Perform calculations
 2. Update internal state
 3. Notify observers with pure data objects
+
+### Numerical Integrators Module
+
+**Purpose:** Provides generic numerical integration methods for solving ordinary differential equations (ODEs). These integrators are completely physics-agnostic and work with any system of differential equations.
+
+**File:** `js/integrators.js`
+
+**Available Methods (Unified Interface):**
+All integrators now have the same interface: `(state, derivative, dt, t)`
+
+- `Integrators.euler(state, derivative, dt, t)` - 1st order Euler method for any ODE
+- `Integrators.rk4(state, derivative, dt, t)` - 4th-order Runge-Kutta for higher accuracy
+- `Integrators.verlet(state, derivative, dt, t)` - Position Verlet for oscillatory systems
+- `Integrators.velocityVerlet(state, derivative, dt, t)` - Velocity Verlet for N-body simulations
+
+**Key Design:**
+- **Unified Interface:** All integrators use the same `(state, derivative, dt, t)` signature
+- **Generic:** Integrators accept a derivative function, not physics-specific parameters
+- **Reusable:** Same integrators work for gravity, projectiles, heat diffusion, waves, etc.
+- **Swappable:** Easy to switch between integrators (e.g., Euler → RK4) without code changes
+- **Extensible:** Easy to add advanced methods (adaptive RK45, leapfrog, etc.)
+- **Testable:** Can be unit tested independently from physics
+
+**Example Usage:**
+```javascript
+// For any ODE system dy/dt = f(y, t)
+const state = [x, y, vx, vy];
+const derivative = (s, t) => [s[2], s[3], ax, ay]; // [dx/dt, dy/dt, dvx/dt, dvy/dt]
+
+// All integrators work with the same interface
+const newState1 = Integrators.euler(state, derivative, dt);
+const newState2 = Integrators.rk4(state, derivative, dt);  // Just swap the method!
+```
+
+**State Format Examples:**
+- Euler/RK4: `[x, y, vx, vy]` - position and velocity components
+- Verlet: `[x, y, prevX, prevY]` - current and previous positions (for single particle)  
+  For multiple particles: `[x1, y1, x2, y2, ..., prevX1, prevY1, prevX2, prevY2, ...]`
+- Velocity Verlet: `[x, y, vx, vy]` - position and velocity components
+```
+
+**Benefits:**
+- Clear separation between numerical methods and physics
+- Physics code specifies "what to compute" (derivatives)
+- Integrators handle "how to compute" (numerical integration)
+- Can swap integrators (Euler → RK4) without changing physics code
 
 ## Visualization Layer
 
@@ -147,6 +194,7 @@ document.getElementById('start').addEventListener('click', () => {
 The architecture is designed so you can easily:
 ```
 physics-engine/          (Separate repo)
+├── integrators.js
 ├── physics-engine.js
 ├── gravity-sim.js
 ├── temperature-sim.js

@@ -28,20 +28,30 @@ const PhysicsEngine = {
     },
 
     /**
-     * Update body position using Euler integration
+     * Update body position using numerical integration
+     * Uses Euler method by default, but can be swapped with other integrators
      * @param {Object} body - Body with x, y, vx, vy, mass
      * @param {number} fx - Force in x direction
      * @param {number} fy - Force in y direction
      * @param {number} dt - Time step
      */
     updatePosition(body, fx, fy, dt) {
-        const ax = fx / body.mass;
-        const ay = fy / body.mass;
+        // Define the state as [x, y, vx, vy]
+        const state = [body.x, body.y, body.vx, body.vy];
         
-        body.vx += ax * dt;
-        body.vy += ay * dt;
-        body.x += body.vx * dt;
-        body.y += body.vy * dt;
+        // Define the derivative function (equations of motion)
+        const derivative = (s) => {
+            const [x, y, vx, vy] = s;
+            const ax = fx / body.mass;
+            const ay = fy / body.mass;
+            return [vx, vy, ax, ay]; // [dx/dt, dy/dt, dvx/dt, dvy/dt]
+        };
+        
+        // Integrate using Euler method
+        const newState = Integrators.euler(state, derivative, dt);
+        
+        // Update body state
+        [body.x, body.y, body.vx, body.vy] = newState;
     },
 
     /**
@@ -55,17 +65,20 @@ const PhysicsEngine = {
     heatDiffusion(temperatures, alpha, dt, dx = 1) {
         const n = temperatures.length;
         const newTemps = new Array(n);
-        const r = alpha * dt / (dx * dx);
         
         // Boundary conditions (fixed temperature at ends)
         newTemps[0] = temperatures[0];
         newTemps[n - 1] = temperatures[n - 1];
         
-        // Update interior points
+        // Update interior points using Euler integration on each point
         for (let i = 1; i < n - 1; i++) {
-            newTemps[i] = temperatures[i] + r * (
-                temperatures[i - 1] - 2 * temperatures[i] + temperatures[i + 1]
-            );
+            // Derivative: dT/dt = alpha * d²T/dx²
+            const derivative = () => {
+                const d2Tdx2 = (temperatures[i - 1] - 2 * temperatures[i] + temperatures[i + 1]) / (dx * dx);
+                return alpha * d2Tdx2;
+            };
+            
+            newTemps[i] = Integrators.euler(temperatures[i], derivative, dt);
         }
         
         return newTemps;
@@ -81,27 +94,39 @@ const PhysicsEngine = {
      * @returns {Object} New state
      */
     projectileMotion(state, g = 9.8, resistanceType = 'none', dragCoeff = 0.1, dt = 0.01) {
-        let ax = 0;
-        let ay = -g;
+        // Define the state as [x, y, vx, vy]
+        const stateArray = [state.x, state.y, state.vx, state.vy];
         
-        const speed = Math.sqrt(state.vx * state.vx + state.vy * state.vy);
+        // Define the derivative function (equations of motion)
+        const derivative = (s) => {
+            const [x, y, vx, vy] = s;
+            let ax = 0;
+            let ay = -g;
+            
+            const speed = Math.sqrt(vx * vx + vy * vy);
+            
+            if (resistanceType === 'linear' && speed > 0) {
+                // Linear air resistance: F = -bv
+                ax -= dragCoeff * vx;
+                ay -= dragCoeff * vy;
+            } else if (resistanceType === 'quadratic' && speed > 0) {
+                // Quadratic air resistance: F = -cv^2
+                const dragFactor = dragCoeff * speed;
+                ax -= dragFactor * vx;
+                ay -= dragFactor * vy;
+            }
+            
+            return [vx, vy, ax, ay]; // [dx/dt, dy/dt, dvx/dt, dvy/dt]
+        };
         
-        if (resistanceType === 'linear' && speed > 0) {
-            // Linear air resistance: F = -bv
-            ax -= dragCoeff * state.vx;
-            ay -= dragCoeff * state.vy;
-        } else if (resistanceType === 'quadratic' && speed > 0) {
-            // Quadratic air resistance: F = -cv^2
-            const dragFactor = dragCoeff * speed;
-            ax -= dragFactor * state.vx;
-            ay -= dragFactor * state.vy;
-        }
+        // Integrate using Euler method
+        const newState = Integrators.euler(stateArray, derivative, dt);
         
         return {
-            x: state.x + state.vx * dt,
-            y: state.y + state.vy * dt,
-            vx: state.vx + ax * dt,
-            vy: state.vy + ay * dt
+            x: newState[0],
+            y: newState[1],
+            vx: newState[2],
+            vy: newState[3]
         };
     },
 
