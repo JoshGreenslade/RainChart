@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RainChart - Primitive Drawing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        #container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        #chart {
+            width: 100%;
+            height: 100%;
+        }
+        
+        #controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            max-width: calc(100% - 40px);
+            z-index: 1000;
+        }
+        
+        #controls button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        #controls button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        #controls button:active {
+            transform: translateY(0);
+        }
+        
+        #controls label {
+            color: white;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        #controls input,
+        #controls select {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        #controls input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        #info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 12px;
+            max-width: 300px;
+            z-index: 1000;
+        }
+        
+        .separator {
+            width: 1px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            #controls {
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                max-width: calc(100% - 20px);
+                padding: 10px;
+                gap: 8px;
+            }
+            
+            #controls button,
+            #controls input,
+            #controls select {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="chart"></div>
+        
+        <div id="controls">
+            <button id="btn-circle">Add Circle</button>
+            <button id="btn-line">Add Line</button>
+            <button id="btn-rectangle">Add Rectangle</button>
+            <button id="btn-wave">Add Wave</button>
+            <button id="btn-quantum">Quantum Wave</button>
+            
+            <div class="separator"></div>
+            
+            <button id="btn-clear">Clear</button>
+            <button id="btn-random">Random Shapes</button>
+            <button id="btn-animate">Animate</button>
+            
+            <div class="separator"></div>
+            
+            <label>
+                Speed:
+                <input type="range" id="speed-slider" min="1" max="10" value="5" style="width: 100px;">
+            </label>
+        </div>
+        
+        <div id="info">
+            <div>Click buttons to add shapes</div>
+            <div>Color scheme updates on page reload</div>
+        </div>
+    </div>
+    
+    <!-- Load D3.js -->
+    <script src="lib/d3.v7.min.js"></script>
+    
+    <!-- Load Primitive Renderer -->
+    <script src="js/primitive-renderer.js"></script>
+    
+    <!-- Main Application -->
+    <script>
+        let renderer;
+        let animationId = null;
+        let time = 0;
+        let quantumWaveIds = [];
+        
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            // Create renderer with full window size
+            renderer = new PrimitiveRenderer('chart', {
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+            
+            // Update controls background to match color scheme
+            const controls = document.getElementById('controls');
+            const info = document.getElementById('info');
+            const scheme = renderer.getColorScheme();
+            
+            // Use the foreground color with transparency for controls
+            const controlsBg = scheme.background.replace(')', ', 0.85)').replace('hsl', 'hsla');
+            controls.style.background = controlsBg;
+            info.style.background = controlsBg;
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                renderer.resize(window.innerWidth, window.innerHeight);
+            });
+            
+            // Set up button handlers
+            setupControls();
+            
+            // Add initial demo content
+            addDemoContent();
+        });
+        
+        function setupControls() {
+            // Add Circle
+            document.getElementById('btn-circle').addEventListener('click', () => {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                const radius = 20 + Math.random() * 50;
+                renderer.addCircle(x, y, radius);
+            });
+            
+            // Add Line
+            document.getElementById('btn-line').addEventListener('click', () => {
+                const x1 = Math.random() * window.innerWidth;
+                const y1 = Math.random() * window.innerHeight;
+                const x2 = Math.random() * window.innerWidth;
+                const y2 = Math.random() * window.innerHeight;
+                renderer.addLine(x1, y1, x2, y2);
+            });
+            
+            // Add Rectangle
+            document.getElementById('btn-rectangle').addEventListener('click', () => {
+                const x = Math.random() * (window.innerWidth - 200);
+                const y = Math.random() * (window.innerHeight - 200);
+                const width = 50 + Math.random() * 150;
+                const height = 50 + Math.random() * 150;
+                renderer.addRectangle(x, y, width, height);
+            });
+            
+            // Add Wave
+            document.getElementById('btn-wave').addEventListener('click', () => {
+                const startX = 0;
+                const centerY = window.innerHeight / 2 + (Math.random() - 0.5) * 200;
+                const width = window.innerWidth;
+                const amplitude = 30 + Math.random() * 50;
+                const frequency = 2 + Math.random() * 4;
+                renderer.addWave(startX, centerY, width, amplitude, frequency);
+            });
+            
+            // Add Quantum Wave
+            document.getElementById('btn-quantum').addEventListener('click', () => {
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                quantumWaveIds = renderer.addQuantumWavePacket(centerX, centerY, time, {
+                    initialSpread: 100,
+                    wavelength: 20,
+                    numWaves: 7,
+                    maxAmplitude: 40
+                });
+            });
+            
+            // Clear
+            document.getElementById('btn-clear').addEventListener('click', () => {
+                renderer.clear();
+                quantumWaveIds = [];
+            });
+            
+            // Random Shapes
+            document.getElementById('btn-random').addEventListener('click', () => {
+                const count = 10 + Math.floor(Math.random() * 20);
+                for (let i = 0; i < count; i++) {
+                    const type = Math.floor(Math.random() * 3);
+                    switch(type) {
+                        case 0:
+                            const x = Math.random() * window.innerWidth;
+                            const y = Math.random() * window.innerHeight;
+                            const radius = 10 + Math.random() * 30;
+                            renderer.addCircle(x, y, radius);
+                            break;
+                        case 1:
+                            const x1 = Math.random() * window.innerWidth;
+                            const y1 = Math.random() * window.innerHeight;
+                            const x2 = Math.random() * window.innerWidth;
+                            const y2 = Math.random() * window.innerHeight;
+                            renderer.addLine(x1, y1, x2, y2);
+                            break;
+                        case 2:
+                            const rx = Math.random() * (window.innerWidth - 100);
+                            const ry = Math.random() * (window.innerHeight - 100);
+                            const w = 20 + Math.random() * 80;
+                            const h = 20 + Math.random() * 80;
+                            renderer.addRectangle(rx, ry, w, h);
+                            break;
+                    }
+                }
+            });
+            
+            // Animate
+            document.getElementById('btn-animate').addEventListener('click', () => {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                    document.getElementById('btn-animate').textContent = 'Animate';
+                } else {
+                    startAnimation();
+                    document.getElementById('btn-animate').textContent = 'Stop';
+                }
+            });
+        }
+        
+        function startAnimation() {
+            const speed = document.getElementById('speed-slider').value / 5;
+            
+            function animate() {
+                time += 0.05 * speed;
+                
+                // Clear and redraw quantum wave if exists
+                if (quantumWaveIds.length > 0) {
+                    quantumWaveIds.forEach(id => renderer.removeElement(id));
+                    
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+                    quantumWaveIds = renderer.addQuantumWavePacket(centerX, centerY, time, {
+                        initialSpread: 100,
+                        wavelength: 20,
+                        numWaves: 7,
+                        maxAmplitude: 40
+                    });
+                }
+                
+                animationId = requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+        
+        function addDemoContent() {
+            // Add a centered title circle
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            // Add a sample wave
+            renderer.addWave(0, centerY - 100, window.innerWidth, 50, 3, {
+                strokeWidth: 3,
+                opacity: 0.6
+            });
+            
+            // Add a few circles
+            for (let i = 0; i < 5; i++) {
+                const angle = (i / 5) * Math.PI * 2;
+                const distance = 150;
+                const x = centerX + Math.cos(angle) * distance;
+                const y = centerY + Math.sin(angle) * distance;
+                renderer.addCircle(x, y, 30);
+            }
+            
+            // Add connecting lines
+            for (let i = 0; i < 5; i++) {
+                const angle1 = (i / 5) * Math.PI * 2;
+                const angle2 = ((i + 1) / 5) * Math.PI * 2;
+                const distance = 150;
+                const x1 = centerX + Math.cos(angle1) * distance;
+                const y1 = centerY + Math.sin(angle1) * distance;
+                const x2 = centerX + Math.cos(angle2) * distance;
+                const y2 = centerY + Math.sin(angle2) * distance;
+                renderer.addLine(x1, y1, x2, y2, { strokeWidth: 2 });
+            }
+        }
+    </script>
+</body>
+</html>
