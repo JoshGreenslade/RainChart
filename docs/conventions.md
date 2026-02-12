@@ -105,7 +105,7 @@ Both backends must always implement the same interface.
 
 ## Performance Guidelines
 
-- Canvas mode is preferred for high-particle-count simulations (1 000+).
+- Canvas mode is preferred for high-particle-count simulations (1,000+).
 - SVG/D3 mode is preferred for interactive or smaller-scale visualisations.
 - Avoid creating objects in hot loops where possible; reuse arrays and objects.
 - Prefer `requestAnimationFrame` over `setInterval` for animation loops in future work.

@@ -103,7 +103,7 @@ An honest assessment of the current codebase with concrete options for addressin
 - **B – Use ES modules**: Same as risk #4, Option A – modules have their own scope by default.
 - **C – Accept for now**: The global scope is tolerable for a small project.
 
-**Recommendation:** Address alongside the module migration (risk #4).
+**Recommendation:** Address alongside the module migration (see "No Module System" above).
 
 ---
 
