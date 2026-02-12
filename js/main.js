@@ -4,7 +4,7 @@
  */
 
 let gravitySimulation;
-let gravityRenderer;
+let primitiveRenderer;
 
 /**
  * Helper function to convert HSL color to HSLA with transparency
@@ -27,30 +27,23 @@ document.addEventListener('DOMContentLoaded', () => {
  * Initialize Gravity Simulation
  */
 function initGravitySimulation() {
-    // Create renderer with full window size
+    // Create primitive renderer with full window size
     const renderMode = document.getElementById('renderer-mode').value;
-    gravityRenderer = new PrimitiveRenderer('gravity-chart', {
+    primitiveRenderer = new PrimitiveRenderer('gravity-chart', {
         width: window.innerWidth,
         height: window.innerHeight,
         renderMode: renderMode
     });
     
     // Update controls background to match color scheme
-    const controls = document.getElementById('controls');
-    const info = document.getElementById('info');
-    const scheme = gravityRenderer.getColorScheme();
+    updateControlsBackground();
     
-    // Use the background color with transparency for controls
-    const controlsBg = toTransparentColor(scheme.background);
-    controls.style.background = controlsBg;
-    info.style.background = controlsBg;
-    
-    // Create physics simulation
+    // Create simulation (MVC controller)
     gravitySimulation = new GravitySimulation(window.innerWidth, window.innerHeight, 3, 1.0);
     
     // Connect simulation to renderer
     gravitySimulation.onUpdate((state) => {
-        gravitySimulation.render(gravityRenderer);
+        gravitySimulation.render(primitiveRenderer);
     });
     
     // Initial render
@@ -58,12 +51,34 @@ function initGravitySimulation() {
     
     // Handle window resize
     window.addEventListener('resize', () => {
-        gravityRenderer.resize(window.innerWidth, window.innerHeight);
+        primitiveRenderer.resize(window.innerWidth, window.innerHeight);
         gravitySimulation.width = window.innerWidth;
         gravitySimulation.height = window.innerHeight;
+        gravitySimulation.engine.setDimensions(window.innerWidth, window.innerHeight);
     });
     
     // Connect UI controls
+    setupUIControls();
+}
+
+/**
+ * Update controls background to match color scheme
+ */
+function updateControlsBackground() {
+    const controls = document.getElementById('controls');
+    const info = document.getElementById('info');
+    const scheme = primitiveRenderer.getColorScheme();
+    
+    // Use the background color with transparency for controls
+    const controlsBg = toTransparentColor(scheme.background);
+    controls.style.background = controlsBg;
+    info.style.background = controlsBg;
+}
+
+/**
+ * Setup UI control event handlers
+ */
+function setupUIControls() {
     document.getElementById('gravity-start').addEventListener('click', () => {
         gravitySimulation.start();
     });
@@ -89,19 +104,16 @@ function initGravitySimulation() {
     // Renderer mode change
     document.getElementById('renderer-mode').addEventListener('change', (e) => {
         const renderMode = e.target.value;
-        gravityRenderer = new PrimitiveRenderer('gravity-chart', {
+        primitiveRenderer = new PrimitiveRenderer('gravity-chart', {
             width: window.innerWidth,
             height: window.innerHeight,
             renderMode: renderMode
         });
         
         // Update background colors
-        const scheme = gravityRenderer.getColorScheme();
-        const controlsBg = toTransparentColor(scheme.background);
-        controls.style.background = controlsBg;
-        info.style.background = controlsBg;
+        updateControlsBackground();
         
         // Re-render
-        gravitySimulation.render(gravityRenderer);
+        gravitySimulation.render(primitiveRenderer);
     });
 }

@@ -1,125 +1,36 @@
 /**
- * Gravity Simulation - Brings together physics, integrators, and rendering
- * Uses PrimitiveRenderer to build the scene
+ * Gravity Simulation - MVC Controller
+ * Coordinates between GravityEngine (physics) and GravityRenderer (rendering)
  */
 
-
-
 class GravitySimulation extends ISimulation {
-
-    static CONFIG = {
-            softening_factor: 5,
-            integrator: Integrators.rk4,
-            minMass: 2,
-            maxMass: 10000,
-            massPowerLawScaling: 2.35
-        }
-
     constructor(width, height, bodyCount = 3, G = 1.0) {
         super();
         this.width = width;
         this.height = height;
-        this.G = G;
-        this.bodies = [];
         this.isRunning = false;
-        this.timeStep = 0.016; // ~60 FPS
         this.listeners = [];
         this.animationFrame = null;
+
+        // Create engine and renderer components
+        this.engine = new GravityEngine(width, height, bodyCount, G);
+        this.renderer = null; // Will be set when renderer is provided
 
         this.initialize(bodyCount);
     }
 
     /**
-     * Physics Engine - Co-located within this simulation
+     * Set the renderer for this simulation
      */
-    static PhysicsEngine = {
-        /**
-         * Calculate gravitational force between two bodies
-         */
-        calculateGravitationalForce(body1, body2, G = 1) {
-            const dx = body2.x - body1.x;
-            const dy = body2.y - body1.y;
-            const distanceSquared = dx * dx + dy * dy;
-
-            // The softened distance ensures we don't encounter errors when distance = 0
-            const softenedDistanceSquared = distanceSquared + GravitySimulation.CONFIG.softening_factor * GravitySimulation.CONFIG.softening_factor
-            const softenedDistance = Math.sqrt(softenedDistanceSquared);
-            
-            const forceMagnitude = G * body1.mass * body2.mass / softenedDistanceSquared;
-            const fx = forceMagnitude * dx / softenedDistance;
-            const fy = forceMagnitude * dy / softenedDistance;
-            
-            return { fx, fy };
-        },
-
-        /**
-         * Update body position using numerical integration
-         */
-        updatePosition(body, fx, fy, dt) {
-            // Define the state as [x, y, vx, vy]
-            const state = [body.x, body.y, body.vx, body.vy];
-            
-            // Define the derivative function (equations of motion)
-            const derivative = (s) => {
-                const [x, y, vx, vy] = s;
-                const ax = fx / body.mass;
-                const ay = fy / body.mass;
-                return [vx, vy, ax, ay]; // [dx/dt, dy/dt, dvx/dt, dvy/dt]
-            };
-            
-            // Integrate using Euler method
-            const newState = GravitySimulation.CONFIG.integrator(state, derivative, dt);
-            
-            // Update body state
-            [body.x, body.y, body.vx, body.vy] = newState;
-        },
-        // 
-        generatePowerLawMass() {
-            const minMass = GravitySimulation.CONFIG.minMass;
-            const maxMass = GravitySimulation.CONFIG.maxMass;
-            const alpha = GravitySimulation.CONFIG.massPowerLawScaling;
-            const u = Math.random();
-            const exp = 1 - alpha;
-            
-            // The formula derived from Inverse Transform Sampling
-            const mass = Math.pow(
-                (Math.pow(maxMass, exp) - Math.pow(minMass, exp)) * u + Math.pow(minMass, exp),
-                1 / exp
-            );
-            
-            return mass;
-        },
-
-        /**
-         * Generate random bodies for gravity simulation
-         */
-        generateRandomBodies(count, width, height) {
-            const bodies = [];
-            for (let i = 0; i < count; i++) {
-                bodies.push({
-                    id: i,
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    vx: (Math.random() - 0.5) * 20,
-                    vy: (Math.random() - 0.5) * 20,
-                    mass: this.generatePowerLawMass(10, 100)
-                });
-            }
-            return bodies;
-        },
-
-
-    };
+    setRenderer(renderer) {
+        this.renderer = new GravityRenderer(renderer);
+    }
 
     /**
      * Initialize bodies for simulation
      */
     initialize(bodyCount) {
-        this.bodies = GravitySimulation.PhysicsEngine.generateRandomBodies(
-            bodyCount, 
-            this.width, 
-            this.height
-        );
+        this.engine.initialize(bodyCount);
     }
 
     /**
@@ -141,15 +52,9 @@ class GravitySimulation extends ISimulation {
      * Get current simulation state
      */
     getState() {
+        const engineState = this.engine.getState();
         return {
-            bodies: this.bodies.map(b => ({
-                id: b.id,
-                x: b.x,
-                y: b.y,
-                vx: b.vx,
-                vy: b.vy,
-                mass: b.mass
-            })),
+            ...engineState,
             time: Date.now(),
             isRunning: this.isRunning
         };
@@ -159,40 +64,7 @@ class GravitySimulation extends ISimulation {
      * Update simulation by one time step
      */
     step() {
-        // Calculate forces between all pairs of bodies
-        const forces = this.bodies.map(() => ({ fx: 0, fy: 0 }));
-        
-        for (let i = 0; i < this.bodies.length; i++) {
-            for (let j = i + 1; j < this.bodies.length; j++) {
-                const force = GravitySimulation.PhysicsEngine.calculateGravitationalForce(
-                    this.bodies[i],
-                    this.bodies[j],
-                    this.G
-                );
-                
-                forces[i].fx += force.fx;
-                forces[i].fy += force.fy;
-                forces[j].fx -= force.fx;
-                forces[j].fy -= force.fy;
-            }
-        }
-        
-        // Update positions
-        for (let i = 0; i < this.bodies.length; i++) {
-            GravitySimulation.PhysicsEngine.updatePosition(
-                this.bodies[i],
-                forces[i].fx,
-                forces[i].fy,
-                this.timeStep
-            );
-            
-            // Boundary conditions - wrap around edges
-            if (this.bodies[i].x < 0) this.bodies[i].x += this.width;
-            if (this.bodies[i].x > this.width) this.bodies[i].x -= this.width;
-            if (this.bodies[i].y < 0) this.bodies[i].y += this.height;
-            if (this.bodies[i].y > this.height) this.bodies[i].y -= this.height;
-        }
-        
+        this.engine.step();
         this.notifyListeners();
     }
 
@@ -203,11 +75,12 @@ class GravitySimulation extends ISimulation {
         if (this.isRunning) return;
         
         this.isRunning = true;
+        const timeStep = 0.016; // ~60 FPS
         this.animationFrame = setInterval(() => {
             if (this.isRunning) {
                 this.step();
             }
-        }, this.timeStep * 1000);
+        }, timeStep * 1000);
         
         this.notifyListeners();
     }
@@ -229,7 +102,7 @@ class GravitySimulation extends ISimulation {
      */
     reset(bodyCount) {
         this.stop();
-        this.initialize(bodyCount || this.bodies.length);
+        this.engine.reset(bodyCount || this.engine.bodies.length);
         this.notifyListeners();
     }
 
@@ -237,71 +110,23 @@ class GravitySimulation extends ISimulation {
      * Update gravitational constant
      */
     setG(newG) {
-        this.G = newG;
+        this.engine.setG(newG);
     }
 
     /**
-     * Render the simulation using PrimitiveRenderer
-     * This is where we use primitives (addCircle) to build the scene
+     * Render the simulation using the configured renderer
      */
-    render(renderer) {
-        const config = ChartConfig.gravity || {};
-        
-        // Clear the renderer
-        renderer.clear();
-        
-        // Draw grid if enabled
-        if (config.showGrid) {
-            this._drawGrid(renderer, config);
+    render(primitiveRenderer) {
+        if (!this.renderer) {
+            // If renderer hasn't been set, create it
+            this.setRenderer(primitiveRenderer);
+        } else if (primitiveRenderer !== this.renderer.renderer) {
+            // If primitive renderer changed, update it
+            this.renderer.setRenderer(primitiveRenderer);
         }
         
-        // Draw bodies using primitive addCircle
-        const bodyCount = Math.min(this.bodies.length, config.maxBodies || 10000);
-        for (let i = 0; i < bodyCount; i++) {
-            const body = this.bodies[i];
-            const color = (config.bodyColors || ['#e74c3c', '#3498db', '#2ecc71'])[i % 3];
-            const radius = Math.sqrt(body.mass) * (config.bodySizeMultiplier || 3);
-            
-            // Use primitive renderer interface
-            renderer.addCircle(body.x, body.y, radius, {
-                fill: color,
-                stroke: config.bodyStrokeColor || '#34495e',
-                strokeWidth: config.bodyStrokeWidth || 1,
-                opacity: config.bodyOpacity || 0.8
-            });
-        }
-        
-        // Draw body count if exceeding display limit
-        if (this.bodies.length > (config.maxBodies || 10000)) {
-            // Note: We would need a text primitive for this
-            // For now, skip or add it to PrimitiveRenderer
-        }
-    }
-
-    /**
-     * Draw grid helper
-     */
-    _drawGrid(renderer, config) {
-        const gridSize = config.gridSize || 50;
-        const color = config.gridColor || '#e0e0e0';
-        
-        // Vertical lines
-        for (let x = 0; x <= this.width; x += gridSize) {
-            renderer.addLine(x, 0, x, this.height, {
-                stroke: color,
-                strokeWidth: 0.5,
-                opacity: 0.5
-            });
-        }
-        
-        // Horizontal lines
-        for (let y = 0; y <= this.height; y += gridSize) {
-            renderer.addLine(0, y, this.width, y, {
-                stroke: color,
-                strokeWidth: 0.5,
-                opacity: 0.5
-            });
-        }
+        const state = this.getState();
+        this.renderer.render(state);
     }
 
     /**
