@@ -36,27 +36,36 @@ const Integrators = {
      * Commonly used for molecular dynamics and N-body simulations
      * Conserves energy better than Euler for oscillatory systems
      * 
-     * @param {Array} position - Current position array
-     * @param {Array} previousPosition - Position at previous time step
-     * @param {Function} acceleration - Function that computes acceleration given (position, t)
+     * @param {Array} state - Current state [position, previousPosition] as flat array
+     * @param {Function} derivative - Function that computes acceleration given (state, t)
+     *                                 Should return acceleration array
      * @param {number} dt - Time step
      * @param {number} t - Current time (optional, default 0)
-     * @returns {Object} {position: new position, previousPosition: current position}
+     * @returns {Array} New state [newPosition, currentPosition] as flat array
      * 
      * @example
      * // For gravity: a = F/m
-     * const result = Integrators.verlet(pos, prevPos, (p, t) => [fx/m, fy/m], dt);
+     * // State format: [x1, y1, x2, y2, ..., prevX1, prevY1, prevX2, prevY2, ...]
+     * const state = [...position, ...previousPosition];
+     * const derivative = (s, t) => {
+     *     const n = s.length / 2;
+     *     const pos = s.slice(0, n);
+     *     return acceleration(pos, t); // Return acceleration array
+     * };
+     * const newState = Integrators.verlet(state, derivative, dt);
      */
-    verlet(position, previousPosition, acceleration, dt, t = 0) {
-        const acc = acceleration(position, t);
+    verlet(state, derivative, dt, t = 0) {
+        const n = state.length / 2;
+        const position = state.slice(0, n);
+        const previousPosition = state.slice(n);
+        
+        const acc = derivative(state, t);
         const newPosition = position.map((x, i) => 
             2 * x - previousPosition[i] + acc[i] * dt * dt
         );
         
-        return {
-            position: newPosition,
-            previousPosition: position
-        };
+        // Return [newPosition, currentPosition]
+        return [...newPosition, ...position];
     },
 
     /**
@@ -111,37 +120,49 @@ const Integrators = {
      * x(t+dt) = x(t) + v(t)*dt + 0.5*a(t)*dt²
      * v(t+dt) = v(t) + 0.5*(a(t) + a(t+dt))*dt
      * 
-     * @param {Array} position - Current position array
-     * @param {Array} velocity - Current velocity array
-     * @param {Function} acceleration - Function that computes acceleration given (position, velocity, t)
+     * @param {Array} state - Current state [position, velocity] as flat array
+     * @param {Function} derivative - Function that computes [velocity, acceleration] given (state, t)
      * @param {number} dt - Time step
      * @param {number} t - Current time (optional, default 0)
-     * @returns {Object} {position: new position, velocity: new velocity}
+     * @returns {Array} New state [newPosition, newVelocity] as flat array
      * 
      * @example
      * // For N-body: a = sum of forces / mass
-     * const result = Integrators.velocityVerlet(pos, vel, computeAcceleration, dt);
+     * // State format: [x, y, vx, vy]
+     * const derivative = (s, t) => {
+     *     const n = s.length / 2;
+     *     const pos = s.slice(0, n);
+     *     const vel = s.slice(n);
+     *     const acc = computeAcceleration(pos, vel, t);
+     *     return [...vel, ...acc]; // [dx/dt, dy/dt, dvx/dt, dvy/dt]
+     * };
+     * const newState = Integrators.velocityVerlet(state, derivative, dt);
      */
-    velocityVerlet(position, velocity, acceleration, dt, t = 0) {
-        // Compute acceleration at current state
-        const acc1 = acceleration(position, velocity, t);
+    velocityVerlet(state, derivative, dt, t = 0) {
+        const n = state.length / 2;
+        const position = state.slice(0, n);
+        const velocity = state.slice(n);
+        
+        // Get [velocity, acceleration] from derivative
+        const dState = derivative(state, t);
+        const acc1 = dState.slice(n); // Second half is acceleration
         
         // Update position: x(t+dt) = x(t) + v(t)*dt + 0.5*a(t)*dt²
         const newPosition = position.map((x, i) => 
             x + velocity[i] * dt + 0.5 * acc1[i] * dt * dt
         );
         
-        // Compute acceleration at new position (with current velocity)
-        const acc2 = acceleration(newPosition, velocity, t + dt);
+        // Compute acceleration at new position
+        const newState1 = [...newPosition, ...velocity];
+        const dState2 = derivative(newState1, t + dt);
+        const acc2 = dState2.slice(n);
         
         // Update velocity: v(t+dt) = v(t) + 0.5*(a(t) + a(t+dt))*dt
         const newVelocity = velocity.map((v, i) => 
             v + 0.5 * (acc1[i] + acc2[i]) * dt
         );
         
-        return {
-            position: newPosition,
-            velocity: newVelocity
-        };
+        // Return [newPosition, newVelocity]
+        return [...newPosition, ...newVelocity];
     }
 };

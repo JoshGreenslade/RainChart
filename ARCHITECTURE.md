@@ -70,15 +70,19 @@ simulator.reset();
 
 **File:** `js/integrators.js`
 
-**Available Methods:**
+**Available Methods (Unified Interface):**
+All integrators now have the same interface: `(state, derivative, dt, t)`
+
 - `Integrators.euler(state, derivative, dt, t)` - 1st order Euler method for any ODE
-- `Integrators.rk4(state, derivative, dt, t)` - 4th order Runge-Kutta for higher accuracy
-- `Integrators.verlet(position, previousPosition, acceleration, dt, t)` - Position Verlet for oscillatory systems
-- `Integrators.velocityVerlet(position, velocity, acceleration, dt, t)` - Velocity Verlet for molecular dynamics
+- `Integrators.rk4(state, derivative, dt, t)` - 4th-order Runge-Kutta for higher accuracy
+- `Integrators.verlet(state, derivative, dt, t)` - Position Verlet for oscillatory systems
+- `Integrators.velocityVerlet(state, derivative, dt, t)` - Velocity Verlet for N-body simulations
 
 **Key Design:**
+- **Unified Interface:** All integrators use the same `(state, derivative, dt, t)` signature
 - **Generic:** Integrators accept a derivative function, not physics-specific parameters
 - **Reusable:** Same integrators work for gravity, projectiles, heat diffusion, waves, etc.
+- **Swappable:** Easy to switch between integrators (e.g., Euler → RK4) without code changes
 - **Extensible:** Easy to add advanced methods (adaptive RK45, leapfrog, etc.)
 - **Testable:** Can be unit tested independently from physics
 
@@ -87,7 +91,16 @@ simulator.reset();
 // For any ODE system dy/dt = f(y, t)
 const state = [x, y, vx, vy];
 const derivative = (s, t) => [s[2], s[3], ax, ay]; // [dx/dt, dy/dt, dvx/dt, dvy/dt]
-const newState = Integrators.rk4(state, derivative, dt);
+
+// All integrators work with the same interface
+const newState1 = Integrators.euler(state, derivative, dt);
+const newState2 = Integrators.rk4(state, derivative, dt);  // Just swap the method!
+```
+
+**State Format Examples:**
+- Euler/RK4: `[x, y, vx, vy]` - position and velocity
+- Verlet: `[x, y, prevX, prevY]` - current and previous positions
+- Velocity Verlet: `[x, y, vx, vy]` - position and velocity
 ```
 
 **Benefits:**
