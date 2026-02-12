@@ -1,14 +1,87 @@
 /**
  * Main Application Entry Point
- * Connects physics simulations with chart renderers
+ * Connects physics simulations with chart renderers via the RendererAdapter
+ * Application layer only interacts with the adapter interface
  */
+
+// Global renderer instances (can be switched by user)
+let gravityRenderer, temperatureRenderer, trajectoryRenderer;
 
 // Initialize simulations when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+    // Determine default renderer (Canvas for now, can be changed by UI)
+    const defaultRenderer = 'canvas';
+    
+    // Initialize renderers
+    gravityRenderer = RendererFactory.create(defaultRenderer);
+    temperatureRenderer = RendererFactory.create(defaultRenderer);
+    trajectoryRenderer = RendererFactory.create(defaultRenderer);
+    
+    // Initialize simulations
     initGravitySimulation();
     initTemperatureSimulation();
     initTrajectorySimulation();
+    
+    // Initialize renderer switching UI if multiple renderers available
+    initRendererSelector();
 });
+
+/**
+ * Initialize renderer selector UI
+ */
+function initRendererSelector() {
+    const availableRenderers = RendererFactory.getAvailableRenderers();
+    
+    if (availableRenderers.length > 1) {
+        // Add renderer selection UI to each simulation
+        addRendererControls('gravity', gravityRenderer, (newRenderer) => {
+            gravityRenderer = newRenderer;
+        });
+        addRendererControls('temperature', temperatureRenderer, (newRenderer) => {
+            temperatureRenderer = newRenderer;
+        });
+        addRendererControls('trajectory', trajectoryRenderer, (newRenderer) => {
+            trajectoryRenderer = newRenderer;
+        });
+    }
+}
+
+/**
+ * Add renderer control to a simulation section
+ */
+function addRendererControls(sectionId, renderer, onRendererChange) {
+    const controls = document.querySelector(`#${sectionId} .controls`);
+    if (!controls) return;
+    
+    const availableRenderers = RendererFactory.getAvailableRenderers();
+    
+    const label = document.createElement('label');
+    label.innerHTML = 'Renderer: ';
+    
+    const select = document.createElement('select');
+    select.className = 'renderer-selector';
+    
+    availableRenderers.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type;
+        option.textContent = type.toUpperCase();
+        if (type === renderer.getRendererType()) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+    
+    select.addEventListener('change', (e) => {
+        const newRenderer = RendererFactory.create(e.target.value);
+        onRendererChange(newRenderer);
+        
+        // Clear and re-render with new renderer
+        newRenderer.clear(`${sectionId}-chart`);
+    });
+    
+    label.appendChild(select);
+    controls.appendChild(label);
+}
 
 /**
  * Initialize Gravity Simulation
@@ -20,9 +93,9 @@ function initGravitySimulation() {
     // Create physics simulator (no visualization dependencies)
     const simulator = new GravitySimulator(chartWidth, chartHeight, 3, 1.0);
     
-    // Connect simulator to chart renderer
+    // Connect simulator to renderer via adapter interface
     simulator.onUpdate((state) => {
-        ChartRenderer.renderGravitySimulation('gravity-chart', state, {
+        gravityRenderer.renderGravity('gravity-chart', state, {
             width: chartWidth,
             height: chartHeight
         });
@@ -65,9 +138,9 @@ function initTemperatureSimulation() {
     // Create physics simulator (no visualization dependencies)
     const simulator = new TemperatureSimulator(50, 0.1);
     
-    // Connect simulator to chart renderer
+    // Connect simulator to renderer via adapter interface
     simulator.onUpdate((state) => {
-        ChartRenderer.renderTemperature('temp-chart', state, {
+        temperatureRenderer.renderTemperature('temp-chart', state, {
             width: chartWidth,
             height: chartHeight
         });
@@ -110,9 +183,9 @@ function initTrajectorySimulation() {
     // Create physics simulator (no visualization dependencies)
     const simulator = new TrajectorySimulator(50, 45, 'none', 0.1);
     
-    // Connect simulator to chart renderer
+    // Connect simulator to renderer via adapter interface
     simulator.onUpdate((state) => {
-        ChartRenderer.renderTrajectory('traj-chart', state, {
+        trajectoryRenderer.renderTrajectory('traj-chart', state, {
             width: chartWidth,
             height: chartHeight
         });

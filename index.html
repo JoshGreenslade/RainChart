@@ -99,8 +99,18 @@
     <script src="js/temperature-sim.js"></script>
     <script src="js/trajectory-sim.js"></script>
     
-    <!-- Visualization Layer (Canvas based - no external dependencies for now) -->
-    <script src="js/chart-renderer.js"></script>
+    <!-- Chart Configuration System -->
+    <script src="js/chart-config.js"></script>
+    
+    <!-- Visualization Layer - Canvas Renderer -->
+    <script src="js/canvas-renderer.js"></script>
+    
+    <!-- Visualization Layer - D3 Renderer (optional, requires D3.js) -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/d3-renderer.js"></script>
+    
+    <!-- Renderer Adapter (Translation Layer) -->
+    <script src="js/renderer-adapter.js"></script>
     
     <!-- Application Layer -->
     <script src="js/main.js"></script>
