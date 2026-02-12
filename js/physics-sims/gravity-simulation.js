@@ -128,8 +128,8 @@ class GravitySimulation extends ISimulation {
         if (!this.renderer) {
             // If renderer hasn't been set, create it
             this.setRenderer(primitiveRenderer);
-        } else if (primitiveRenderer !== this.renderer.renderer) {
-            // If primitive renderer changed, update it
+        } else {
+            // Update the underlying primitive renderer if it changed
             this.renderer.setRenderer(primitiveRenderer);
         }
         
