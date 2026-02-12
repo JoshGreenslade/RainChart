@@ -1,211 +1,107 @@
 /**
  * Main Application Entry Point
- * Connects physics simulations with chart renderers via the RendererAdapter
- * Application layer only interacts with the adapter interface
+ * Gravity Simulation using Primitive Renderer
  */
 
-// Global renderer instances (can be switched by user)
-let gravityRenderer, temperatureRenderer, trajectoryRenderer;
-
-// Initialize simulations when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    // Determine default renderer (Canvas for now, can be changed by UI)
-    const defaultRenderer = 'canvas';
-    
-    // Initialize renderers
-    gravityRenderer = RendererFactory.create(defaultRenderer);
-    temperatureRenderer = RendererFactory.create(defaultRenderer);
-    trajectoryRenderer = RendererFactory.create(defaultRenderer);
-    
-    // Initialize simulations
-    initGravitySimulation();
-    initTemperatureSimulation();
-    initTrajectorySimulation();
-    
-    // Initialize renderer switching UI if multiple renderers available
-    initRendererSelector();
-});
+let gravitySimulation;
+let gravityRenderer;
 
 /**
- * Initialize renderer selector UI
+ * Helper function to convert HSL color to HSLA with transparency
  */
-function initRendererSelector() {
-    const availableRenderers = RendererFactory.getAvailableRenderers();
-    
-    if (availableRenderers.length > 1) {
-        // Add renderer selection UI to each simulation
-        addRendererControls('gravity', gravityRenderer, (newRenderer) => {
-            gravityRenderer = newRenderer;
-        });
-        addRendererControls('temperature', temperatureRenderer, (newRenderer) => {
-            temperatureRenderer = newRenderer;
-        });
-        addRendererControls('trajectory', trajectoryRenderer, (newRenderer) => {
-            trajectoryRenderer = newRenderer;
-        });
+function toTransparentColor(hslColor, alpha = 0.85) {
+    // Check if color is already in HSL format
+    if (hslColor && hslColor.includes('hsl')) {
+        return hslColor.replace(')', `, ${alpha})`).replace('hsl', 'hsla');
     }
+    // Fallback to default dark transparent background
+    return `rgba(0, 0, 0, ${alpha})`;
 }
 
-/**
- * Add renderer control to a simulation section
- */
-function addRendererControls(sectionId, renderer, onRendererChange) {
-    const controls = document.querySelector(`#${sectionId} .controls`);
-    if (!controls) return;
-    
-    const availableRenderers = RendererFactory.getAvailableRenderers();
-    
-    const label = document.createElement('label');
-    label.innerHTML = 'Renderer: ';
-    
-    const select = document.createElement('select');
-    select.className = 'renderer-selector';
-    
-    availableRenderers.forEach(type => {
-        const option = document.createElement('option');
-        option.value = type;
-        option.textContent = type.toUpperCase();
-        if (type === renderer.getRendererType()) {
-            option.selected = true;
-        }
-        select.appendChild(option);
-    });
-    
-    select.addEventListener('change', (e) => {
-        const newRenderer = RendererFactory.create(e.target.value);
-        onRendererChange(newRenderer);
-        
-        // Clear and re-render with new renderer
-        newRenderer.clear(`${sectionId}-chart`);
-    });
-    
-    label.appendChild(select);
-    controls.appendChild(label);
-}
+// Initialize simulation when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    initGravitySimulation();
+});
 
 /**
  * Initialize Gravity Simulation
  */
 function initGravitySimulation() {
-    const chartWidth = 800;
-    const chartHeight = 600;
+    // Create renderer with full window size
+    const renderMode = document.getElementById('renderer-mode').value;
+    gravityRenderer = new PrimitiveRenderer('gravity-chart', {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        renderMode: renderMode
+    });
     
-    // Create physics simulator (no visualization dependencies)
-    const simulator = new GravitySimulator(chartWidth, chartHeight, 3, 1.0);
+    // Update controls background to match color scheme
+    const controls = document.getElementById('controls');
+    const info = document.getElementById('info');
+    const scheme = gravityRenderer.getColorScheme();
     
-    // Connect simulator to renderer via adapter interface
-    simulator.onUpdate((state) => {
-        gravityRenderer.renderGravity('gravity-chart', state, {
-            width: chartWidth,
-            height: chartHeight
-        });
+    // Use the background color with transparency for controls
+    const controlsBg = toTransparentColor(scheme.background);
+    controls.style.background = controlsBg;
+    info.style.background = controlsBg;
+    
+    // Create physics simulation
+    gravitySimulation = new GravitySimulation(window.innerWidth, window.innerHeight, 3, 1.0);
+    
+    // Connect simulation to renderer
+    gravitySimulation.onUpdate((state) => {
+        gravitySimulation.render(gravityRenderer);
     });
     
     // Initial render
-    simulator.notifyListeners();
+    gravitySimulation.notifyListeners();
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        gravityRenderer.resize(window.innerWidth, window.innerHeight);
+        gravitySimulation.width = window.innerWidth;
+        gravitySimulation.height = window.innerHeight;
+    });
     
     // Connect UI controls
     document.getElementById('gravity-start').addEventListener('click', () => {
-        simulator.start();
+        gravitySimulation.start();
     });
     
     document.getElementById('gravity-stop').addEventListener('click', () => {
-        simulator.stop();
+        gravitySimulation.stop();
     });
     
     document.getElementById('gravity-reset').addEventListener('click', () => {
         const bodyCount = parseInt(document.getElementById('gravity-bodies').value);
-        simulator.reset(bodyCount);
+        gravitySimulation.reset(bodyCount);
     });
     
     document.getElementById('gravity-constant').addEventListener('change', (e) => {
-        simulator.setG(parseFloat(e.target.value));
+        gravitySimulation.setG(parseFloat(e.target.value));
     });
     
     document.getElementById('gravity-bodies').addEventListener('change', (e) => {
         const bodyCount = parseInt(e.target.value);
-        simulator.reset(bodyCount);
+        gravitySimulation.reset(bodyCount);
     });
-}
-
-/**
- * Initialize Temperature Simulation
- */
-function initTemperatureSimulation() {
-    const chartWidth = 800;
-    const chartHeight = 400;
     
-    // Create physics simulator (no visualization dependencies)
-    const simulator = new TemperatureSimulator(50, 0.1);
-    
-    // Connect simulator to renderer via adapter interface
-    simulator.onUpdate((state) => {
-        temperatureRenderer.renderTemperature('temp-chart', state, {
-            width: chartWidth,
-            height: chartHeight
+    // Renderer mode change
+    document.getElementById('renderer-mode').addEventListener('change', (e) => {
+        const renderMode = e.target.value;
+        gravityRenderer = new PrimitiveRenderer('gravity-chart', {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            renderMode: renderMode
         });
-    });
-    
-    // Initial render
-    simulator.notifyListeners();
-    
-    // Connect UI controls
-    document.getElementById('temp-start').addEventListener('click', () => {
-        simulator.start();
-    });
-    
-    document.getElementById('temp-stop').addEventListener('click', () => {
-        simulator.stop();
-    });
-    
-    document.getElementById('temp-reset').addEventListener('click', () => {
-        const points = parseInt(document.getElementById('temp-points').value);
-        simulator.reset(points);
-    });
-    
-    document.getElementById('temp-diffusivity').addEventListener('change', (e) => {
-        simulator.setDiffusivity(parseFloat(e.target.value));
-    });
-    
-    document.getElementById('temp-points').addEventListener('change', (e) => {
-        const points = parseInt(e.target.value);
-        simulator.reset(points);
-    });
-}
-
-/**
- * Initialize Trajectory Simulation
- */
-function initTrajectorySimulation() {
-    const chartWidth = 800;
-    const chartHeight = 400;
-    
-    // Create physics simulator (no visualization dependencies)
-    const simulator = new TrajectorySimulator(50, 45, 'none', 0.1);
-    
-    // Connect simulator to renderer via adapter interface
-    simulator.onUpdate((state) => {
-        trajectoryRenderer.renderTrajectory('traj-chart', state, {
-            width: chartWidth,
-            height: chartHeight
-        });
-    });
-    
-    // Initial render
-    simulator.notifyListeners();
-    
-    // Connect UI controls
-    document.getElementById('traj-launch').addEventListener('click', () => {
-        const velocity = parseFloat(document.getElementById('traj-velocity').value);
-        const angle = parseFloat(document.getElementById('traj-angle').value);
-        const resistance = document.getElementById('traj-resistance').value;
-        const drag = parseFloat(document.getElementById('traj-drag').value);
         
-        simulator.setParameters(velocity, angle, resistance, drag);
-        simulator.launch();
-    });
-    
-    document.getElementById('traj-reset').addEventListener('click', () => {
-        simulator.reset();
+        // Update background colors
+        const scheme = gravityRenderer.getColorScheme();
+        const controlsBg = toTransparentColor(scheme.background);
+        controls.style.background = controlsBg;
+        info.style.background = controlsBg;
+        
+        // Re-render
+        gravitySimulation.render(gravityRenderer);
     });
 }
