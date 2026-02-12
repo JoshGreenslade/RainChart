@@ -39,8 +39,8 @@ class PrimitiveRenderer {
         const objectColors = [];
         for (let i = 0; i < 10; i++) {
             const objectHue = (hue + (i * 36)) % 360; // Spread hues evenly
-            // Alternate between light and dark for contrast with background
-            const lightness = background.includes('20%') ? 80 : 20;
+            // Use 80% lightness for objects to contrast with 20% dark background
+            const lightness = 80;
             objectColors.push(`hsl(${objectHue}, 50%, ${lightness}%)`);
         }
         
