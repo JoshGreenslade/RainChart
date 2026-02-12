@@ -1,71 +1,143 @@
 /**
  * Numerical Integrators
- * Collection of numerical integration methods for physics simulations
- * Separated from physics calculations for modularity and reusability
+ * Generic numerical integration methods for ordinary differential equations (ODEs)
+ * These integrators are physics-agnostic and work with any system of ODEs
  */
 
 const Integrators = {
     /**
-     * Euler integration for position updates
-     * Simple first-order integration method
-     * @param {Object} body - Body with x, y, vx, vy, mass
-     * @param {number} fx - Force in x direction
-     * @param {number} fy - Force in y direction
+     * Euler method (1st order explicit integration)
+     * Simplest integration method: y(t+dt) = y(t) + dt * dy/dt
+     * 
+     * @param {Array|number} state - Current state (can be scalar or array)
+     * @param {Function} derivative - Function that computes dy/dt given (state, t)
      * @param {number} dt - Time step
+     * @param {number} t - Current time (optional, default 0)
+     * @returns {Array|number} New state after time step dt
+     * 
+     * @example
+     * // Simple harmonic oscillator: d²x/dt² = -kx
+     * const state = [x, vx];
+     * const newState = Integrators.euler(state, (s, t) => [s[1], -k * s[0]], dt);
      */
-    euler(body, fx, fy, dt) {
-        const ax = fx / body.mass;
-        const ay = fy / body.mass;
+    euler(state, derivative, dt, t = 0) {
+        const isScalar = typeof state === 'number';
+        const stateArray = isScalar ? [state] : state;
+        const dState = derivative(stateArray, t);
         
-        body.vx += ax * dt;
-        body.vy += ay * dt;
-        body.x += body.vx * dt;
-        body.y += body.vy * dt;
+        const newState = stateArray.map((val, i) => val + dt * dState[i]);
+        return isScalar ? newState[0] : newState;
     },
 
     /**
-     * Euler integration for projectile motion
-     * Updates state with acceleration based on forces
-     * @param {Object} state - Current state {x, y, vx, vy}
-     * @param {number} ax - Acceleration in x direction
-     * @param {number} ay - Acceleration in y direction
+     * Verlet integration (symplectic 2nd order method)
+     * Position Verlet: x(t+dt) = 2*x(t) - x(t-dt) + a(t)*dt²
+     * Commonly used for molecular dynamics and N-body simulations
+     * Conserves energy better than Euler for oscillatory systems
+     * 
+     * @param {Array} position - Current position array
+     * @param {Array} previousPosition - Position at previous time step
+     * @param {Function} acceleration - Function that computes acceleration given (position, t)
      * @param {number} dt - Time step
-     * @returns {Object} New state
+     * @param {number} t - Current time (optional, default 0)
+     * @returns {Object} {position: new position, previousPosition: current position}
+     * 
+     * @example
+     * // For gravity: a = F/m
+     * const result = Integrators.verlet(pos, prevPos, (p, t) => [fx/m, fy/m], dt);
      */
-    eulerProjectile(state, ax, ay, dt) {
+    verlet(position, previousPosition, acceleration, dt, t = 0) {
+        const acc = acceleration(position, t);
+        const newPosition = position.map((x, i) => 
+            2 * x - previousPosition[i] + acc[i] * dt * dt
+        );
+        
         return {
-            x: state.x + state.vx * dt,
-            y: state.y + state.vy * dt,
-            vx: state.vx + ax * dt,
-            vy: state.vy + ay * dt
+            position: newPosition,
+            previousPosition: position
         };
     },
 
     /**
-     * Finite difference method for heat diffusion (1D)
-     * Solves the heat equation using explicit method
-     * @param {Array} temperatures - Array of temperature values
-     * @param {number} alpha - Thermal diffusivity
+     * 4th order Runge-Kutta method (RK4)
+     * Higher accuracy integration: O(h⁴) local error
+     * Standard method for most physics simulations requiring accuracy
+     * 
+     * @param {Array|number} state - Current state (can be scalar or array)
+     * @param {Function} derivative - Function that computes dy/dt given (state, t)
      * @param {number} dt - Time step
-     * @param {number} dx - Spatial step
-     * @returns {Array} New temperature array
+     * @param {number} t - Current time (optional, default 0)
+     * @returns {Array|number} New state after time step dt
+     * 
+     * @example
+     * // Projectile with drag: dv/dt = -g - k*v, dx/dt = v
+     * const state = [x, y, vx, vy];
+     * const newState = Integrators.rk4(state, derivatives, dt);
      */
-    heatDiffusion1D(temperatures, alpha, dt, dx = 1) {
-        const n = temperatures.length;
-        const newTemps = new Array(n);
-        const r = alpha * dt / (dx * dx);
+    rk4(state, derivative, dt, t = 0) {
+        const isScalar = typeof state === 'number';
+        const stateArray = isScalar ? [state] : state;
         
-        // Boundary conditions (fixed temperature at ends)
-        newTemps[0] = temperatures[0];
-        newTemps[n - 1] = temperatures[n - 1];
+        // k1 = f(t, y)
+        const k1 = derivative(stateArray, t);
         
-        // Update interior points
-        for (let i = 1; i < n - 1; i++) {
-            newTemps[i] = temperatures[i] + r * (
-                temperatures[i - 1] - 2 * temperatures[i] + temperatures[i + 1]
-            );
-        }
+        // k2 = f(t + dt/2, y + k1*dt/2)
+        const state2 = stateArray.map((val, i) => val + 0.5 * dt * k1[i]);
+        const k2 = derivative(state2, t + 0.5 * dt);
         
-        return newTemps;
+        // k3 = f(t + dt/2, y + k2*dt/2)
+        const state3 = stateArray.map((val, i) => val + 0.5 * dt * k2[i]);
+        const k3 = derivative(state3, t + 0.5 * dt);
+        
+        // k4 = f(t + dt, y + k3*dt)
+        const state4 = stateArray.map((val, i) => val + dt * k3[i]);
+        const k4 = derivative(state4, t + dt);
+        
+        // y(t+dt) = y(t) + dt/6 * (k1 + 2*k2 + 2*k3 + k4)
+        const newState = stateArray.map((val, i) => 
+            val + (dt / 6) * (k1[i] + 2*k2[i] + 2*k3[i] + k4[i])
+        );
+        
+        return isScalar ? newState[0] : newState;
+    },
+
+    /**
+     * Velocity Verlet integration (symplectic 2nd order method)
+     * More commonly used than position Verlet as it directly tracks velocity
+     * x(t+dt) = x(t) + v(t)*dt + 0.5*a(t)*dt²
+     * v(t+dt) = v(t) + 0.5*(a(t) + a(t+dt))*dt
+     * 
+     * @param {Array} position - Current position array
+     * @param {Array} velocity - Current velocity array
+     * @param {Function} acceleration - Function that computes acceleration given (position, velocity, t)
+     * @param {number} dt - Time step
+     * @param {number} t - Current time (optional, default 0)
+     * @returns {Object} {position: new position, velocity: new velocity}
+     * 
+     * @example
+     * // For N-body: a = sum of forces / mass
+     * const result = Integrators.velocityVerlet(pos, vel, computeAcceleration, dt);
+     */
+    velocityVerlet(position, velocity, acceleration, dt, t = 0) {
+        // Compute acceleration at current state
+        const acc1 = acceleration(position, velocity, t);
+        
+        // Update position: x(t+dt) = x(t) + v(t)*dt + 0.5*a(t)*dt²
+        const newPosition = position.map((x, i) => 
+            x + velocity[i] * dt + 0.5 * acc1[i] * dt * dt
+        );
+        
+        // Compute acceleration at new position (with current velocity)
+        const acc2 = acceleration(newPosition, velocity, t + dt);
+        
+        // Update velocity: v(t+dt) = v(t) + 0.5*(a(t) + a(t+dt))*dt
+        const newVelocity = velocity.map((v, i) => 
+            v + 0.5 * (acc1[i] + acc2[i]) * dt
+        );
+        
+        return {
+            position: newPosition,
+            velocity: newVelocity
+        };
     }
 };

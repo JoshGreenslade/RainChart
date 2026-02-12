@@ -66,20 +66,35 @@ simulator.reset();
 
 ### Numerical Integrators Module
 
-**Purpose:** Separates numerical integration methods from physics calculations for better modularity and reusability.
+**Purpose:** Provides generic numerical integration methods for solving ordinary differential equations (ODEs). These integrators are completely physics-agnostic and work with any system of differential equations.
 
 **File:** `js/integrators.js`
 
 **Available Methods:**
-- `Integrators.euler(body, fx, fy, dt)` - Euler integration for position updates
-- `Integrators.eulerProjectile(state, ax, ay, dt)` - Euler integration for projectile motion
-- `Integrators.heatDiffusion1D(temperatures, alpha, dt, dx)` - Finite difference method for 1D heat diffusion
+- `Integrators.euler(state, derivative, dt, t)` - 1st order Euler method for any ODE
+- `Integrators.rk4(state, derivative, dt, t)` - 4th order Runge-Kutta for higher accuracy
+- `Integrators.verlet(position, previousPosition, acceleration, dt, t)` - Position Verlet for oscillatory systems
+- `Integrators.velocityVerlet(position, velocity, acceleration, dt, t)` - Velocity Verlet for molecular dynamics
+
+**Key Design:**
+- **Generic:** Integrators accept a derivative function, not physics-specific parameters
+- **Reusable:** Same integrators work for gravity, projectiles, heat diffusion, waves, etc.
+- **Extensible:** Easy to add advanced methods (adaptive RK45, leapfrog, etc.)
+- **Testable:** Can be unit tested independently from physics
+
+**Example Usage:**
+```javascript
+// For any ODE system dy/dt = f(y, t)
+const state = [x, y, vx, vy];
+const derivative = (s, t) => [s[2], s[3], ax, ay]; // [dx/dt, dy/dt, dvx/dt, dvy/dt]
+const newState = Integrators.rk4(state, derivative, dt);
+```
 
 **Benefits:**
-- Clear separation between integration algorithms and physics logic
-- Easy to add new integration methods (e.g., Runge-Kutta, Verlet)
-- Integration methods can be tested independently
-- Can be reused across different physics simulations
+- Clear separation between numerical methods and physics
+- Physics code specifies "what to compute" (derivatives)
+- Integrators handle "how to compute" (numerical integration)
+- Can swap integrators (Euler → RK4) without changing physics code
 
 ## Visualization Layer
 
