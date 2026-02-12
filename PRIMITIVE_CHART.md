@@ -1,8 +1,8 @@
-# Primitive Chart Interface
+# Primitive Drawing Interface
 
 ## Overview
 
-The Primitive Chart Interface provides a simple, intuitive way to build custom visualizations using basic drawing primitives. It's designed with a minimalistic full-screen layout and uses a randomly-generated HSL color scheme for visual appeal.
+The Primitive Drawing Interface provides a simple, intuitive way to build custom visualizations using basic drawing primitives. It's designed with a minimalistic full-screen layout and uses a randomly-generated HSL color scheme for visual appeal.
 
 ## Getting Started
 

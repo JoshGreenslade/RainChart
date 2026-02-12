@@ -1,6 +1,6 @@
 /**
  * Primitive Renderer - Simple drawing interface using D3.js primitives
- * Provides basic drawing commands: AddCircle, AddLine, AddRectangle, AddCurve, AddPath
+ * Provides basic drawing commands: addCircle, addLine, addRectangle, addCurve, addPath
  * Designed for building custom visualizations like quantum wave propagation
  */
 
