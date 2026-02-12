@@ -15,7 +15,7 @@ class D3Renderer {
         this.idCounter = 0;
         
         // Generate random HSL color scheme
-        this.colorScheme = this._generateColorScheme();
+        this.colorScheme = ColorScheme.generate();
         
         // Set default options
         this.options = {
@@ -28,31 +28,6 @@ class D3Renderer {
         
         this.container = d3.select(`#${containerId}`);
         this._initSVG();
-    }
-    
-    /**
-     * Generate HSL color scheme with random hue, 50% saturation, 20%/80% lightness
-     */
-    _generateColorScheme() {
-        const hue = Math.floor(Math.random() * 360);
-        const background = `hsl(${hue}, 50%, 20%)`; // Dark background
-        const foreground = `hsl(${hue}, 50%, 80%)`; // Light foreground
-        
-        // Generate object colors with different hues but same saturation/lightness rules
-        const objectColors = [];
-        for (let i = 0; i < 10; i++) {
-            const objectHue = (hue + (i * 36)) % 360; // Spread hues evenly
-            // Use 80% lightness for objects to contrast with 20% dark background
-            const lightness = 80;
-            objectColors.push(`hsl(${objectHue}, 50%, ${lightness}%)`);
-        }
-        
-        return {
-            hue,
-            background,
-            foreground,
-            objectColors
-        };
     }
     
     /**
