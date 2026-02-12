@@ -69,7 +69,7 @@ class ISimulation {
     /**
      * Render the current state using the provided renderer
      * @abstract
-     * @param {PrimitiveRenderer} renderer - The renderer to use for drawing
+     * @param {BaseRenderer} renderer - The renderer to use for drawing
      */
     render(renderer) {
         throw new Error('render() must be implemented by subclass');

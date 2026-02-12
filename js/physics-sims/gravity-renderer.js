@@ -1,6 +1,6 @@
 /**
  * Gravity Renderer - Handles all rendering logic for gravity simulation
- * Uses PrimitiveRenderer to build the scene
+ * Uses BaseRenderer to build the scene
  */
 
 class GravityRenderer {

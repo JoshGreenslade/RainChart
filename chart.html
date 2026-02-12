@@ -160,8 +160,15 @@
     <!-- Load D3.js -->
     <script src="lib/d3.v7.min.js"></script>
     
-    <!-- Load Primitive Renderer -->
-    <script src="js/renderer/primitive-renderer.js"></script>
+    <!-- Color Scheme Utility -->
+    <script src="js/renderer/color-scheme.js"></script>
+    
+    <!-- Renderer Implementations -->
+    <script src="js/renderer/canvas-renderer.js"></script>
+    <script src="js/renderer/d3-renderer.js"></script>
+    
+    <!-- Base Renderer (delegates to implementations) -->
+    <script src="js/renderer/base-renderer.js"></script>
     
     <!-- Main Application -->
     <script>
@@ -171,7 +178,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             // Create renderer with full window size
             const renderMode = document.getElementById('renderer-mode').value;
-            renderer = new PrimitiveRenderer('chart', {
+            renderer = new BaseRenderer('chart', {
                 width: window.innerWidth,
                 height: window.innerHeight,
                 renderMode: renderMode
@@ -290,7 +297,7 @@
             // Renderer mode change
             document.getElementById('renderer-mode').addEventListener('change', (e) => {
                 const renderMode = e.target.value;
-                renderer = new PrimitiveRenderer('chart', {
+                renderer = new BaseRenderer('chart', {
                     width: window.innerWidth,
                     height: window.innerHeight,
                     renderMode: renderMode

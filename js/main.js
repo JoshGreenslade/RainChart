@@ -1,10 +1,10 @@
 /**
  * Main Application Entry Point
- * Gravity Simulation using Primitive Renderer
+ * Gravity Simulation using Base Renderer
  */
 
 let gravitySimulation;
-let primitiveRenderer;
+let baseRenderer;
 
 /**
  * Helper function to convert HSL color to HSLA with transparency
@@ -27,9 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
  * Initialize Gravity Simulation
  */
 function initGravitySimulation() {
-    // Create primitive renderer with full window size
+    // Create base renderer with full window size
     const renderMode = document.getElementById('renderer-mode').value;
-    primitiveRenderer = new PrimitiveRenderer('gravity-chart', {
+    baseRenderer = new BaseRenderer('gravity-chart', {
         width: window.innerWidth,
         height: window.innerHeight,
         renderMode: renderMode
@@ -43,7 +43,7 @@ function initGravitySimulation() {
     
     // Connect simulation to renderer
     gravitySimulation.onUpdate((state) => {
-        gravitySimulation.render(primitiveRenderer);
+        gravitySimulation.render(baseRenderer);
     });
     
     // Initial render
@@ -51,7 +51,7 @@ function initGravitySimulation() {
     
     // Handle window resize
     window.addEventListener('resize', () => {
-        primitiveRenderer.resize(window.innerWidth, window.innerHeight);
+        baseRenderer.resize(window.innerWidth, window.innerHeight);
         gravitySimulation.setDimensions(window.innerWidth, window.innerHeight);
     });
     
@@ -65,7 +65,7 @@ function initGravitySimulation() {
 function updateControlsBackground() {
     const controls = document.getElementById('controls');
     const info = document.getElementById('info');
-    const scheme = primitiveRenderer.getColorScheme();
+    const scheme = baseRenderer.getColorScheme();
     
     // Use the background color with transparency for controls
     const controlsBg = toTransparentColor(scheme.background);
@@ -102,7 +102,7 @@ function setupUIControls() {
     // Renderer mode change
     document.getElementById('renderer-mode').addEventListener('change', (e) => {
         const renderMode = e.target.value;
-        primitiveRenderer = new PrimitiveRenderer('gravity-chart', {
+        baseRenderer = new BaseRenderer('gravity-chart', {
             width: window.innerWidth,
             height: window.innerHeight,
             renderMode: renderMode
@@ -112,6 +112,6 @@ function setupUIControls() {
         updateControlsBackground();
         
         // Re-render
-        gravitySimulation.render(primitiveRenderer);
+        gravitySimulation.render(baseRenderer);
     });
 }
