@@ -93,25 +93,29 @@
         <p>Customizable Physics Simulations - Powered by HTML5 Canvas</p>
     </footer>
 
-    <!-- Physics Layer (no dependencies) -->
+    <!-- Integrators (used by simulations) -->
     <script src="js/integrators/integrators.js"></script>
-    <script src="js/physics-sims/physics-engine.js"></script>
-    <script src="js/physics-sims/gravity-sim.js"></script>
-    <script src="js/physics-sims/temperature-sim.js"></script>
-    <script src="js/physics-sims/trajectory-sim.js"></script>
     
     <!-- Chart Configuration System -->
     <script src="js/renderer/chart-config.js"></script>
     
-    <!-- Visualization Layer - Canvas Renderer -->
+    <!-- Primitive Renderer (base interface) -->
+    <script src="js/renderer/primitive-renderer.js"></script>
+    
+    <!-- Renderer Implementations (extend PrimitiveRenderer) -->
     <script src="js/renderer/canvas-renderer.js"></script>
     
-    <!-- Visualization Layer - D3 Renderer (optional, requires D3.js) -->
+    <!-- D3 Renderer (optional, requires D3.js) -->
     <script src="lib/d3.v7.min.js"></script>
     <script src="js/renderer/d3-renderer.js"></script>
     
-    <!-- Renderer Adapter (Translation Layer) -->
-    <script src="js/renderer/renderer-adapter.js"></script>
+    <!-- Simulation Interface -->
+    <script src="js/physics-sims/simulation-interface.js"></script>
+    
+    <!-- Simulation Classes (bring together physics, integrators, and rendering) -->
+    <script src="js/physics-sims/gravity-simulation.js"></script>
+    <script src="js/physics-sims/temperature-simulation.js"></script>
+    <script src="js/physics-sims/trajectory-simulation.js"></script>
     
     <!-- Application Layer -->
     <script src="js/main.js"></script>
