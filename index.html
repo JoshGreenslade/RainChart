@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Simulations</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <header>
+        <h1>Interactive Physics Simulations</h1>
+        <p>Explore various physics concepts through interactive simulations</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#gravity">Gravity Simulator</a></li>
+            <li><a href="#temperature">Temperature Equalization</a></li>
+            <li><a href="#trajectory">Trajectory Simulator</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="gravity" class="simulation-section">
+            <h2>Gravity Simulator</h2>
+            <p>Simulate gravitational forces between multiple bodies</p>
+            <div class="simulation-container">
+                <div class="controls">
+                    <button id="gravity-start">Start</button>
+                    <button id="gravity-stop">Stop</button>
+                    <button id="gravity-reset">Reset</button>
+                    <label>
+                        Bodies: <input type="number" id="gravity-bodies" min="1" max="20" value="3">
+                    </label>
+                    <label>
+                        G Constant: <input type="number" id="gravity-constant" step="0.1" value="1.0">
+                    </label>
+                </div>
+                <div id="gravity-chart" class="chart"></div>
+            </div>
+        </section>
+
+        <section id="temperature" class="simulation-section">
+            <h2>Temperature Equalization Along a Bar</h2>
+            <p>Visualize heat distribution and equalization over time</p>
+            <div class="simulation-container">
+                <div class="controls">
+                    <button id="temp-start">Start</button>
+                    <button id="temp-stop">Stop</button>
+                    <button id="temp-reset">Reset</button>
+                    <label>
+                        Points: <input type="number" id="temp-points" min="10" max="100" value="50">
+                    </label>
+                    <label>
+                        Diffusivity: <input type="number" id="temp-diffusivity" step="0.01" value="0.1">
+                    </label>
+                </div>
+                <div id="temp-chart" class="chart"></div>
+            </div>
+        </section>
+
+        <section id="trajectory" class="simulation-section">
+            <h2>Trajectory Simulator</h2>
+            <p>Simulate projectile motion with different air resistance models</p>
+            <div class="simulation-container">
+                <div class="controls">
+                    <button id="traj-launch">Launch</button>
+                    <button id="traj-reset">Reset</button>
+                    <label>
+                        Initial Velocity: <input type="number" id="traj-velocity" min="1" max="100" value="50">
+                    </label>
+                    <label>
+                        Angle (deg): <input type="number" id="traj-angle" min="0" max="90" value="45">
+                    </label>
+                    <label>
+                        Air Resistance:
+                        <select id="traj-resistance">
+                            <option value="none">None (Vacuum)</option>
+                            <option value="linear">Linear</option>
+                            <option value="quadratic">Quadratic</option>
+                        </select>
+                    </label>
+                    <label>
+                        Drag Coefficient: <input type="number" id="traj-drag" step="0.01" value="0.1">
+                    </label>
+                </div>
+                <div id="traj-chart" class="chart"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Customizable Physics Simulations - Powered by HTML5 Canvas</p>
+    </footer>
+
+    <!-- Physics Layer (no dependencies) -->
+    <script src="js/physics-engine.js"></script>
+    <script src="js/gravity-sim.js"></script>
+    <script src="js/temperature-sim.js"></script>
+    <script src="js/trajectory-sim.js"></script>
+    
+    <!-- Chart Configuration System -->
+    <script src="js/chart-config.js"></script>
+    
+    <!-- Visualization Layer - Canvas Renderer -->
+    <script src="js/canvas-renderer.js"></script>
+    
+    <!-- Visualization Layer - D3 Renderer (optional, requires D3.js) -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/d3-renderer.js"></script>
+    
+    <!-- Renderer Adapter (Translation Layer) -->
+    <script src="js/renderer-adapter.js"></script>
+    
+    <!-- Application Layer -->
+    <script src="js/main.js"></script>
+</body>
+</html>
