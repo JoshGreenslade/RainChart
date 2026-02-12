@@ -73,9 +73,9 @@ const PhysicsEngine = {
         // Update interior points using Euler integration on each point
         for (let i = 1; i < n - 1; i++) {
             // Derivative: dT/dt = alpha * d²T/dx²
-            const derivative = (T) => {
+            const derivative = () => {
                 const d2Tdx2 = (temperatures[i - 1] - 2 * temperatures[i] + temperatures[i + 1]) / (dx * dx);
-                return [alpha * d2Tdx2];
+                return alpha * d2Tdx2;
             };
             
             newTemps[i] = Integrators.euler(temperatures[i], derivative, dt);

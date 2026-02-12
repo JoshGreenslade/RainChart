@@ -24,8 +24,9 @@ const Integrators = {
         const isScalar = typeof state === 'number';
         const stateArray = isScalar ? [state] : state;
         const dState = derivative(stateArray, t);
+        const dStateArray = typeof dState === 'number' ? [dState] : dState;
         
-        const newState = stateArray.map((val, i) => val + dt * dState[i]);
+        const newState = stateArray.map((val, i) => val + dt * dStateArray[i]);
         return isScalar ? newState[0] : newState;
     },
 
@@ -59,7 +60,7 @@ const Integrators = {
     },
 
     /**
-     * 4th order Runge-Kutta method (RK4)
+     * 4th-order Runge-Kutta method (RK4)
      * Higher accuracy integration: O(h⁴) local error
      * Standard method for most physics simulations requiring accuracy
      * 
@@ -78,20 +79,23 @@ const Integrators = {
         const isScalar = typeof state === 'number';
         const stateArray = isScalar ? [state] : state;
         
+        // Helper to ensure derivative result is an array
+        const ensureArray = (d) => typeof d === 'number' ? [d] : d;
+        
         // k1 = f(t, y)
-        const k1 = derivative(stateArray, t);
+        const k1 = ensureArray(derivative(stateArray, t));
         
         // k2 = f(t + dt/2, y + k1*dt/2)
         const state2 = stateArray.map((val, i) => val + 0.5 * dt * k1[i]);
-        const k2 = derivative(state2, t + 0.5 * dt);
+        const k2 = ensureArray(derivative(state2, t + 0.5 * dt));
         
         // k3 = f(t + dt/2, y + k2*dt/2)
         const state3 = stateArray.map((val, i) => val + 0.5 * dt * k2[i]);
-        const k3 = derivative(state3, t + 0.5 * dt);
+        const k3 = ensureArray(derivative(state3, t + 0.5 * dt));
         
         // k4 = f(t + dt, y + k3*dt)
         const state4 = stateArray.map((val, i) => val + dt * k3[i]);
-        const k4 = derivative(state4, t + dt);
+        const k4 = ensureArray(derivative(state4, t + dt));
         
         // y(t+dt) = y(t) + dt/6 * (k1 + 2*k2 + 2*k3 + k4)
         const newState = stateArray.map((val, i) => 
