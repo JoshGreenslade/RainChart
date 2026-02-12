@@ -29,7 +29,8 @@ This project demonstrates a **clean architecture** with complete separation betw
 ## Physics Layer (Pure JavaScript)
 
 **Files:**
-- `js/physics-engine.js` - Core physics calculations
+- `js/integrators.js` - Numerical integration methods (Euler, finite difference, etc.)
+- `js/physics-engine.js` - Core physics calculations (forces, motion, etc.)
 - `js/gravity-sim.js` - Gravity simulation logic
 - `js/temperature-sim.js` - Heat diffusion logic  
 - `js/trajectory-sim.js` - Projectile motion logic
@@ -62,6 +63,23 @@ simulator.reset();
 1. Perform calculations
 2. Update internal state
 3. Notify observers with pure data objects
+
+### Numerical Integrators Module
+
+**Purpose:** Separates numerical integration methods from physics calculations for better modularity and reusability.
+
+**File:** `js/integrators.js`
+
+**Available Methods:**
+- `Integrators.euler(body, fx, fy, dt)` - Euler integration for position updates
+- `Integrators.eulerProjectile(state, ax, ay, dt)` - Euler integration for projectile motion
+- `Integrators.heatDiffusion1D(temperatures, alpha, dt, dx)` - Finite difference method for 1D heat diffusion
+
+**Benefits:**
+- Clear separation between integration algorithms and physics logic
+- Easy to add new integration methods (e.g., Runge-Kutta, Verlet)
+- Integration methods can be tested independently
+- Can be reused across different physics simulations
 
 ## Visualization Layer
 
@@ -147,6 +165,7 @@ document.getElementById('start').addEventListener('click', () => {
 The architecture is designed so you can easily:
 ```
 physics-engine/          (Separate repo)
+├── integrators.js
 ├── physics-engine.js
 ├── gravity-sim.js
 ├── temperature-sim.js

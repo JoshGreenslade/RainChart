@@ -35,13 +35,7 @@ const PhysicsEngine = {
      * @param {number} dt - Time step
      */
     updatePosition(body, fx, fy, dt) {
-        const ax = fx / body.mass;
-        const ay = fy / body.mass;
-        
-        body.vx += ax * dt;
-        body.vy += ay * dt;
-        body.x += body.vx * dt;
-        body.y += body.vy * dt;
+        Integrators.euler(body, fx, fy, dt);
     },
 
     /**
@@ -53,22 +47,7 @@ const PhysicsEngine = {
      * @returns {Array} New temperature array
      */
     heatDiffusion(temperatures, alpha, dt, dx = 1) {
-        const n = temperatures.length;
-        const newTemps = new Array(n);
-        const r = alpha * dt / (dx * dx);
-        
-        // Boundary conditions (fixed temperature at ends)
-        newTemps[0] = temperatures[0];
-        newTemps[n - 1] = temperatures[n - 1];
-        
-        // Update interior points
-        for (let i = 1; i < n - 1; i++) {
-            newTemps[i] = temperatures[i] + r * (
-                temperatures[i - 1] - 2 * temperatures[i] + temperatures[i + 1]
-            );
-        }
-        
-        return newTemps;
+        return Integrators.heatDiffusion1D(temperatures, alpha, dt, dx);
     },
 
     /**
@@ -97,12 +76,7 @@ const PhysicsEngine = {
             ay -= dragFactor * state.vy;
         }
         
-        return {
-            x: state.x + state.vx * dt,
-            y: state.y + state.vy * dt,
-            vx: state.vx + ax * dt,
-            vy: state.vy + ay * dt
-        };
+        return Integrators.eulerProjectile(state, ax, ay, dt);
     },
 
     /**
