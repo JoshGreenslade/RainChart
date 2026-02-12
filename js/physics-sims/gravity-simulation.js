@@ -3,7 +3,18 @@
  * Uses PrimitiveRenderer to build the scene
  */
 
+
+
 class GravitySimulation extends ISimulation {
+
+    static CONFIG = {
+            softening_factor: 5,
+            integrator: Integrators.rk4,
+            minMass: 2,
+            maxMass: 10000,
+            massPowerLawScaling: 2.35
+        }
+
     constructor(width, height, bodyCount = 3, G = 1.0) {
         super();
         this.width = width;
@@ -14,7 +25,7 @@ class GravitySimulation extends ISimulation {
         this.timeStep = 0.016; // ~60 FPS
         this.listeners = [];
         this.animationFrame = null;
-        
+
         this.initialize(bodyCount);
     }
 
@@ -29,14 +40,14 @@ class GravitySimulation extends ISimulation {
             const dx = body2.x - body1.x;
             const dy = body2.y - body1.y;
             const distanceSquared = dx * dx + dy * dy;
-            const distance = Math.sqrt(distanceSquared);
+
+            // The softened distance ensures we don't encounter errors when distance = 0
+            const softenedDistanceSquared = distanceSquared + GravitySimulation.CONFIG.softening_factor * GravitySimulation.CONFIG.softening_factor
+            const softenedDistance = Math.sqrt(softenedDistanceSquared);
             
-            // Avoid division by zero and extreme forces at very close distances
-            if (distance < 1) return { fx: 0, fy: 0 };
-            
-            const forceMagnitude = G * body1.mass * body2.mass / distanceSquared;
-            const fx = forceMagnitude * dx / distance;
-            const fy = forceMagnitude * dy / distance;
+            const forceMagnitude = G * body1.mass * body2.mass / softenedDistanceSquared;
+            const fx = forceMagnitude * dx / softenedDistance;
+            const fy = forceMagnitude * dy / softenedDistance;
             
             return { fx, fy };
         },
@@ -57,10 +68,26 @@ class GravitySimulation extends ISimulation {
             };
             
             // Integrate using Euler method
-            const newState = Integrators.euler(state, derivative, dt);
+            const newState = GravitySimulation.CONFIG.integrator(state, derivative, dt);
             
             // Update body state
             [body.x, body.y, body.vx, body.vy] = newState;
+        },
+        // 
+        generatePowerLawMass() {
+            const minMass = GravitySimulation.CONFIG.minMass;
+            const maxMass = GravitySimulation.CONFIG.maxMass;
+            const alpha = GravitySimulation.CONFIG.massPowerLawScaling;
+            const u = Math.random();
+            const exp = 1 - alpha;
+            
+            // The formula derived from Inverse Transform Sampling
+            const mass = Math.pow(
+                (Math.pow(maxMass, exp) - Math.pow(minMass, exp)) * u + Math.pow(minMass, exp),
+                1 / exp
+            );
+            
+            return mass;
         },
 
         /**
@@ -75,11 +102,13 @@ class GravitySimulation extends ISimulation {
                     y: Math.random() * height,
                     vx: (Math.random() - 0.5) * 20,
                     vy: (Math.random() - 0.5) * 20,
-                    mass: Math.random() * 50 + 10
+                    mass: this.generatePowerLawMass(10, 100)
                 });
             }
             return bodies;
-        }
+        },
+
+
     };
 
     /**
