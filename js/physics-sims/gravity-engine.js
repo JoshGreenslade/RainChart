@@ -3,7 +3,9 @@
  * Handles all physics logic: forces, positions, velocities, and body generation
  */
 
-class GravityEngine {
+import { Integrators } from '../integrators/integrators.js';
+
+export class GravityEngine {
     static CONFIG = {
         softening_factor: 5,
         integrator: Integrators.rk4,

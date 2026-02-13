@@ -3,7 +3,7 @@
  * Provides extensive customization options for chart appearance
  */
 
-const ChartConfig = {
+export const ChartConfig = {
     // Gravity Simulation Visual Config
     gravity: {
         // Canvas settings
@@ -107,7 +107,7 @@ const ChartConfig = {
 /**
  * Helper function to interpolate colors
  */
-function interpolateColor(color1, color2, factor) {
+export function interpolateColor(color1, color2, factor) {
     return {
         r: Math.round(color1.r + (color2.r - color1.r) * factor),
         g: Math.round(color1.g + (color2.g - color1.g) * factor),
@@ -118,7 +118,7 @@ function interpolateColor(color1, color2, factor) {
 /**
  * Get color based on temperature and color scheme
  */
-function getTemperatureColor(temp, maxTemp, config) {
+export function getTemperatureColor(temp, maxTemp, config) {
     const ratio = temp / maxTemp;
     
     switch (config.colorScheme) {

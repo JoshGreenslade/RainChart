@@ -3,7 +3,9 @@
  * Uses BaseRenderer to build the scene
  */
 
-class GravityRenderer {
+import { ChartConfig } from '../renderer/chart-config.js';
+
+export class GravityRenderer {
     constructor(renderer) {
         this.renderer = renderer;
         this.config = ChartConfig.gravity || {};

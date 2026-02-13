@@ -3,6 +3,9 @@
  * Gravity Simulation using Base Renderer
  */
 
+import { BaseRenderer } from './renderer/base-renderer.js';
+import { GravitySimulation } from './physics-sims/gravity-simulation.js';
+
 let gravitySimulation;
 let baseRenderer;
 

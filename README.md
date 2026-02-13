@@ -6,6 +6,8 @@ Interactive physics simulations rendered in the browser with highly customizable
 
 This project provides a collection of interactive physics simulations that can be viewed in a web browser. The architecture is designed with a **clear separation between physics calculations and visualization**, allowing each layer to be developed and maintained independently.
 
+**✨ Now built with ES6 modules** - No more worrying about script loading order! Import only what you need. See [MODULES.md](MODULES.md) for detailed usage instructions.
+
 ## Architecture
 
 The project is structured in three distinct layers:
@@ -108,7 +110,27 @@ Each simulation exposes parameters through the UI:
 
 ## Usage
 
-Simply open `index.html` in a modern web browser. No build step required.
+Simply open `index.html` or `chart.html` in a modern web browser. No build step required.
+
+### Using as a Module
+
+You can also import RainChart components in your own projects:
+
+```javascript
+import { BaseRenderer, GravitySimulation } from './js/rainchart.js';
+
+const renderer = new BaseRenderer('my-container', {
+    width: 800,
+    height: 600,
+    renderMode: 'canvas'
+});
+
+const simulation = new GravitySimulation(800, 600, 3, 1.0);
+simulation.onUpdate(() => simulation.render(renderer));
+simulation.start();
+```
+
+See [MODULES.md](MODULES.md) for complete module documentation and examples.
 
 ## Future Plans
 

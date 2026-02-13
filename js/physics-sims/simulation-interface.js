@@ -7,7 +7,7 @@
  * extend this class and implement all required methods.
  */
 
-class ISimulation {
+export class ISimulation {
     /**
      * Initialize the simulation with required parameters
      * @abstract

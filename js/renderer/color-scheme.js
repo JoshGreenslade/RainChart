@@ -3,7 +3,7 @@
  * Generates HSL color schemes for renderers
  */
 
-class ColorScheme {
+export class ColorScheme {
     static OBJECT_COLOR_COUNT = 10;
     
     /**

@@ -161,34 +161,10 @@
         </div>
     </div>
     
-    <!-- Integrators (used by simulations) -->
-    <script src="js/integrators/integrators.js"></script>
-    
-    <!-- Chart Configuration System -->
-    <script src="js/renderer/chart-config.js"></script>
-    
     <!-- D3.js library (required for D3Renderer) -->
     <script src="lib/d3.v7.min.js"></script>
     
-    <!-- Color Scheme Utility -->
-    <script src="js/renderer/color-scheme.js"></script>
-    
-    <!-- Renderer Implementations (Canvas and D3) -->
-    <script src="js/renderer/canvas-renderer.js"></script>
-    <script src="js/renderer/d3-renderer.js"></script>
-    
-    <!-- Base Renderer (delegates to Canvas or D3 implementations) -->
-    <script src="js/renderer/base-renderer.js"></script>
-    
-    <!-- Simulation Interface -->
-    <script src="js/physics-sims/simulation-interface.js"></script>
-    
-    <!-- Gravity Simulation Components (MVC) -->
-    <script src="js/physics-sims/gravity-engine.js"></script>
-    <script src="js/physics-sims/gravity-renderer.js"></script>
-    <script src="js/physics-sims/gravity-simulation.js"></script>
-    
-    <!-- Application Layer -->
-    <script src="js/main.js"></script>
+    <!-- Application Layer (ES6 Module) -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

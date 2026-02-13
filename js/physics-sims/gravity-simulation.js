@@ -3,7 +3,11 @@
  * Coordinates between GravityEngine (physics) and GravityRenderer (rendering)
  */
 
-class GravitySimulation extends ISimulation {
+import { ISimulation } from './simulation-interface.js';
+import { GravityEngine } from './gravity-engine.js';
+import { GravityRenderer } from './gravity-renderer.js';
+
+export class GravitySimulation extends ISimulation {
     constructor(width, height, bodyCount = 3, G = 1.0) {
         super();
         this.width = width;
