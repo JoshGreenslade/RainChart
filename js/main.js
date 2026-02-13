@@ -35,7 +35,8 @@ function initGravitySimulation() {
     baseRenderer = new BaseRenderer('gravity-chart', {
         width: window.innerWidth,
         height: window.innerHeight,
-        renderMode: renderMode
+        renderMode: renderMode,
+        background: `hsl(240, 50%, 10%)`,
     });
     
     // Update controls background to match color scheme

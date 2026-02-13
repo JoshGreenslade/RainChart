@@ -3,9 +3,7 @@
  * Handles all physics logic: forces, positions, velocities, and body generation
  */
 
-import { GravityConfig } from './gravity-config.js';
-
-export class GravityEngine {
+class GravityEngine {
     constructor(width, height, bodyCount = 3, G = 1.0) {
         this.width = width;
         this.height = height;

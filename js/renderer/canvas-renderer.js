@@ -11,9 +11,6 @@ export class CanvasRenderer {
         this.elements = [];
         this.idCounter = 0;
         
-        // Generate random HSL color scheme
-        this.colorScheme = ColorScheme.generate();
-        
         // Set default options
         this.options = {
             width: options.width || window.innerWidth,

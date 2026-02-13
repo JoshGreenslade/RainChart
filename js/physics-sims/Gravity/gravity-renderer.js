@@ -1,6 +1,6 @@
 /**
  * Gravity Renderer - Handles all rendering logic for gravity simulation
- * Uses BaseRenderer to build the scene
+ * Uses PrimitiveRenderer to build the scene
  */
 
 import { GravityConfig } from './gravity-config.js';
