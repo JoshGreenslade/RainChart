@@ -2,7 +2,7 @@ const GravityConfig = {
     // Gravity Simulation Visual Config
     renderer: {
         // Canvas settings
-        backgroundColor: '#f8f9fa',
+        backgroundColor: 'hsl(240, 50%, 10%)',
         borderColor: '#bdc3c7',
         borderWidth: 1,
         
