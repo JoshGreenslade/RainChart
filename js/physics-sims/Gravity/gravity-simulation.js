@@ -3,7 +3,7 @@
  * Coordinates between GravityEngine (physics) and GravityRenderer (rendering)
  */
 
-import { ISimulation } from './simulation-interface.js';
+import { ISimulation } from '../simulation-interface.js';
 import { GravityEngine } from './gravity-engine.js';
 import { GravityRenderer } from './gravity-renderer.js';
 
@@ -128,13 +128,13 @@ export class GravitySimulation extends ISimulation {
     /**
      * Render the simulation using the configured renderer
      */
-    render(primitiveRenderer) {
+    render(baseRenderer) {
         if (!this.renderer) {
             // If renderer hasn't been set, create it
-            this.setRenderer(primitiveRenderer);
+            this.setRenderer(baseRenderer);
         } else {
-            // Update the underlying primitive renderer if it changed
-            this.renderer.setRenderer(primitiveRenderer);
+            // Update the underlying base renderer if it changed
+            this.renderer.setRenderer(baseRenderer);
         }
         
         const state = this.getState();

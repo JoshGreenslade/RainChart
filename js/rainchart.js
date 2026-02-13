@@ -12,9 +12,10 @@ export { ChartConfig, interpolateColor, getTemperatureColor } from './renderer/c
 
 // Physics simulation modules
 export { ISimulation } from './physics-sims/simulation-interface.js';
-export { GravitySimulation } from './physics-sims/gravity-simulation.js';
-export { GravityEngine } from './physics-sims/gravity-engine.js';
-export { GravityRenderer } from './physics-sims/gravity-renderer.js';
+export { GravitySimulation } from './physics-sims/Gravity/gravity-simulation.js';
+export { GravityEngine } from './physics-sims/Gravity/gravity-engine.js';
+export { GravityRenderer } from './physics-sims/Gravity/gravity-renderer.js';
+export { GravityConfig } from './physics-sims/Gravity/gravity-config.js';
 
 // Integrator utilities
 export { Integrators } from './integrators/integrators.js';
