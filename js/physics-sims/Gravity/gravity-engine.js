@@ -4,21 +4,13 @@
  */
 
 class GravityEngine {
-    static CONFIG = {
-        softening_factor: 5,
-        integrator: Integrators.rk4,
-        minMass: 2,
-        maxMass: 10000,
-        massPowerLawScaling: 2.35
-    };
-
     constructor(width, height, bodyCount = 3, G = 1.0) {
         this.width = width;
         this.height = height;
         this.G = G;
         this.bodies = [];
         this.timeStep = 0.016; // ~60 FPS
-
+        this.config = GravityConfig.engine || {};
         this.initialize(bodyCount);
     }
 

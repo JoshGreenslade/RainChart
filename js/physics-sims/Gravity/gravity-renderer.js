@@ -1,12 +1,12 @@
 /**
  * Gravity Renderer - Handles all rendering logic for gravity simulation
- * Uses BaseRenderer to build the scene
+ * Uses PrimitiveRenderer to build the scene
  */
 
 class GravityRenderer {
     constructor(renderer) {
         this.renderer = renderer;
-        this.config = ChartConfig.gravity || {};
+        this.config = GravityConfig.renderer || {};
     }
 
     /**

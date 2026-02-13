@@ -2,6 +2,7 @@
  * Main Application Entry Point
  * Gravity Simulation using Base Renderer
  */
+import { GravitySimulation } from "./physics-sims/Gravity/gravity-simulation";
 
 let gravitySimulation;
 let baseRenderer;

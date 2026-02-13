@@ -3,7 +3,7 @@
  * Coordinates between GravityEngine (physics) and GravityRenderer (rendering)
  */
 
-class GravitySimulation extends ISimulation {
+export class GravitySimulation extends ISimulation {
     constructor(width, height, bodyCount = 3, G = 1.0) {
         super();
         this.width = width;
