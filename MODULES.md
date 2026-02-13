@@ -41,8 +41,9 @@ import { D3Renderer } from './js/renderer/d3-renderer.js';
 import { ColorScheme } from './js/renderer/color-scheme.js';
 
 // Import physics modules
-import { GravitySimulation } from './js/physics-sims/gravity-simulation.js';
-import { GravityEngine } from './js/physics-sims/gravity-engine.js';
+import { GravitySimulation } from './js/physics-sims/Gravity/gravity-simulation.js';
+import { GravityEngine } from './js/physics-sims/Gravity/gravity-engine.js';
+import { GravityConfig } from './js/physics-sims/Gravity/gravity-config.js';
 
 // Import utilities
 import { Integrators } from './js/integrators/integrators.js';
@@ -62,9 +63,11 @@ import { ChartConfig } from './js/renderer/chart-config.js';
 ### Physics Simulation Modules (`js/physics-sims/`)
 
 - **`ISimulation`** - Base interface for all simulations
-- **`GravitySimulation`** - Gravity simulation controller
-- **`GravityEngine`** - Physics engine for gravity calculations
-- **`GravityRenderer`** - Rendering logic for gravity visualization
+- **Gravity Simulation** (`js/physics-sims/Gravity/`):
+  - **`GravitySimulation`** - Gravity simulation controller
+  - **`GravityEngine`** - Physics engine for gravity calculations
+  - **`GravityRenderer`** - Rendering logic for gravity visualization
+  - **`GravityConfig`** - Configuration for gravity simulation
 
 ### Utility Modules
 
