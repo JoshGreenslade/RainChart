@@ -14,20 +14,20 @@ export class D3Renderer {
         this.elements = [];
         this.idCounter = 0;
         
-        // Set default options - colors come from options or defaults
-        this.options = {
-            width: options.width || window.innerWidth,
-            height: options.height || window.innerHeight,
-            background: options.background || '#000000',
-            foreground: options.foreground || '#ffffff',
-            ...options
-        };
-        
         // Simple default colors for objects
         this.defaultColors = [
             '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', 
             '#1abc9c', '#e67e22', '#34495e', '#16a085', '#27ae60'
         ];
+        
+        // Set default options - use provided options or defaults
+        this.options = {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            background: '#000000',
+            foreground: '#ffffff',
+            ...options  // Override defaults with provided options
+        };
         
         this.container = d3.select(`#${containerId}`);
         this._initSVG();
