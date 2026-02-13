@@ -1,4 +1,6 @@
-const GravityConfig = {
+import { Integrators } from '../../integrators/integrators.js';
+
+export const GravityConfig = {
     // Gravity Simulation Visual Config
     renderer: {
         // Canvas settings

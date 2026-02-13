@@ -5,8 +5,9 @@
 
 import { BaseRenderer } from './renderer/base-renderer.js';
 import { GravitySimulation } from './physics-sims/Gravity/gravity-simulation.js';
+import { GravityConfig } from './physics-sims/Gravity/gravity-config.js';
 
-let gravitySimulation;
+let simulation;
 let baseRenderer;
 
 /**
@@ -30,33 +31,36 @@ document.addEventListener('DOMContentLoaded', () => {
  * Initialize Gravity Simulation
  */
 function initGravitySimulation() {
+    // Get background color from config
+    const backgroundColor = GravityConfig.renderer.backgroundColor;
+    
     // Create base renderer with full window size
     const renderMode = document.getElementById('renderer-mode').value;
     baseRenderer = new BaseRenderer('gravity-chart', {
         width: window.innerWidth,
         height: window.innerHeight,
         renderMode: renderMode,
-        background: `hsl(240, 50%, 10%)`,
+        background: backgroundColor,
     });
     
     // Update controls background to match color scheme
     updateControlsBackground();
     
-    // Create simulation (MVC controller)
-    gravitySimulation = new GravitySimulation(window.innerWidth, window.innerHeight, 3, 1.0);
+    // Create simulation (MVC controller) - using interface
+    simulation = new GravitySimulation(window.innerWidth, window.innerHeight, 3, 1.0);
     
     // Connect simulation to renderer
-    gravitySimulation.onUpdate((state) => {
-        gravitySimulation.render(baseRenderer);
+    simulation.onUpdate((state) => {
+        simulation.render(baseRenderer);
     });
     
     // Initial render
-    gravitySimulation.notifyListeners();
+    simulation.notifyListeners();
     
     // Handle window resize
     window.addEventListener('resize', () => {
         baseRenderer.resize(window.innerWidth, window.innerHeight);
-        gravitySimulation.setDimensions(window.innerWidth, window.innerHeight);
+        simulation.setDimensions(window.innerWidth, window.innerHeight);
     });
     
     // Connect UI controls
@@ -82,40 +86,42 @@ function updateControlsBackground() {
  */
 function setupUIControls() {
     document.getElementById('gravity-start').addEventListener('click', () => {
-        gravitySimulation.start();
+        simulation.start();
     });
     
     document.getElementById('gravity-stop').addEventListener('click', () => {
-        gravitySimulation.stop();
+        simulation.stop();
     });
     
     document.getElementById('gravity-reset').addEventListener('click', () => {
         const bodyCount = parseInt(document.getElementById('gravity-bodies').value);
-        gravitySimulation.reset(bodyCount);
+        simulation.reset(bodyCount);
     });
     
     document.getElementById('gravity-constant').addEventListener('change', (e) => {
-        gravitySimulation.setG(parseFloat(e.target.value));
+        simulation.setG(parseFloat(e.target.value));
     });
     
     document.getElementById('gravity-bodies').addEventListener('change', (e) => {
         const bodyCount = parseInt(e.target.value);
-        gravitySimulation.reset(bodyCount);
+        simulation.reset(bodyCount);
     });
     
     // Renderer mode change
     document.getElementById('renderer-mode').addEventListener('change', (e) => {
         const renderMode = e.target.value;
+        const backgroundColor = GravityConfig.renderer.backgroundColor;
         baseRenderer = new BaseRenderer('gravity-chart', {
             width: window.innerWidth,
             height: window.innerHeight,
-            renderMode: renderMode
+            renderMode: renderMode,
+            background: backgroundColor
         });
         
         // Update background colors
         updateControlsBackground();
         
         // Re-render
-        gravitySimulation.render(baseRenderer);
+        simulation.render(baseRenderer);
     });
 }
