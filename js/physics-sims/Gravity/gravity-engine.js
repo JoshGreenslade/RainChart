@@ -18,9 +18,10 @@ class GravityEngine {
      * Generate mass using power law distribution
      */
     static generatePowerLawMass() {
-        const minMass = GravityEngine.CONFIG.minMass;
-        const maxMass = GravityEngine.CONFIG.maxMass;
-        const alpha = GravityEngine.CONFIG.massPowerLawScaling;
+        const config = GravityConfig.engine;
+        const minMass = config.minMass;
+        const maxMass = config.maxMass;
+        const alpha = config.massPowerLawScaling;
         const u = Math.random();
         const exp = 1 - alpha;
         
@@ -59,8 +60,9 @@ class GravityEngine {
         const dy = body2.y - body1.y;
         const distanceSquared = dx * dx + dy * dy;
 
+        const config = GravityConfig.engine;
         // The softened distance ensures we don't encounter errors when distance = 0
-        const softenedDistanceSquared = distanceSquared + GravityEngine.CONFIG.softening_factor * GravityEngine.CONFIG.softening_factor;
+        const softenedDistanceSquared = distanceSquared + config.softening_factor * config.softening_factor;
         const softenedDistance = Math.sqrt(softenedDistanceSquared);
         
         const forceMagnitude = G * body1.mass * body2.mass / softenedDistanceSquared;
@@ -86,7 +88,8 @@ class GravityEngine {
         };
         
         // Integrate using configured method
-        const newState = GravityEngine.CONFIG.integrator(state, derivative, dt);
+        const config = GravityConfig.engine;
+        const newState = config.integrator(state, derivative, dt);
         
         // Update body state
         [body.x, body.y, body.vx, body.vy] = newState;

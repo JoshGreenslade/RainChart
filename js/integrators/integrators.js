@@ -4,7 +4,7 @@
  * These integrators are physics-agnostic and work with any system of ODEs
  */
 
-const Integrators = {
+export const Integrators = {
     /**
      * Euler method (1st order explicit integration)
      * Simplest integration method: y(t+dt) = y(t) + dt * dy/dt

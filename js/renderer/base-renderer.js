@@ -3,7 +3,10 @@
  * Acts as a factory and adapter that routes calls to Canvas or D3 renderers
  */
 
-class BaseRenderer {
+import { CanvasRenderer } from './canvas-renderer.js';
+import { D3Renderer } from './d3-renderer.js';
+
+export class BaseRenderer {
     constructor(containerId, options = {}) {
         this.containerId = containerId;
         this.renderMode = options.renderMode || 'svg'; // 'svg' or 'canvas'

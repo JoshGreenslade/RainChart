@@ -3,7 +3,9 @@
  * Implements only primitive drawing methods, no simulation-specific logic
  */
 
-class D3Renderer {
+import { ColorScheme } from './color-scheme.js';
+
+export class D3Renderer {
     constructor(containerId, options = {}) {
         if (typeof d3 === 'undefined') {
             console.error('D3.js is required for SVG rendering mode');

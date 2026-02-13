@@ -3,7 +3,9 @@
  * Implements only primitive drawing methods, no simulation-specific logic
  */
 
-class CanvasRenderer {
+import { ColorScheme } from './color-scheme.js';
+
+export class CanvasRenderer {
     constructor(containerId, options = {}) {
         this.containerId = containerId;
         this.elements = [];

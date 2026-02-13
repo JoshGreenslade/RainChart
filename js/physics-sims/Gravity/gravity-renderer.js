@@ -3,7 +3,9 @@
  * Uses PrimitiveRenderer to build the scene
  */
 
-class GravityRenderer {
+import { GravityConfig } from './gravity-config.js';
+
+export class GravityRenderer {
     constructor(renderer) {
         this.renderer = renderer;
         this.config = GravityConfig.renderer || {};
@@ -17,7 +19,7 @@ class GravityRenderer {
         // Clear the renderer
         this.renderer.clear();
         
-        // Draw background (already handled by PrimitiveRenderer during clear)
+        // Draw background (already handled by BaseRenderer during clear)
         
         // Draw grid if enabled
         if (this.config.showGrid) {
@@ -30,7 +32,7 @@ class GravityRenderer {
         // Draw body count if exceeding display limit
         if (state.bodies.length > (this.config.maxBodies || 10000)) {
             // Note: Text primitive would be needed for this
-            // For now, skip or add it to PrimitiveRenderer
+            // For now, skip or add it to BaseRenderer
         }
     }
 
@@ -85,7 +87,7 @@ class GravityRenderer {
 
     /**
      * Update the renderer (e.g., when switching render modes)
-     * @param {PrimitiveRenderer} renderer - New renderer instance
+     * @param {BaseRenderer} renderer - New renderer instance
      */
     setRenderer(renderer) {
         this.renderer = renderer;
