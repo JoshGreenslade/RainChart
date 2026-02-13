@@ -7,7 +7,6 @@
 export { BaseRenderer } from './renderer/base-renderer.js';
 export { CanvasRenderer } from './renderer/canvas-renderer.js';
 export { D3Renderer } from './renderer/d3-renderer.js';
-export { ColorScheme } from './renderer/color-scheme.js';
 export { ChartConfig, interpolateColor, getTemperatureColor } from './renderer/chart-config.js';
 
 // Physics simulation modules

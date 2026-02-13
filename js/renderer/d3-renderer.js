@@ -3,8 +3,6 @@
  * Implements only primitive drawing methods, no simulation-specific logic
  */
 
-import { ColorScheme } from './color-scheme.js';
-
 export class D3Renderer {
     constructor(containerId, options = {}) {
         if (typeof d3 === 'undefined') {
@@ -16,16 +14,19 @@ export class D3Renderer {
         this.elements = [];
         this.idCounter = 0;
         
-        // Generate random HSL color scheme
-        this.colorScheme = ColorScheme.generate();
+        // Simple default colors for objects
+        this.defaultColors = [
+            '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', 
+            '#1abc9c', '#e67e22', '#34495e', '#16a085', '#27ae60'
+        ];
         
-        // Set default options
+        // Set default options - use provided options or defaults
         this.options = {
-            width: options.width || window.innerWidth,
-            height: options.height || window.innerHeight,
-            background: options.background || this.colorScheme.background,
-            foreground: options.foreground || this.colorScheme.foreground,
-            ...options
+            width: window.innerWidth,
+            height: window.innerHeight,
+            background: '#000000',
+            foreground: '#ffffff',
+            ...options  // Override defaults with provided options
         };
         
         this.container = d3.select(`#${containerId}`);
@@ -52,11 +53,10 @@ export class D3Renderer {
     }
     
     /**
-     * Get next color from the color scheme
+     * Get next color from the default colors
      */
     _getNextColor() {
-        const colors = this.colorScheme.objectColors;
-        return colors[this.idCounter % colors.length];
+        return this.defaultColors[this.idCounter % this.defaultColors.length];
     }
     
     /**
@@ -71,7 +71,7 @@ export class D3Renderer {
         const id = `circle-${this.idCounter++}`;
         const defaultStyle = {
             fill: this._getNextColor(),
-            stroke: this.colorScheme.foreground,
+            stroke: this.options.foreground,
             strokeWidth: 1,
             opacity: 0.8,
             ...style
@@ -140,7 +140,7 @@ export class D3Renderer {
         const id = `rect-${this.idCounter++}`;
         const defaultStyle = {
             fill: this._getNextColor(),
-            stroke: this.colorScheme.foreground,
+            stroke: this.options.foreground,
             strokeWidth: 1,
             opacity: 0.6,
             ...style
@@ -244,7 +244,7 @@ export class D3Renderer {
             showLabels: true,
             labelOffset: 10,
             tickLength: 5,
-            stroke: this.colorScheme.foreground,
+            stroke: this.options.foreground,
             strokeWidth: 1,
             fontSize: 12,
             ...options
@@ -393,6 +393,10 @@ export class D3Renderer {
      * Get the color scheme being used
      */
     getColorScheme() {
-        return this.colorScheme;
+        return {
+            background: this.options.background,
+            foreground: this.options.foreground,
+            objectColors: this.defaultColors
+        };
     }
 }
