@@ -64,7 +64,7 @@ export const GravityConfig = {
         trailFadeRate: 0.95,
         
         // Grid settings
-        showGrid: false,
+        showGrid: true,
         gridColor: '#e0e0e0',
         gridSize: 50,
         

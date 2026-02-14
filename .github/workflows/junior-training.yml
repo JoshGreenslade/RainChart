@@ -1,0 +1,29 @@
+name: Junior Training Pipeline
+
+on:
+  schedule:
+    - cron: "0 9 1 * *"   # First of each month at 09:00
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  training:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate training materials
+        run: |
+          copilot-agent run \
+            --skill skills/junior-training.md \
+            --input ".github/context/junior-profile.json" \
+            --output training/monthly-plan-$(date +%F).md
+
+      - name: Commit training plan
+        run: |
+          git add training/
+          git commit -m "Monthly junior training plan"
+          git push
