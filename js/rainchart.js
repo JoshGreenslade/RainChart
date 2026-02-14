@@ -13,7 +13,6 @@ export { ISimulationControls } from './physics-sims/controls-interface.js';
 export { BaseRenderer } from './renderer/base-renderer.js';
 export { CanvasRenderer } from './renderer/canvas-renderer.js';
 export { D3Renderer } from './renderer/d3-renderer.js';
-export { ChartConfig, interpolateColor, getTemperatureColor } from './renderer/chart-config.js';
 
 // Physics simulation modules
 export { GravitySimulation } from './physics-sims/Gravity/gravity-simulation.js';
