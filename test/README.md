@@ -73,7 +73,7 @@ node --test test/unit/integrators.test.js
   - Tests selective imports
   - Infrastructure module system validation
 
-## Testing Philosophy
+## Implementation Details
 
 Following the project's "no build step" philosophy:
 - Tests use Node.js built-in test runner (available in Node.js 18+)
