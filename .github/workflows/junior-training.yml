@@ -24,7 +24,7 @@ jobs:
           PROFILE=$(cat .github/context/junior-profile.json)
           
           # Generate training plan
-          cat > "$OUTPUT_FILE" << 'EOF'
+          cat > "$OUTPUT_FILE" << EOF
           # Monthly Training Plan - $(date +%B\ %Y)
           
           ## Junior Developer Profile
@@ -49,9 +49,9 @@ jobs:
           ## 4-Week Training Plan
           
           ### Week 1: Codebase Architecture
-          - [ ] Read and understand `docs/architecture.md`
-          - [ ] Read and understand `docs/conventions.md`
-          - [ ] Review the main application entry point (`js/main.js`)
+          - [ ] Read and understand \`docs/architecture.md\`
+          - [ ] Read and understand \`docs/conventions.md\`
+          - [ ] Review the main application entry point (\`js/main.js\`)
           - [ ] Explore the separation between physics and rendering layers
           - [ ] Exercise: Draw a diagram of the data flow in the gravity simulation
           
@@ -62,14 +62,14 @@ jobs:
           - [ ] Exercise: Write type definitions for one of the integrator modules
           
           ### Week 3: Physics Simulations
-          - [ ] Study the `ISimulation` and `ISimulationEngine` interfaces
+          - [ ] Study the \`ISimulation\` and \`ISimulationEngine\` interfaces
           - [ ] Review the gravity simulation implementation
           - [ ] Understand the different integrators (Euler, RK4, Verlet, Velocity Verlet)
           - [ ] Exercise: Implement a simple pendulum simulation following the existing patterns
           
           ### Week 4: Rendering and Testing
-          - [ ] Study the `IRenderer` interface and primitive rendering backends
-          - [ ] Understand how `BaseRenderer` delegates to Canvas, D3, or WebGPU renderers
+          - [ ] Study the \`IRenderer\` interface and primitive rendering backends
+          - [ ] Understand how \`BaseRenderer\` delegates to Canvas, D3, or WebGPU renderers
           - [ ] Learn about the observer pattern used in simulations
           - [ ] Exercise: Add unit tests for the integrator modules
           - [ ] Exercise: Implement a simple visual test for the pendulum simulation
@@ -79,7 +79,7 @@ jobs:
           ### Tasks for Code Review
           1. Review recent PRs in the repository to understand the review process
           2. Practice reviewing code changes for:
-             - Adherence to conventions in `docs/conventions.md`
+             - Adherence to conventions in \`docs/conventions.md\`
              - Proper separation of concerns (physics vs rendering)
              - Code quality and maintainability
           3. Focus on providing constructive feedback
