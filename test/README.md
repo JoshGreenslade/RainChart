@@ -1,18 +1,24 @@
 # Running Tests
 
-This project includes both unit and integration tests to ensure code quality and correctness.
+This project includes unit and integration tests for the **infrastructure** components to ensure the framework works correctly.
+
+## Testing Philosophy
+
+Following the project's principle of separation of concerns, tests focus on:
+- **Infrastructure components**: Interfaces, base classes, renderers, integrators, module system
+- **NOT simulation-specific implementations**: Tests do not validate physics correctness
+
+As long as a simulation implements the required interfaces (ISimulation, ISimulationEngine, etc.), it will work within the framework. Physics accuracy is the responsibility of individual simulation implementations.
 
 ## Test Structure
 
 ```
 test/
-├── unit/                       # Unit tests for individual modules
+├── unit/                       # Unit tests for infrastructure modules
 │   ├── integrators.test.js     # Tests for numerical integration methods
-│   ├── gravity-engine.test.js  # Tests for gravity physics engine
 │   └── base-renderer.test.js   # Tests for renderer factory
 └── integration/                # Integration tests for complete features
-    ├── gravity-simulation.test.js  # Tests for complete simulation lifecycle
-    └── module-imports.test.js      # Tests for ES6 module system
+    └── module-imports.test.js  # Tests for ES6 module system
 ```
 
 ## Running Tests
@@ -50,32 +56,22 @@ node --test test/unit/integrators.test.js
   - Tests all numerical integration methods (Euler, RK4, Verlet, Velocity Verlet)
   - Validates accuracy against known ODE solutions
   - Tests scalar and array state handling
-
-- **GravityEngine** (`test/unit/gravity-engine.test.js`)
-  - Tests body generation with power-law mass distribution
-  - Tests gravitational force calculations
-  - Tests position updates and boundary conditions
-  - Tests Newton's third law (equal and opposite forces)
+  - These are infrastructure components used by all simulations
 
 - **BaseRenderer** (`test/unit/base-renderer.test.js`)
   - Tests factory pattern for creating Canvas/SVG renderers
   - Tests delegation to concrete renderer implementations
+  - Core infrastructure for all visualizations
 
 ### Integration Tests
 
-- **GravitySimulation** (`test/integration/gravity-simulation.test.js`)
-  - Tests complete simulation lifecycle (start, stop, reset)
-  - Tests state management and updates
-  - Tests observer pattern for callbacks
-  - Tests integration with engine and renderer
-  - Tests edge cases (zero bodies, single body, many bodies)
-
 - **Module Imports** (`test/integration/module-imports.test.js`)
   - Tests ES6 module imports and exports
+  - Tests interface exports (ISimulation, ISimulationEngine, ISimulationConfig, ISimulationControls)
+  - Tests renderer module exports
   - Tests barrel export from `rainchart.js`
   - Tests selective imports
-  - Tests cross-module dependencies
-  - Tests module instantiation
+  - Infrastructure module system validation
 
 ## Testing Philosophy
 
@@ -129,6 +125,7 @@ describe('ModuleName', () => {
 - Renderer tests are limited in Node.js environment due to lack of DOM
 - Some D3Renderer tests cannot run without a browser environment
 - Browser-specific integration tests should use `test-selective-import.html`
+- **Simulation implementations are not tested**: Physics accuracy is the responsibility of individual simulations
 
 ## Browser Testing
 

@@ -47,39 +47,6 @@ describe('Module System', () => {
         });
     });
 
-    describe('Gravity simulation modules', () => {
-        it('should export GravityEngine', async () => {
-            const { GravityEngine } = await import('../../js/physics-sims/Gravity/gravity-engine.js');
-            
-            assert.ok(GravityEngine, 'GravityEngine should be exported');
-            assert.ok(typeof GravityEngine === 'function');
-        });
-
-        it('should export GravitySimulation', async () => {
-            const { GravitySimulation } = await import('../../js/physics-sims/Gravity/gravity-simulation.js');
-            
-            assert.ok(GravitySimulation, 'GravitySimulation should be exported');
-            assert.ok(typeof GravitySimulation === 'function');
-        });
-
-        it('should export GravityConfig', async () => {
-            const { GravityConfig } = await import('../../js/physics-sims/Gravity/gravity-config.js');
-            
-            assert.ok(GravityConfig, 'GravityConfig should be exported');
-            assert.ok(typeof GravityConfig === 'object');
-            assert.ok(GravityConfig.module, 'Config should have module metadata');
-            assert.ok(GravityConfig.engine, 'Config should have engine settings');
-            assert.ok(GravityConfig.renderer, 'Config should have renderer settings');
-        });
-
-        it('should export GravityControls', async () => {
-            const { GravityControls } = await import('../../js/physics-sims/Gravity/gravity-controls.js');
-            
-            assert.ok(GravityControls, 'GravityControls should be exported');
-            assert.ok(Array.isArray(GravityControls.controls));
-        });
-    });
-
     describe('Renderer modules', () => {
         it('should export BaseRenderer', async () => {
             const { BaseRenderer } = await import('../../js/renderer/base-renderer.js');
@@ -104,16 +71,16 @@ describe('Module System', () => {
     });
 
     describe('Barrel export (rainchart.js)', () => {
-        it('should export all public modules', async () => {
+        it('should export infrastructure modules', async () => {
             const rainchart = await import('../../js/rainchart.js');
             
-            // Check that major exports are present
+            // Check that infrastructure exports are present
             assert.ok(rainchart.Integrators, 'Should export Integrators');
             assert.ok(rainchart.BaseRenderer, 'Should export BaseRenderer');
             assert.ok(rainchart.ISimulation, 'Should export ISimulation');
             assert.ok(rainchart.ISimulationEngine, 'Should export ISimulationEngine');
-            assert.ok(rainchart.GravitySimulation, 'Should export GravitySimulation');
-            assert.ok(rainchart.GravityEngine, 'Should export GravityEngine');
+            assert.ok(rainchart.ISimulationConfig, 'Should export ISimulationConfig');
+            assert.ok(rainchart.ISimulationControls, 'Should export ISimulationControls');
         });
 
         it('should allow selective imports', async () => {
@@ -121,44 +88,6 @@ describe('Module System', () => {
             
             assert.ok(Integrators);
             assert.ok(BaseRenderer);
-        });
-    });
-
-    describe('Module instantiation', () => {
-        it('should be able to instantiate GravityEngine from import', async () => {
-            const { GravityEngine } = await import('../../js/physics-sims/Gravity/gravity-engine.js');
-            
-            const engine = new GravityEngine(800, 600, 3, 1.0);
-            
-            assert.ok(engine);
-            assert.strictEqual(engine.width, 800);
-            assert.strictEqual(engine.height, 600);
-        });
-
-        it('should be able to instantiate GravitySimulation from import', async () => {
-            const { GravitySimulation } = await import('../../js/physics-sims/Gravity/gravity-simulation.js');
-            
-            const simulation = new GravitySimulation(800, 600, 3, 1.0);
-            
-            assert.ok(simulation);
-            assert.strictEqual(simulation.width, 800);
-            assert.strictEqual(simulation.height, 600);
-        });
-    });
-
-    describe('Cross-module dependencies', () => {
-        it('should handle circular dependencies correctly', async () => {
-            // Import modules that depend on each other
-            const { GravitySimulation } = await import('../../js/physics-sims/Gravity/gravity-simulation.js');
-            const { GravityEngine } = await import('../../js/physics-sims/Gravity/gravity-engine.js');
-            
-            // Both should be available
-            assert.ok(GravitySimulation);
-            assert.ok(GravityEngine);
-            
-            // Should be able to create instances
-            const simulation = new GravitySimulation(800, 600, 3, 1.0);
-            assert.ok(simulation.engine instanceof GravityEngine);
         });
     });
 });

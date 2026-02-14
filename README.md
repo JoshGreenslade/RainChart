@@ -75,7 +75,7 @@ See `example-module.html` for a working example.
 
 ## Testing
 
-The project includes comprehensive unit and integration tests:
+The project includes tests for infrastructure components:
 
 ```bash
 npm test              # Run all tests
@@ -83,7 +83,7 @@ npm run test:unit     # Run unit tests only
 npm run test:integration  # Run integration tests only
 ```
 
-See [test/README.md](test/README.md) for detailed testing documentation.
+Tests focus on validating the framework infrastructure (interfaces, integrators, renderers, module system) rather than simulation-specific implementations. See [test/README.md](test/README.md) for detailed testing documentation.
 
 ## Adding a New Simulation
 
