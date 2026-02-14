@@ -16,7 +16,7 @@ export class ISimulationEngine {
      * @param {...any} args - Additional engine-specific parameters
      */
     initialize(...args) {
-        throw new Error('initialize() must be implemented by subclass');
+        throw new Error(`${this.constructor.name} must implement initialize()`);
     }
     
     /**
@@ -25,7 +25,7 @@ export class ISimulationEngine {
      * @param {...any} args - Reset parameters
      */
     reset(...args) {
-        throw new Error('reset() must be implemented by subclass');
+        throw new Error(`${this.constructor.name} must implement reset()`);
     }
     
     /**
@@ -33,7 +33,7 @@ export class ISimulationEngine {
      * @abstract
      */
     step() {
-        throw new Error('step() must be implemented by subclass');
+        throw new Error(`${this.constructor.name} must implement step()`);
     }
     
     /**
@@ -42,7 +42,7 @@ export class ISimulationEngine {
      * @returns {Object} Current state with all relevant data
      */
     getState() {
-        throw new Error('getState() must be implemented by subclass');
+        throw new Error(`${this.constructor.name} must implement getState()`);
     }
     
     /**
@@ -52,7 +52,7 @@ export class ISimulationEngine {
      * @param {number} height - New height
      */
     setDimensions(width, height) {
-        throw new Error('setDimensions() must be implemented by subclass');
+        throw new Error(`${this.constructor.name} must implement setDimensions()`);
     }
 }
 
