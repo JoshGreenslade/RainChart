@@ -1,7 +1,11 @@
 /**
  * Gravity Simulation Controls Configuration
+ * Implements ISimulationControls interface
+ * 
  * Defines the UI controls for the gravity simulation
  */
+
+import { ISimulationControls } from '../controls-interface.js';
 
 export const GravityControls = {
     // Control definitions for the gravity simulation
@@ -74,3 +78,6 @@ export const GravityControls = {
         return this.controls.filter(control => control.type === type);
     }
 };
+
+// Validate controls implements the interface
+ISimulationControls.validate(GravityControls);

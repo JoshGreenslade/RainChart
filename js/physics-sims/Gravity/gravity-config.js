@@ -1,4 +1,15 @@
+/**
+ * Gravity Simulation Configuration
+ * Implements ISimulationConfig interface
+ * 
+ * Contains:
+ * - Module loading metadata (how to load this simulation)
+ * - Renderer configuration (visual settings)
+ * - Engine configuration (physics settings)
+ */
+
 import { Integrators } from '../../integrators/integrators.js';
+import { ISimulationConfig } from '../config-interface.js';
 
 export const GravityConfig = {
     // Module loading metadata - tells main.js how to load this simulation
@@ -76,3 +87,6 @@ export const GravityConfig = {
         massPowerLawScaling: 2.35
     }
 }
+
+// Validate config implements the interface
+ISimulationConfig.validate(GravityConfig);

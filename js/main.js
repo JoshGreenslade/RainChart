@@ -4,9 +4,17 @@
  * 
  * This file is completely independent of concrete simulations.
  * To switch simulations, change the SIMULATION_CONFIG_PATH below.
+ * 
+ * All simulations must implement:
+ * - ISimulation (simulation class)
+ * - ISimulationEngine (engine class)
+ * - ISimulationConfig (config object structure)
+ * - ISimulationControls (controls object structure)
  */
 
 import { BaseRenderer } from './renderer/base-renderer.js';
+import { ISimulationConfig } from './physics-sims/config-interface.js';
+import { ISimulationControls } from './physics-sims/controls-interface.js';
 
 // ============================================================================
 // CONFIGURATION: Change this path to switch simulations
@@ -45,6 +53,9 @@ async function initSimulation() {
     const configName = Object.keys(ConfigModule).find(key => key.endsWith('Config'));
     simulationConfig = ConfigModule[configName];
     
+    // Validate config implements ISimulationConfig interface
+    ISimulationConfig.validate(simulationConfig);
+    
     // Get the base path of the config file for resolving relative paths
     const configBasePath = SIMULATION_CONFIG_PATH.substring(0, SIMULATION_CONFIG_PATH.lastIndexOf('/'));
     
@@ -62,6 +73,9 @@ async function initSimulation() {
     // Load controls module
     const ControlsModule = await import(controlsPath);
     simulationControls = ControlsModule[moduleConfig.controlsClass];
+    
+    // Validate controls implements ISimulationControls interface
+    ISimulationControls.validate(simulationControls);
     
     // Get background color from config (if available)
     const backgroundColor = simulationConfig?.renderer?.backgroundColor;

@@ -4,7 +4,18 @@
 
 Each simulation defines its UI controls within its own folder, following the same pattern as configuration files. This makes simulations self-contained and easier to maintain.
 
-The **main application layer** (`main.js`) is completely independent of concrete simulations and works through the `ISimulation` interface. It dynamically loads the simulation based on a single config path specified in `main.js`.
+The **main application layer** (`main.js`) is completely independent of concrete simulations and works through defined interfaces. It dynamically loads the simulation based on a single config path specified in `main.js`.
+
+## Interface Requirements
+
+All simulations must implement these interfaces to work with main.js:
+
+1. **`ISimulation`** - Simulation class must extend this interface
+2. **`ISimulationEngine`** - Engine class must extend this interface  
+3. **`ISimulationConfig`** - Config object must follow this structure
+4. **`ISimulationControls`** - Controls object must follow this structure
+
+These interfaces ensure **any simulation will work with main.js** without modifications.
 
 ## Structure
 
@@ -12,14 +23,18 @@ Each simulation is fully self-contained with all metadata defined in its config 
 
 ```
 js/
-├── main.js                    (Generic - points to simulation config)
+├── main.js                           (Generic - points to simulation config)
 └── physics-sims/
+    ├── simulation-interface.js       (ISimulation - interface for simulations)
+    ├── engine-interface.js           (ISimulationEngine - interface for engines)
+    ├── config-interface.js           (ISimulationConfig - interface for configs)
+    ├── controls-interface.js         (ISimulationControls - interface for controls)
     └── Gravity/
-        ├── gravity-simulation.js  (MVC controller)
-        ├── gravity-engine.js       (Physics engine)
-        ├── gravity-renderer.js     (Rendering logic)
-        ├── gravity-config.js       (Config + module metadata)
-        └── gravity-controls.js     (UI controls definition)
+        ├── gravity-simulation.js     (extends ISimulation)
+        ├── gravity-engine.js          (extends ISimulationEngine)
+        ├── gravity-renderer.js        (Rendering logic)
+        ├── gravity-config.js          (implements ISimulationConfig)
+        └── gravity-controls.js        (implements ISimulationControls)
 ```
 
 ## Simulation Config Structure
@@ -133,7 +148,7 @@ async function initSimulation() {
 
 **Key Point**: `main.js` only needs to change ONE line (the config path) to switch simulations.
 
-**Key Point**: `main.js` only imports `BaseRenderer` and works through the `ISimulation` interface. All simulation-specific metadata is in the simulation's config file.
+**Key Point**: `main.js` validates all loaded modules against interfaces, ensuring any simulation that implements the interfaces will work correctly.
 
 ## Benefits
 
@@ -143,8 +158,9 @@ async function initSimulation() {
 4. **Better Organization**: Control definitions live with the simulation code
 5. **Reusability**: Controls can be queried and manipulated programmatically
 6. **Complete Decoupling**: Main application is 100% independent of concrete simulations
-7. **Interface-Driven**: Main.js works through ISimulation interface only
+7. **Interface-Driven**: All components implement interfaces for guaranteed compatibility
 8. **Single Configuration Point**: Only change one line in main.js to switch simulations
+9. **Type Safety**: Interfaces enforce structure and throw errors if requirements not met
 
 ## Switching Simulations
 
@@ -164,6 +180,8 @@ When creating a new simulation, follow these steps:
 1. **Create the config file with module metadata**: `js/physics-sims/YourSim/yoursim-config.js`
 
 ```javascript
+import { ISimulationConfig } from '../config-interface.js';
+
 export const YourSimConfig = {
     // Module loading metadata
     module: {
@@ -176,12 +194,19 @@ export const YourSimConfig = {
         containerId: 'yoursim-chart',
         defaultRenderMode: 'canvas'
     },
-    // ... renderer and engine config
+    renderer: { /* visual config */ },
+    engine: { /* physics config */ }
 };
+
+// Validate config implements the interface
+ISimulationConfig.validate(YourSimConfig);
 ```
 
 2. **Create the controls file**: `js/physics-sims/YourSim/yoursim-controls.js`
+
 ```javascript
+import { ISimulationControls } from '../controls-interface.js';
+
 export const YourSimControls = {
     controls: [
         {
@@ -195,11 +220,53 @@ export const YourSimControls = {
     
     getControl(id) {
         return this.controls.find(control => control.id === id);
+    },
+    
+    getControlsByType(type) {
+        return this.controls.filter(control => control.type === type);
     }
 };
+
+// Validate controls implements the interface
+ISimulationControls.validate(YourSimControls);
 ```
 
-3. **Export from main module** (rainchart.js):
+3. **Create the engine class**: `js/physics-sims/YourSim/yoursim-engine.js`
+
+```javascript
+import { ISimulationEngine } from '../engine-interface.js';
+
+export class YourSimEngine extends ISimulationEngine {
+    constructor(width, height, ...params) {
+        super();
+        // Your engine implementation
+    }
+    
+    initialize(...args) { /* implement */ }
+    reset(...args) { /* implement */ }
+    step() { /* implement */ }
+    getState() { /* implement */ }
+    setDimensions(width, height) { /* implement */ }
+}
+```
+
+4. **Create the simulation class**: `js/physics-sims/YourSim/yoursim-simulation.js`
+
+```javascript
+import { ISimulation } from '../simulation-interface.js';
+
+export class YourSimSimulation extends ISimulation {
+    constructor(width, height, ...params) {
+        super();
+        // Your simulation implementation
+    }
+    
+    // Implement all ISimulation methods
+}
+```
+
+5. **Export from main module** (rainchart.js):
+
 ```javascript
 export { YourSimControls } from './physics-sims/YourSim/yoursim-controls.js';
 ```
