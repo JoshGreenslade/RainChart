@@ -58,6 +58,12 @@ export const GravityControls = {
         }
     ],
 
+    // Info text to display
+    info: [
+        'Gravity Simulator - N-body gravitational interactions',
+        'Bodies attract each other based on their mass and distance'
+    ],
+
     // Helper method to get control by id
     /**
      * Get a control definition by its ID

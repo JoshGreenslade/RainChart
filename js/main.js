@@ -77,6 +77,11 @@ async function initSimulation() {
     // Validate controls implements ISimulationControls interface
     ISimulationControls.validate(simulationControls);
     
+    // Create control UI elements dynamically
+    ISimulationControls.createControlElements(simulationControls, 'controls', {
+        info: simulationControls.info
+    });
+    
     // Get background color from config (if available)
     const backgroundColor = simulationConfig?.renderer?.backgroundColor;
     

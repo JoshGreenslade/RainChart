@@ -1,6 +1,7 @@
 /**
  * Simulation Controls Interface - Base interface that all simulation controls must implement
  * This interface defines the required structure for simulation control objects
+ * and provides methods to dynamically create control UI elements
  * 
  * Note: JavaScript doesn't have built-in interface enforcement. This is a convention-based
  * interface that serves as documentation and validation contract.
@@ -77,6 +78,182 @@ export class ISimulationControls {
         ISimulationControls.validate(controls);
         return controls.getControlsByType(type);
     }
+    
+    /**
+     * Create DOM elements for all controls and append them to the container
+     * @param {Object} controls - The controls object
+     * @param {string} containerId - ID of the container element
+     * @param {Object} options - Optional configuration
+     * @returns {void}
+     */
+    static createControlElements(controls, containerId = 'controls', options = {}) {
+        ISimulationControls.validate(controls);
+        
+        const container = document.getElementById(containerId);
+        if (!container) {
+            throw new Error(`Container element with id '${containerId}' not found`);
+        }
+        
+        // Clear any existing controls
+        container.innerHTML = '';
+        
+        // Create controls
+        controls.controls.forEach((control, index) => {
+            const element = ISimulationControls._createControlElement(control);
+            container.appendChild(element);
+            
+            // Add separator after button groups (if next control is not a button)
+            if (control.type === 'button' && index < controls.controls.length - 1) {
+                const nextControl = controls.controls[index + 1];
+                if (nextControl.type !== 'button') {
+                    const separator = document.createElement('div');
+                    separator.className = 'separator';
+                    container.appendChild(separator);
+                }
+            }
+        });
+        
+        // Add info section if provided
+        if (options.info) {
+            const infoContainer = document.getElementById('info');
+            if (infoContainer) {
+                infoContainer.innerHTML = '';
+                if (Array.isArray(options.info)) {
+                    options.info.forEach(text => {
+                        const div = document.createElement('div');
+                        div.textContent = text;
+                        infoContainer.appendChild(div);
+                    });
+                } else {
+                    infoContainer.textContent = options.info;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Create a single control element based on its definition
+     * @private
+     * @param {Object} control - Control definition
+     * @returns {HTMLElement} The created control element
+     */
+    static _createControlElement(control) {
+        switch (control.type) {
+            case 'button':
+                return ISimulationControls._createButton(control);
+            case 'number':
+                return ISimulationControls._createNumberInput(control);
+            case 'select':
+                return ISimulationControls._createSelect(control);
+            case 'checkbox':
+                return ISimulationControls._createCheckbox(control);
+            case 'text':
+                return ISimulationControls._createTextInput(control);
+            default:
+                throw new Error(`Unknown control type: ${control.type}`);
+        }
+    }
+    
+    /**
+     * Create a button element
+     * @private
+     */
+    static _createButton(control) {
+        const button = document.createElement('button');
+        button.id = control.id;
+        button.textContent = control.label;
+        if (control.className) button.className = control.className;
+        return button;
+    }
+    
+    /**
+     * Create a number input element with label
+     * @private
+     */
+    static _createNumberInput(control) {
+        const label = document.createElement('label');
+        label.textContent = control.label + ':';
+        
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = control.id;
+        if (control.min !== undefined) input.min = control.min;
+        if (control.max !== undefined) input.max = control.max;
+        if (control.step !== undefined) input.step = control.step;
+        if (control.value !== undefined) input.value = control.value;
+        if (control.className) input.className = control.className;
+        
+        label.appendChild(document.createTextNode(' '));
+        label.appendChild(input);
+        return label;
+    }
+    
+    /**
+     * Create a select element with label
+     * @private
+     */
+    static _createSelect(control) {
+        const label = document.createElement('label');
+        label.textContent = control.label + ':';
+        
+        const select = document.createElement('select');
+        select.id = control.id;
+        if (control.className) select.className = control.className;
+        
+        if (control.options && Array.isArray(control.options)) {
+            control.options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option.value;
+                optionElement.textContent = option.label;
+                if (control.value === option.value) {
+                    optionElement.selected = true;
+                }
+                select.appendChild(optionElement);
+            });
+        }
+        
+        label.appendChild(document.createTextNode(' '));
+        label.appendChild(select);
+        return label;
+    }
+    
+    /**
+     * Create a checkbox element with label
+     * @private
+     */
+    static _createCheckbox(control) {
+        const label = document.createElement('label');
+        
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.id = control.id;
+        if (control.value !== undefined) input.checked = control.value;
+        if (control.className) input.className = control.className;
+        
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(' ' + control.label));
+        return label;
+    }
+    
+    /**
+     * Create a text input element with label
+     * @private
+     */
+    static _createTextInput(control) {
+        const label = document.createElement('label');
+        label.textContent = control.label + ':';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = control.id;
+        if (control.value !== undefined) input.value = control.value;
+        if (control.placeholder) input.placeholder = control.placeholder;
+        if (control.className) input.className = control.className;
+        
+        label.appendChild(document.createTextNode(' '));
+        label.appendChild(input);
+        return label;
+    }
 }
 
 /**
@@ -94,7 +271,9 @@ export class ISimulationControls {
  *             max: number,             // For number inputs
  *             step: number,            // For number inputs
  *             value: any,              // Default value
- *             options: Array           // For select controls: [{value, label}]
+ *             options: Array,          // For select controls: [{value, label}]
+ *             placeholder: string,     // For text inputs
+ *             className: string        // CSS class name
  *         }
  *     ],
  *     getControl(id): Object|undefined,
