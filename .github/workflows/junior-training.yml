@@ -24,18 +24,15 @@ jobs:
           PROMPT_FILE="training/prompt-engineering-$MONTH.md"
           PLAN_FILE="training/training-plan-$MONTH.md"
           
-          # Read junior profile
-          PROFILE=$(cat .github/context/junior-profile.json)
-          
           echo "🎯 Generating training materials for $MONTH..."
           
           # 1. Generate Quiz
-          cat > "$QUIZ_FILE" << 'EOF'
-          # Monthly Knowledge Quiz - $(date +%B\ %Y)
+          cat > "$QUIZ_FILE" << EOF
+          # Monthly Knowledge Quiz - $MONTH
           
           ## RainChart Codebase Quiz
           
-          **Instructions:** Answer all questions. Submit your answers in a new file \`quiz-answers-$(date +%B-%Y).md\` in the training folder.
+          **Instructions:** Answer all questions. Submit your answers in a new file \`quiz-answers-$MONTH.md\` in the training folder.
           
           ### Section 1: Architecture & Design Patterns (20 points)
           
@@ -126,8 +123,8 @@ jobs:
           EOF
           
           # 2. Generate Coding Challenge
-          cat > "$CHALLENGE_FILE" << 'EOF'
-          # Coding Challenge - $(date +%B\ %Y)
+          cat > "$CHALLENGE_FILE" << EOF
+          # Coding Challenge - $MONTH
           
           ## Challenge: Implement a Damped Harmonic Oscillator
           
@@ -230,8 +227,8 @@ jobs:
           EOF
           
           # 3. Generate Prompt Engineering Exercise
-          cat > "$PROMPT_FILE" << 'EOF'
-          # Prompt Engineering Exercise - $(date +%B\ %Y)
+          cat > "$PROMPT_FILE" << EOF
+          # Prompt Engineering Exercise - $MONTH
           
           ## Exercise: Effective Prompting for Code Generation
           
@@ -334,13 +331,13 @@ jobs:
           
           ### Submission
           
-          Submit your completed exercise as \`training/prompt-engineering-answers-$(date +%B-%Y).md\`
+          Submit your completed exercise as \`training/prompt-engineering-answers-$MONTH.md\`
           
           EOF
           
           # 4. Generate Personalized Training Plan
-          cat > "$PLAN_FILE" << 'EOF'
-          # Personalized Training Plan - $(date +%B\ %Y)
+          cat > "$PLAN_FILE" << EOF
+          # Personalized Training Plan - $MONTH
           
           ## Junior Developer Profile
           
@@ -552,7 +549,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add training/
-          git commit -m "🎓 Monthly junior training materials - $(date +%B\ %Y)
+          git commit -m "🎓 Monthly junior training materials - $MONTH
 
           Generated:
           - Knowledge quiz
