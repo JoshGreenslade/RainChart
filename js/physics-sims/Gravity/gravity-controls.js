@@ -55,11 +55,21 @@ export const GravityControls = {
     ],
 
     // Helper method to get control by id
+    /**
+     * Get a control definition by its ID
+     * @param {string} id - The control ID to search for
+     * @returns {Object|undefined} The control definition or undefined if not found
+     */
     getControl(id) {
         return this.controls.find(control => control.id === id);
     },
 
     // Helper method to get all controls by type
+    /**
+     * Get all controls of a specific type
+     * @param {string} type - The control type to filter by (e.g., 'button', 'number', 'select')
+     * @returns {Array} Array of control definitions matching the specified type
+     */
     getControlsByType(type) {
         return this.controls.filter(control => control.type === type);
     }

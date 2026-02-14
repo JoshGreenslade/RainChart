@@ -117,10 +117,14 @@ function handleControlAction(action, event) {
             simulation.stop();
             break;
         
-        case 'reset':
-            const bodyCount = parseInt(document.getElementById('gravity-bodies').value);
+        case 'reset': {
+            // Read current body count from the bodies control
+            const bodiesControl = GravityControls.getControl('gravity-bodies');
+            const bodyCountElement = document.getElementById(bodiesControl.id);
+            const bodyCount = parseInt(bodyCountElement.value);
             simulation.reset(bodyCount);
             break;
+        }
         
         case 'setG':
             simulation.setG(parseFloat(event.target.value));
