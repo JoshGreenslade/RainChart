@@ -1,12 +1,16 @@
 /**
  * Gravity Engine - Pure physics calculations for N-body gravity simulation
  * Handles all physics logic: forces, positions, velocities, and body generation
+ * 
+ * Implements ISimulationEngine interface
  */
 
 import { GravityConfig } from './gravity-config.js';
+import { ISimulationEngine } from '../engine-interface.js';
 
-export class GravityEngine {
+export class GravityEngine extends ISimulationEngine {
     constructor(width, height, bodyCount = 3, G = 1.0) {
+        super();
         this.width = width;
         this.height = height;
         this.G = G;
