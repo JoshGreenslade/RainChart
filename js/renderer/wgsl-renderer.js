@@ -20,6 +20,7 @@ export class WGSLRenderer {
         this.context = null;
         this.pipeline = null;
         this.initialized = false;
+        this.initError = null;
         
         // Rendering state
         this.circles = [];
@@ -32,10 +33,12 @@ export class WGSLRenderer {
             accent: '#3498db'
         };
         
-        // Initialize WebGPU
+        // Initialize WebGPU asynchronously
+        // Note: Constructor completes synchronously, but rendering won't work until initialized
         this._initWebGPU().catch(err => {
             console.error('Failed to initialize WebGPU:', err);
-            throw new Error('WebGPU not supported or initialization failed');
+            this.initError = err;
+            // WebGPU initialization failed - renderer will be non-functional
         });
     }
     
@@ -140,6 +143,8 @@ export class WGSLRenderer {
     
     /**
      * Get WGSL shader code for rendering circles
+     * Note: This embeds width and height into the shader at initialization time.
+     * The resize() method reinitializes the entire pipeline to update these values.
      * @private
      */
     _getShaderCode() {
@@ -235,11 +240,12 @@ export class WGSLRenderer {
     
     /**
      * Add a circle to the scene
+     * Note: Returns 'pending' if WebGPU is still initializing
      */
     addCircle(x, y, radius, style = {}) {
         if (!this.initialized) {
-            console.warn('WGSLRenderer not initialized yet');
-            return 'pending';
+            console.warn('WGSLRenderer not initialized yet, circle will not be rendered');
+            return `pending-circle-${Date.now()}`;
         }
         
         const color = this._parseColor(style.fill || '#ffffff');
@@ -315,12 +321,12 @@ export class WGSLRenderer {
         }
         
         try {
-            // Clear circle data
-            const circleData = this.circles;
+            // Store circles to render, then clear the array for next frame
+            const circlesToRender = this.circles;
             this.circles = [];
             
             // Create vertex buffer
-            if (circleData.length === 0) {
+            if (circlesToRender.length === 0) {
                 // Just clear the canvas
                 const commandEncoder = this.device.createCommandEncoder();
                 const textureView = this.context.getCurrentTexture().createView();
@@ -341,9 +347,9 @@ export class WGSLRenderer {
             }
             
             // Prepare vertex data (8 floats per circle)
-            const vertexData = new Float32Array(circleData.length * 8);
-            for (let i = 0; i < circleData.length; i++) {
-                const circle = circleData[i];
+            const vertexData = new Float32Array(circlesToRender.length * 8);
+            for (let i = 0; i < circlesToRender.length; i++) {
+                const circle = circlesToRender[i];
                 const offset = i * 8;
                 vertexData[offset + 0] = circle.x;
                 vertexData[offset + 1] = circle.y;
@@ -379,7 +385,7 @@ export class WGSLRenderer {
             
             renderPass.setPipeline(this.pipeline);
             renderPass.setVertexBuffer(0, vertexBuffer);
-            renderPass.draw(6, circleData.length); // 6 vertices per circle instance
+            renderPass.draw(6, circlesToRender.length); // 6 vertices per circle instance
             renderPass.end();
             
             this.device.queue.submit([commandEncoder.finish()]);
@@ -401,8 +407,9 @@ export class WGSLRenderer {
             this.canvas.height = height;
         }
         
-        // Reinitialize with new dimensions
+        // Mark as not initialized during reinit to prevent rendering with stale state
         if (this.initialized) {
+            this.initialized = false;
             this._initWebGPU().catch(err => {
                 console.error('Failed to reinitialize WebGPU after resize:', err);
             });

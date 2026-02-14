@@ -1,9 +1,9 @@
 /**
- * Numerical Integrators - Barrel Export
+ * Numerical Integrators - Backward Compatibility Wrapper
  * Generic numerical integration methods for ordinary differential equations (ODEs)
  * These integrators are physics-agnostic and work with any system of ODEs
  * 
- * This file maintains backward compatibility with the original Integrators object
+ * This file provides the original Integrators object interface for backward compatibility
  * while delegating to individual integrator implementations.
  */
 
