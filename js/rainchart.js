@@ -23,3 +23,6 @@ export { GravityControls } from './physics-sims/Gravity/gravity-controls.js';
 
 // Integrator utilities
 export { Integrators } from './integrators/integrators.js';
+
+// Color utilities
+export { DEFAULT_COLOR_PALETTE, BASE_COLOR_PALETTE } from './utils/color-palette.js';
