@@ -1,14 +1,17 @@
 /**
  * Main Application Entry Point
- * Gravity Simulation using Base Renderer
+ * Generic simulation runner that works with any simulation through interfaces
+ * 
+ * This file is completely independent of concrete simulations.
+ * Configure which simulation to run in app-config.js
  */
 
 import { BaseRenderer } from './renderer/base-renderer.js';
-import { GravitySimulation } from './physics-sims/Gravity/gravity-simulation.js';
-import { GravityConfig } from './physics-sims/Gravity/gravity-config.js';
-import { GravityControls } from './physics-sims/Gravity/gravity-controls.js';
+import { AppConfig } from './app-config.js';
 
 let simulation;
+let simulationConfig;
+let simulationControls;
 let baseRenderer;
 
 /**
@@ -24,20 +27,35 @@ function toTransparentColor(hslColor, alpha = 0.85) {
 }
 
 // Initialize simulation when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    initGravitySimulation();
+document.addEventListener('DOMContentLoaded', async () => {
+    await initSimulation();
 });
 
 /**
- * Initialize Gravity Simulation
+ * Initialize Simulation (Generic - works with any simulation)
  */
-function initGravitySimulation() {
-    // Get background color from config
-    const backgroundColor = GravityConfig.renderer.backgroundColor;
+async function initSimulation() {
+    // Dynamically import the simulation, config, and controls based on AppConfig
+    const { simulation: simConfig } = AppConfig;
+    
+    // Load simulation module
+    const SimulationModule = await import(simConfig.modulePath);
+    const SimulationClass = SimulationModule[simConfig.className];
+    
+    // Load config module
+    const ConfigModule = await import(simConfig.configPath);
+    simulationConfig = ConfigModule[simConfig.configName];
+    
+    // Load controls module
+    const ControlsModule = await import(simConfig.controlsPath);
+    simulationControls = ControlsModule[simConfig.controlsName];
+    
+    // Get background color from config (if available)
+    const backgroundColor = simulationConfig?.renderer?.backgroundColor;
     
     // Create base renderer with full window size
-    const renderMode = document.getElementById('renderer-mode').value;
-    baseRenderer = new BaseRenderer('gravity-chart', {
+    const renderMode = document.getElementById('renderer-mode')?.value || AppConfig.renderer.defaultMode;
+    baseRenderer = new BaseRenderer(AppConfig.renderer.containerId, {
         width: window.innerWidth,
         height: window.innerHeight,
         renderMode: renderMode,
@@ -47,10 +65,16 @@ function initGravitySimulation() {
     // Update controls background to match color scheme
     updateControlsBackground();
     
-    // Create simulation (MVC controller) - using interface
-    simulation = new GravitySimulation(window.innerWidth, window.innerHeight, 3, 1.0);
+    // Create simulation instance using configured parameters
+    const params = simConfig.initialParams;
+    simulation = new SimulationClass(
+        window.innerWidth,
+        window.innerHeight,
+        params.bodyCount,
+        params.G
+    );
     
-    // Connect simulation to renderer
+    // Connect simulation to renderer (using interface methods)
     simulation.onUpdate((state) => {
         simulation.render(baseRenderer);
     });
@@ -64,7 +88,7 @@ function initGravitySimulation() {
         simulation.setDimensions(window.innerWidth, window.innerHeight);
     });
     
-    // Connect UI controls
+    // Connect UI controls (generic)
     setupUIControls();
 }
 
@@ -83,11 +107,11 @@ function updateControlsBackground() {
 }
 
 /**
- * Setup UI control event handlers using control definitions from GravityControls
+ * Setup UI control event handlers (Generic - works with any simulation)
  */
 function setupUIControls() {
-    // Iterate through all controls defined in GravityControls
-    GravityControls.controls.forEach(control => {
+    // Iterate through all controls defined in the loaded simulation controls
+    simulationControls.controls.forEach(control => {
         const element = document.getElementById(control.id);
         if (!element) {
             console.warn(`Control element with id '${control.id}' not found in DOM`);
@@ -105,10 +129,11 @@ function setupUIControls() {
 }
 
 /**
- * Handle control actions
+ * Handle control actions (Generic - delegates to simulation interface methods)
  */
 function handleControlAction(action, event) {
     switch (action) {
+        // Standard interface actions that all simulations must support
         case 'start':
             simulation.start();
             break;
@@ -118,28 +143,25 @@ function handleControlAction(action, event) {
             break;
         
         case 'reset': {
-            // Read current body count from the bodies control
-            const bodiesControl = GravityControls.getControl('gravity-bodies');
-            const bodyCountElement = document.getElementById(bodiesControl.id);
-            const bodyCount = parseInt(bodyCountElement.value);
-            simulation.reset(bodyCount);
+            // For reset, get the appropriate parameters from controls
+            // This is generic - reads from any control that might affect reset
+            const params = getResetParameters();
+            simulation.reset(...params);
             break;
         }
         
-        case 'setG':
-            simulation.setG(parseFloat(event.target.value));
-            break;
-        
+        // setBodies action should trigger a reset with new body count
         case 'setBodies': {
-            const bodyCount = parseInt(event.target.value);
+            const bodyCount = parseControlValue(event.target.value, event.target.type);
             simulation.reset(bodyCount);
             break;
         }
         
+        // Renderer mode is application-level, not simulation-specific
         case 'setRendererMode': {
             const renderMode = event.target.value;
-            const backgroundColor = GravityConfig.renderer.backgroundColor;
-            baseRenderer = new BaseRenderer('gravity-chart', {
+            const backgroundColor = simulationConfig?.renderer?.backgroundColor;
+            baseRenderer = new BaseRenderer(AppConfig.renderer.containerId, {
                 width: window.innerWidth,
                 height: window.innerHeight,
                 renderMode: renderMode,
@@ -149,12 +171,63 @@ function handleControlAction(action, event) {
             // Update background colors
             updateControlsBackground();
             
-            // Re-render
+            // Re-render using interface method
             simulation.render(baseRenderer);
             break;
         }
         
-        default:
-            console.warn(`Unknown control action: ${action}`);
+        // For any other action, try to call it as a method on the simulation
+        // This allows simulations to define custom actions (like setG, setTemperature, etc.)
+        default: {
+            // Check if the simulation has this method
+            if (typeof simulation[action] === 'function') {
+                // Extract the value from the event
+                const value = event.target.value;
+                // Call the method with the parsed value
+                const parsedValue = parseControlValue(value, event.target.type);
+                simulation[action](parsedValue);
+            } else {
+                console.warn(`Unknown control action: ${action}, and simulation doesn't have method ${action}()`);
+            }
+            break;
+        }
     }
+}
+
+/**
+ * Get parameters for reset based on current control values
+ * @returns {Array} Parameters to pass to simulation.reset()
+ */
+function getResetParameters() {
+    // This is simulation-agnostic - looks for any controls that should be passed to reset
+    const params = [];
+    
+    // Common pattern: find controls that have reset-related data
+    // For example, bodyCount, particle count, etc.
+    simulationControls.controls.forEach(control => {
+        // Look for controls that might affect reset (e.g., body count, particle count)
+        if (control.action === 'setBodies' || control.id.includes('bodies') || 
+            control.id.includes('particles') || control.id.includes('count')) {
+            const element = document.getElementById(control.id);
+            if (element) {
+                params.push(parseControlValue(element.value, control.type));
+            }
+        }
+    });
+    
+    // If no specific parameters found, return empty array (reset with defaults)
+    return params;
+}
+
+/**
+ * Parse control value based on its type
+ * @param {string} value - The value to parse
+ * @param {string} type - The type of control
+ * @returns {*} Parsed value
+ */
+function parseControlValue(value, type) {
+    if (type === 'number') {
+        return parseFloat(value);
+    }
+    return value;
 }
