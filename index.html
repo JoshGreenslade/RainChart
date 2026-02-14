@@ -3,45 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gravity Simulator</title>
+    <title>RainChart - Physics Simulations</title>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/controls.css">
 </head>
 <body>
     <div id="container">
+        <!-- Chart container - ID will be determined by simulation config -->
         <div id="gravity-chart"></div>
         
-        <div id="controls">
-            <button id="gravity-start">Start</button>
-            <button id="gravity-stop">Stop</button>
-            <button id="gravity-reset">Reset</button>
-            
-            <div class="separator"></div>
-            
-            <label>
-                Bodies:
-                <input type="number" id="gravity-bodies" min="1" max="20" value="3">
-            </label>
-            <label>
-                G Constant:
-                <input type="number" id="gravity-constant" step="0.1" value="1.0">
-            </label>
-            
-            <div class="separator"></div>
-            
-            <label>
-                Renderer:
-                <select id="renderer-mode">
-                    <option value="canvas">Canvas</option>
-                    <option value="svg">SVG</option>
-                </select>
-            </label>
-        </div>
+        <!-- Controls container - populated dynamically by controls-interface -->
+        <div id="controls"></div>
         
-        <div id="info">
-            <div>Gravity Simulator - N-body gravitational interactions</div>
-            <div>Bodies attract each other based on their mass and distance</div>
-        </div>
+        <!-- Info container - populated dynamically by simulation -->
+        <div id="info"></div>
     </div>
     
     <!-- D3.js library (required for D3Renderer) -->

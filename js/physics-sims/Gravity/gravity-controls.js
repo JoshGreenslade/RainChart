@@ -51,11 +51,18 @@ export const GravityControls = {
             label: 'Renderer',
             options: [
                 { value: 'canvas', label: 'Canvas' },
-                { value: 'svg', label: 'SVG' }
+                { value: 'svg', label: 'SVG' },
+                { value: 'webgpu', label: 'WebGPU (10k+ objects)' }
             ],
             value: 'canvas',
             action: 'setRendererMode'
         }
+    ],
+
+    // Info text to display
+    info: [
+        'Gravity Simulator - N-body gravitational interactions',
+        'Bodies attract each other based on their mass and distance'
     ],
 
     // Helper method to get control by id

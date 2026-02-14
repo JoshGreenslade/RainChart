@@ -1,19 +1,22 @@
 /**
  * Base Renderer - Delegates to concrete renderer implementations
- * Acts as a factory and adapter that routes calls to Canvas or D3 renderers
+ * Acts as a factory and adapter that routes calls to Canvas, D3, or WGSL renderers
  */
 
 import { CanvasRenderer } from './canvas-renderer.js';
 import { D3Renderer } from './d3-renderer.js';
+import { WGSLRenderer } from './wgsl-renderer.js';
 
 export class BaseRenderer {
     constructor(containerId, options = {}) {
         this.containerId = containerId;
-        this.renderMode = options.renderMode || 'svg'; // 'svg' or 'canvas'
+        this.renderMode = options.renderMode || 'svg'; // 'svg', 'canvas', or 'webgpu'
         
         // Create the concrete renderer based on mode
         if (this.renderMode === 'canvas') {
             this.renderer = new CanvasRenderer(containerId, options);
+        } else if (this.renderMode === 'webgpu') {
+            this.renderer = new WGSLRenderer(containerId, options);
         } else {
             this.renderer = new D3Renderer(containerId, options);
         }

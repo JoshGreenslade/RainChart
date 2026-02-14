@@ -4,7 +4,7 @@ Canonical reference for how RainChart is structured. Keep this in sync with the 
 
 ## Purpose
 
-RainChart is an interactive physics simulation framework rendered in the browser. It currently ships a gravity simulation with pluggable rendering backends (Canvas and SVG/D3). The core design goal is **complete separation between physics calculations and visualisation**.
+RainChart is an interactive physics simulation framework rendered in the browser. It currently ships a gravity simulation with pluggable rendering backends (Canvas, SVG/D3, and WebGPU). The core design goal is **complete separation between physics calculations and visualisation**.
 
 ## Guiding Principles
 
@@ -28,12 +28,15 @@ RainChart is an interactive physics simulation framework rendered in the browser
 ┌───▼──────────────┐  ┌──▼────────────────────┐
 │  Physics Layer   │  │  Visualisation Layer   │
 │                  │  │                        │
-│ Integrators      │  │ BaseRenderer (factory) │
-│ Engines          │  │  ├─ CanvasRenderer     │
-│ Simulations      │  │  └─ D3Renderer         │
-│ (ISimulation)    │  │                        │
-│                  │  │ Simulation Renderers    │
-│                  │  │  └─ GravityRenderer     │
+│ IIntegrator      │  │ IRenderer interface    │
+│  ├─ Euler        │  │                        │
+│  ├─ RK4          │  │ BaseRenderer (factory) │
+│  ├─ Verlet       │  │  ├─ CanvasRenderer     │
+│  └─ VelVerlet    │  │  ├─ D3Renderer         │
+│                  │  │  └─ WGSLRenderer       │
+│ ISimulation      │  │                        │
+│ IEngine          │  │ Simulation Renderers   │
+│                  │  │  └─ GravityRenderer    │
 └──────────────────┘  └────────────────────────┘
 ```
 
@@ -44,12 +47,17 @@ js/
 ├── main.js                          # Application layer – entry point, generic simulation runner
 ├── rainchart.js                     # Barrel export for all public modules
 ├── integrators/
-│   └── integrators.js               # Generic ODE solvers (Euler, RK4, Verlet, Velocity Verlet)
+│   ├── integrator-interface.js     # IIntegrator – interface for all integrators
+│   ├── euler-integrator.js         # Euler method implementation
+│   ├── rk4-integrator.js           # 4th-order Runge-Kutta implementation
+│   ├── verlet-integrator.js        # Position Verlet implementation
+│   ├── velocity-verlet-integrator.js # Velocity Verlet implementation
+│   └── integrators.js              # Barrel export (backward compatibility)
 ├── physics-sims/
 │   ├── simulation-interface.js      # ISimulation – abstract base class
 │   ├── engine-interface.js          # ISimulationEngine – abstract base class
 │   ├── config-interface.js          # ISimulationConfig – validation helper
-│   ├── controls-interface.js        # ISimulationControls – validation helper
+│   ├── controls-interface.js        # ISimulationControls – validation + DOM creation
 │   └── Gravity/
 │       ├── gravity-simulation.js    # Controller: owns engine + renderer, animation loop
 │       ├── gravity-engine.js        # Pure physics: N-body force/position calculations
@@ -57,9 +65,11 @@ js/
 │       ├── gravity-config.js        # Module metadata + renderer/engine configuration
 │       └── gravity-controls.js      # UI control definitions
 └── renderer/
-    ├── base-renderer.js             # Factory/adapter – routes to Canvas or D3
+    ├── renderer-interface.js        # IRenderer – interface for all renderers
+    ├── base-renderer.js             # Factory/adapter – routes to Canvas, D3, or WGSL
     ├── canvas-renderer.js           # HTML5 Canvas primitives implementation
-    └── d3-renderer.js               # SVG/D3.js primitives implementation
+    ├── d3-renderer.js               # SVG/D3.js primitives implementation
+    └── wgsl-renderer.js             # WebGPU high-performance renderer (10k+ objects)
 
 styles/
 └── main.css                         # Shared CSS variables and base styles
@@ -67,7 +77,7 @@ styles/
 lib/
 └── d3.v7.min.js                     # Vendored D3 library (optional – SVG mode only)
 
-index.html                           # Gravity simulator app
+index.html                           # Generic simulation app (controls created dynamically)
 chart.html                           # Primitive drawing demo
 example-module.html                  # Module usage example
 test-selective-import.html           # Module import testing
@@ -99,21 +109,27 @@ Application (main.js)
     │    BaseRenderer.addCircle / addLine / …
     │         │
     │         ▼
-    │    CanvasRenderer or D3Renderer
+    │    CanvasRenderer, D3Renderer, or WGSLRenderer
     │
     ▼
-Visual Output (Canvas element or SVG element)
+Visual Output (Canvas element, SVG element, or WebGPU canvas)
 ```
 
 **Key rule:** Data flows in one direction. Renderers never call back into physics.
 
 ## Component Responsibilities
 
-### Integrators (`js/integrators/integrators.js`)
+### Integrators (`js/integrators/`)
 
-Physics-agnostic ODE solvers with a uniform interface: `(state, derivative, dt, t) → newState`.
+Physics-agnostic ODE solvers that all implement the `IIntegrator` interface: `integrate(state, derivative, dt, t) → newState`.
 
-Available methods: Euler, RK4, position Verlet, velocity Verlet. Each engine selects its integrator via its config (e.g. `GravityConfig.engine.integrator`).
+Each integrator is now in its own file:
+- `euler-integrator.js` - Euler method (1st order)
+- `rk4-integrator.js` - 4th-order Runge-Kutta
+- `verlet-integrator.js` - Position Verlet (symplectic)
+- `velocity-verlet-integrator.js` - Velocity Verlet (symplectic)
+
+The `integrators.js` file serves as a barrel export for backward compatibility. Each engine selects its integrator via its config (e.g. `GravityConfig.engine.integrator`).
 
 ### Physics Engines (e.g. `gravity-engine.js`)
 
@@ -135,11 +151,19 @@ Available methods: Euler, RK4, position Verlet, velocity Verlet. Each engine sel
 - Contain visual logic like grid drawing, colour mapping, and size scaling.
 - Depend only on the primitive renderer interface, not on a specific backend.
 
-### BaseRenderer → CanvasRenderer / D3Renderer
+### IRenderer Interface (`js/renderer/renderer-interface.js`)
+
+Defines the contract that all renderer implementations must follow. Validates that renderers implement required methods: `addCircle`, `addLine`, `addRectangle`, `addCurve`, `addPath`, `addAxis`, `updateElement`, `removeElement`, `clear`, `resize`, `getColorScheme`.
+
+### BaseRenderer → CanvasRenderer / D3Renderer / WGSLRenderer
 
 - `BaseRenderer` is a thin factory/adapter that delegates every call to the active backend.
-- Both backends implement the same primitive interface (see table below).
+- All backends implement the same primitive interface (see table below).
 - Backends can be swapped at runtime by recreating `BaseRenderer` with a different `renderMode`.
+- Three render modes available:
+  - `canvas` - HTML5 Canvas 2D (good for 100-1000 objects)
+  - `svg` - SVG with D3.js (good for interactive visualizations, <500 objects)
+  - `webgpu` - WebGPU/WGSL (optimized for 10,000+ objects, limited primitives)
 
 ### Simulation Configs (e.g. `gravity-config.js`)
 
@@ -151,13 +175,15 @@ Available methods: Euler, RK4, position Verlet, velocity Verlet. Each engine sel
 
 - Implement the `ISimulationControls` structure (validated at load time).
 - Define UI controls as a declarative array of objects (`{ id, type, label, action, ... }`).
-- `main.js` iterates the array, attaches DOM event listeners, and delegates actions to the simulation.
+- `ISimulationControls.createControlElements()` dynamically creates DOM elements from the control definitions.
+- `main.js` attaches event listeners and delegates actions to the simulation.
 
 ### Application Layer (`main.js`)
 
 - Completely generic – has **no hardcoded references** to any specific simulation.
 - Points to a single `SIMULATION_CONFIG_PATH` constant; change it to switch simulations.
 - Dynamically imports the simulation class and controls from the config's `module` metadata.
+- Dynamically creates UI controls from the controls definition.
 - Validates loaded modules against interfaces (`ISimulationConfig`, `ISimulationControls`).
 - Should remain thin – no physics or rendering logic.
 
@@ -179,7 +205,7 @@ Any renderer backend must implement these methods:
 | `resize` | `(width, height)` | – |
 | `getColorScheme` | `()` | scheme object |
 
-> **Note:** `updateElement` and `removeElement` are no-ops in Canvas mode because the canvas requires a full redraw.
+> **Note:** `updateElement` and `removeElement` are no-ops in Canvas and WebGPU modes because they require a full redraw. WebGPU renderer only optimally supports `addCircle` for high-performance rendering of 10,000+ objects; other primitives will log warnings.
 
 ## ISimulation Interface
 
