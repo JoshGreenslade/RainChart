@@ -132,10 +132,6 @@ async function initSimulation() {
 ```
 
 **Key Point**: `main.js` only needs to change ONE line (the config path) to switch simulations.
-    // Create simulation and wire up controls generically
-    // ... (main.js has NO hardcoded references to GravitySimulation)
-}
-```
 
 **Key Point**: `main.js` only imports `BaseRenderer` and works through the `ISimulation` interface. All simulation-specific metadata is in the simulation's config file.
 
