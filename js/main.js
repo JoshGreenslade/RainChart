@@ -130,10 +130,11 @@ function handleControlAction(action, event) {
             simulation.setG(parseFloat(event.target.value));
             break;
         
-        case 'setBodies':
-            const bodies = parseInt(event.target.value);
-            simulation.reset(bodies);
+        case 'setBodies': {
+            const bodyCount = parseInt(event.target.value);
+            simulation.reset(bodyCount);
             break;
+        }
         
         case 'setRendererMode':
             const renderMode = event.target.value;
