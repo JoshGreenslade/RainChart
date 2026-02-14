@@ -1,0 +1,13 @@
+{
+  "name": "Junior Developer",
+  "experience_level": "junior",
+  "experience_years": 1,
+  "goals": [
+    "Learn TypeScript",
+    "Understand codebase architecture",
+    "Improve code review skills"
+  ],
+  "languages_familiar": ["JavaScript", "HTML", "CSS"],
+  "languages_to_learn": ["TypeScript", "Python"],
+  "focus_areas": ["frontend", "testing"]
+}

@@ -18,7 +18,7 @@ jobs:
       - name: Generate training materials
         run: |
           copilot-agent run \
-            --skill skills/junior-training.md \
+            --skill .github/skills/junior-training.md \
             --input ".github/context/junior-profile.json" \
             --output training/monthly-plan-$(date +%F).md
 
