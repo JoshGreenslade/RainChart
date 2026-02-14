@@ -44,6 +44,7 @@ import { ColorScheme } from './js/renderer/color-scheme.js';
 import { GravitySimulation } from './js/physics-sims/Gravity/gravity-simulation.js';
 import { GravityEngine } from './js/physics-sims/Gravity/gravity-engine.js';
 import { GravityConfig } from './js/physics-sims/Gravity/gravity-config.js';
+import { GravityControls } from './js/physics-sims/Gravity/gravity-controls.js';
 
 // Import utilities
 import { Integrators } from './js/integrators/integrators.js';
@@ -68,6 +69,7 @@ import { ChartConfig } from './js/renderer/chart-config.js';
   - **`GravityEngine`** - Physics engine for gravity calculations
   - **`GravityRenderer`** - Rendering logic for gravity visualization
   - **`GravityConfig`** - Configuration for gravity simulation
+  - **`GravityControls`** - UI control definitions for gravity simulation
 
 ### Utility Modules
 
