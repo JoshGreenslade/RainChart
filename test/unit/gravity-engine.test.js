@@ -79,7 +79,7 @@ describe('GravityEngine', () => {
             assert.strictEqual(force.fy, 0); // No y component for horizontal alignment
         });
 
-        it('should have equal and opposite forces (Newtons third law)', () => {
+        it('should have equal and opposite forces (Newton\'s third law)', () => {
             const body1 = { x: 5, y: 5, mass: 10 };
             const body2 = { x: 15, y: 15, mass: 20 };
             const G = 1.0;
