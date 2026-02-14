@@ -54,7 +54,8 @@ async function initSimulation() {
     const backgroundColor = simulationConfig?.renderer?.backgroundColor;
     
     // Create base renderer with full window size
-    const renderMode = document.getElementById('renderer-mode')?.value || AppConfig.renderer.defaultMode;
+    const rendererModeElement = document.getElementById('renderer-mode');
+    const renderMode = (rendererModeElement && rendererModeElement.value) || AppConfig.renderer.defaultMode;
     baseRenderer = new BaseRenderer(AppConfig.renderer.containerId, {
         width: window.innerWidth,
         height: window.innerHeight,
@@ -183,8 +184,11 @@ function handleControlAction(action, event) {
             if (typeof simulation[action] === 'function') {
                 // Extract the value from the event
                 const value = event.target.value;
+                // Find the corresponding control to get its type
+                const control = simulationControls.controls.find(c => c.action === action);
+                const controlType = control ? control.type : 'text';
                 // Call the method with the parsed value
-                const parsedValue = parseControlValue(value, event.target.type);
+                const parsedValue = parseControlValue(value, controlType);
                 simulation[action](parsedValue);
             } else {
                 console.warn(`Unknown control action: ${action}, and simulation doesn't have method ${action}()`);
@@ -227,7 +231,8 @@ function getResetParameters() {
  */
 function parseControlValue(value, type) {
     if (type === 'number') {
-        return parseFloat(value);
+        const parsed = parseFloat(value);
+        return isNaN(parsed) ? 0 : parsed;
     }
     return value;
 }
