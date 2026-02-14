@@ -18,115 +18,545 @@ jobs:
       - name: Generate training materials
         run: |
           mkdir -p training
-          OUTPUT_FILE="training/monthly-plan-$(date +%F).md"
+          MONTH=$(date +%B-%Y)
+          QUIZ_FILE="training/quiz-$MONTH.md"
+          CHALLENGE_FILE="training/coding-challenge-$MONTH.md"
+          PROMPT_FILE="training/prompt-engineering-$MONTH.md"
+          PLAN_FILE="training/training-plan-$MONTH.md"
           
           # Read junior profile
           PROFILE=$(cat .github/context/junior-profile.json)
           
-          # Generate training plan
-          cat > "$OUTPUT_FILE" << EOF
-          # Monthly Training Plan - $(date +%B\ %Y)
+          echo "🎯 Generating training materials for $MONTH..."
+          
+          # 1. Generate Quiz
+          cat > "$QUIZ_FILE" << 'EOF'
+          # Monthly Knowledge Quiz - $(date +%B\ %Y)
+          
+          ## RainChart Codebase Quiz
+          
+          **Instructions:** Answer all questions. Submit your answers in a new file \`quiz-answers-$(date +%B-%Y).md\` in the training folder.
+          
+          ### Section 1: Architecture & Design Patterns (20 points)
+          
+          **Q1.** (5 points) What are the three main layers in the RainChart architecture?
+          
+          - [ ] A) Frontend, Backend, Database
+          - [ ] B) Application, Physics, Visualization
+          - [ ] C) Model, View, Controller
+          - [ ] D) Components, Services, Utils
+          
+          **Q2.** (5 points) Which design pattern is used to notify renderers when simulation state changes?
+          
+          - [ ] A) Singleton
+          - [ ] B) Factory
+          - [ ] C) Observer
+          - [ ] D) Strategy
+          
+          **Q3.** (5 points) Why must physics engines NEVER reference DOM APIs according to our conventions?
+          
+          _Your answer:_
+          
+          **Q4.** (5 points) What is the purpose of the \`BaseRenderer\` class?
+          
+          _Your answer:_
+          
+          ### Section 2: Integrators & Physics (20 points)
+          
+          **Q5.** (5 points) Which integrator is the simplest but least accurate?
+          
+          - [ ] A) Runge-Kutta 4th order (RK4)
+          - [ ] B) Euler
+          - [ ] C) Verlet
+          - [ ] D) Velocity Verlet
+          
+          **Q6.** (5 points) What makes Verlet and Velocity Verlet integrators "symplectic"?
+          
+          _Your answer:_
+          
+          **Q7.** (10 points) Name the five required methods that all simulation engines must implement (from \`ISimulationEngine\`):
+          
+          1. _______________________
+          2. _______________________
+          3. _______________________
+          4. _______________________
+          5. _______________________
+          
+          ### Section 3: Code Conventions (15 points)
+          
+          **Q8.** (5 points) What naming convention is used for file names in this project?
+          
+          - [ ] A) camelCase
+          - [ ] B) PascalCase
+          - [ ] C) snake_case
+          - [ ] D) kebab-case
+          
+          **Q9.** (5 points) According to conventions, private methods should be prefixed with:
+          
+          - [ ] A) \`private_\`
+          - [ ] B) \`_\`
+          - [ ] C) \`#\`
+          - [ ] D) No prefix needed
+          
+          **Q10.** (5 points) What is the maximum recommended lines per file?
+          
+          _Your answer:_
+          
+          ### Section 4: Practical Understanding (25 points)
+          
+          **Q11.** (10 points) Trace the data flow: A user clicks "Start Simulation". List the sequence of method calls that occur (at least 5 steps).
+          
+          _Your answer:_
+          
+          **Q12.** (10 points) Why does the project have a "no build step" philosophy? What are two advantages?
+          
+          _Your answer:_
+          
+          **Q13.** (5 points) When would you choose Canvas renderer over D3/SVG renderer?
+          
+          _Your answer:_
+          
+          ### Scoring Guide
+          
+          - **90-100 points:** Excellent! You have strong understanding of the codebase.
+          - **75-89 points:** Good job! Review the areas where you lost points.
+          - **60-74 points:** Satisfactory. Spend more time with the documentation and code.
+          - **Below 60:** Need improvement. Schedule a pairing session with a senior developer.
+          
+          EOF
+          
+          # 2. Generate Coding Challenge
+          cat > "$CHALLENGE_FILE" << 'EOF'
+          # Coding Challenge - $(date +%B\ %Y)
+          
+          ## Challenge: Implement a Damped Harmonic Oscillator
+          
+          ### Objective
+          Create a new physics simulation that models a damped harmonic oscillator (mass on a spring with friction).
+          
+          ### Background
+          A damped harmonic oscillator follows the equation:
+          \`\`\`
+          F = -kx - cv
+          \`\`\`
+          Where:
+          - \`k\` = spring constant
+          - \`x\` = displacement from equilibrium
+          - \`c\` = damping coefficient
+          - \`v\` = velocity
+          
+          ### Requirements
+          
+          #### Part 1: Engine Implementation (40 points)
+          
+          Create \`js/physics-sims/Oscillator/oscillator-engine.js\`:
+          
+          - [ ] Extend \`ISimulationEngine\`
+          - [ ] Implement all five required interface methods
+          - [ ] Use the Velocity Verlet integrator
+          - [ ] Track position, velocity, and acceleration
+          - [ ] Support configurable spring constant (k) and damping (c)
+          - [ ] Handle equilibrium position at center of canvas
+          
+          #### Part 2: Renderer Implementation (20 points)
+          
+          Create \`js/physics-sims/Oscillator/oscillator-renderer.js\`:
+          
+          - [ ] Draw the mass as a circle
+          - [ ] Draw the spring as a line from anchor point to mass
+          - [ ] Draw a faint trail showing the path of motion
+          - [ ] Color-code by velocity (slow = blue, fast = red)
+          - [ ] Draw equilibrium position marker
+          
+          #### Part 3: Config & Controls (15 points)
+          
+          Create \`oscillator-config.js\` and \`oscillator-controls.js\`:
+          
+          - [ ] Config follows \`ISimulationConfig\` structure
+          - [ ] Controls include sliders for:
+            - Spring constant (k): 0.1 to 5.0
+            - Damping coefficient (c): 0.0 to 2.0
+            - Initial displacement: -200 to 200 pixels
+          - [ ] Start/Stop/Reset buttons
+          
+          #### Part 4: Simulation Controller (15 points)
+          
+          Create \`oscillator-simulation.js\`:
+          
+          - [ ] Extend \`ISimulation\`
+          - [ ] Compose engine and renderer
+          - [ ] Implement animation loop
+          - [ ] Support observer pattern for state updates
+          
+          #### Part 5: Code Quality (10 points)
+          
+          - [ ] Follow all naming conventions from \`docs/conventions.md\`
+          - [ ] Add JSDoc comments to all public methods
+          - [ ] No file exceeds 200 lines
+          - [ ] Physics layer doesn't reference DOM
+          - [ ] Include comments for non-obvious physics calculations
+          
+          ### Bonus Challenges (+15 points)
+          
+          - [ ] (+5) Add energy visualization showing KE, PE, and total energy over time
+          - [ ] (+5) Support multiple oscillators with different parameters
+          - [ ] (+5) Implement phase portrait visualization (position vs velocity)
+          
+          ### Submission
+          
+          1. Create your implementation in the appropriate directories
+          2. Create a file \`training/oscillator-implementation-notes.md\` explaining:
+             - Design decisions you made
+             - Challenges you encountered
+             - How you tested your implementation
+          3. Update \`SIMULATION_CONFIG_PATH\` in \`main.js\` to point to your new simulation
+          4. Test it in a browser and take a screenshot
+          5. Submit via pull request
+          
+          ### Evaluation Criteria
+          
+          - **Correctness:** Does the physics behave as expected?
+          - **Code Quality:** Follows conventions, well-documented, clean
+          - **Completeness:** All requirements implemented
+          - **Testing:** Evidence of testing and verification
+          
+          ### Resources
+          
+          - Simple Harmonic Motion: https://en.wikipedia.org/wiki/Simple_harmonic_motion
+          - Damping: https://en.wikipedia.org/wiki/Damping
+          - Example integrator usage: See \`gravity-engine.js\`
+          - Example simulation: See \`js/physics-sims/Gravity/\` directory
+          
+          EOF
+          
+          # 3. Generate Prompt Engineering Exercise
+          cat > "$PROMPT_FILE" << 'EOF'
+          # Prompt Engineering Exercise - $(date +%B\ %Y)
+          
+          ## Exercise: Effective Prompting for Code Generation
+          
+          ### Objective
+          Learn to write effective prompts for AI coding assistants when working with the RainChart codebase.
+          
+          ### Background
+          AI assistants like GitHub Copilot can help you code faster, but only if you provide clear context and instructions. This exercise will help you practice writing prompts that generate high-quality, convention-compliant code.
+          
+          ### Task 1: Generate a New Integrator (30 points)
+          
+          **Your Goal:** Get an AI assistant to generate a new integrator (Midpoint method) that follows our conventions.
+          
+          **Bad Prompt Example:**
+          \`\`\`
+          "Write a midpoint integrator"
+          \`\`\`
+          
+          **Your Task:** Write a better prompt that:
+          - References our conventions and existing patterns
+          - Specifies the interface to implement
+          - Mentions file location and naming
+          - Requests JSDoc comments
+          
+          Write your prompt here:
+          \`\`\`
+          [Your prompt]
+          \`\`\`
+          
+          **Evaluation Criteria:**
+          - Does it reference \`IIntegrator\` interface?
+          - Does it mention existing integrators as examples?
+          - Does it specify file name and location?
+          - Does it request JSDoc comments?
+          - Does it ask for the correct function signature?
+          
+          ### Task 2: Fix a Bug with Context (30 points)
+          
+          **Scenario:** The gravity simulation sometimes produces NaN values for positions when bodies get very close.
+          
+          **Your Task:** Write a prompt that helps diagnose and fix this issue. Your prompt should:
+          - Describe the bug symptoms
+          - Provide context about where it likely occurs
+          - Request specific debugging steps
+          - Ask for a fix that follows our error handling conventions
+          
+          Write your prompt here:
+          \`\`\`
+          [Your prompt]
+          \`\`\`
+          
+          ### Task 3: Add a New Feature (40 points)
+          
+          **Goal:** Add collision detection to the gravity simulation.
+          
+          **Your Task:** Write a comprehensive prompt that:
+          - Explains the feature requirement
+          - References relevant files and interfaces
+          - Specifies where code changes should go (hint: engine, not renderer!)
+          - Mentions performance considerations
+          - Requests tests or validation approach
+          
+          Write your prompt here:
+          \`\`\`
+          [Your prompt]
+          \`\`\`
+          
+          ### Reflection Questions
+          
+          **Q1:** What makes a prompt "effective" when working with an established codebase?
+          
+          _Your answer:_
+          
+          **Q2:** Why is it important to reference conventions and patterns in your prompts?
+          
+          _Your answer:_
+          
+          **Q3:** How would you verify that AI-generated code follows our architecture constraints (e.g., physics layer not referencing DOM)?
+          
+          _Your answer:_
+          
+          ### Bonus: Prompt Iteration (+10 points)
+          
+          Pick one of your prompts above. Show how you would refine it based on an initial AI response that didn't quite meet requirements.
+          
+          **Initial Prompt:**
+          \`\`\`
+          [Your original prompt]
+          \`\`\`
+          
+          **AI Response Issues:**
+          \`\`\`
+          [What was wrong with the generated code]
+          \`\`\`
+          
+          **Refined Prompt:**
+          \`\`\`
+          [Your improved prompt]
+          \`\`\`
+          
+          ### Submission
+          
+          Submit your completed exercise as \`training/prompt-engineering-answers-$(date +%B-%Y).md\`
+          
+          EOF
+          
+          # 4. Generate Personalized Training Plan
+          cat > "$PLAN_FILE" << 'EOF'
+          # Personalized Training Plan - $(date +%B\ %Y)
           
           ## Junior Developer Profile
           
-          **Experience Level:** Junior
-          **Experience:** 1 year
+          Based on: \`.github/context/junior-profile.json\`
           
-          ### Current Skills
-          - JavaScript
-          - HTML
-          - CSS
+          **Name:** Junior Developer  
+          **Experience Level:** Junior (1 year)  
+          **Current Skills:** JavaScript, HTML, CSS  
+          **Learning Goals:** TypeScript, Architecture, Code Review  
+          **Focus Areas:** Frontend, Testing
           
-          ### Learning Goals
-          - Learn TypeScript
-          - Understand codebase architecture
-          - Improve code review skills
+          ---
           
-          ### Focus Areas
-          - Frontend development
-          - Testing
+          ## Progress Assessment
           
-          ## 4-Week Training Plan
+          ### Completed This Month
+          - [ ] Quiz score: ___/100
+          - [ ] Coding challenge: ___/100
+          - [ ] Prompt engineering: ___/100
+          - [ ] Previous sprint tasks completed: ___/___
           
-          ### Week 1: Codebase Architecture
-          - [ ] Read and understand \`docs/architecture.md\`
-          - [ ] Read and understand \`docs/conventions.md\`
-          - [ ] Review the main application entry point (\`js/main.js\`)
-          - [ ] Explore the separation between physics and rendering layers
-          - [ ] Exercise: Draw a diagram of the data flow in the gravity simulation
+          ### Areas of Strength
+          _(Will be filled after reviewing quiz and challenge submissions)_
           
-          ### Week 2: JavaScript to TypeScript Transition
-          - [ ] Study ES6 module syntax used in the codebase
-          - [ ] Learn about TypeScript interfaces and how they compare to the interface pattern used in RainChart
-          - [ ] Review JSDoc comments and how they relate to TypeScript types
-          - [ ] Exercise: Write type definitions for one of the integrator modules
+          ### Areas for Improvement
+          _(Will be filled after reviewing quiz and challenge submissions)_
           
-          ### Week 3: Physics Simulations
-          - [ ] Study the \`ISimulation\` and \`ISimulationEngine\` interfaces
-          - [ ] Review the gravity simulation implementation
-          - [ ] Understand the different integrators (Euler, RK4, Verlet, Velocity Verlet)
-          - [ ] Exercise: Implement a simple pendulum simulation following the existing patterns
+          ---
           
-          ### Week 4: Rendering and Testing
-          - [ ] Study the \`IRenderer\` interface and primitive rendering backends
-          - [ ] Understand how \`BaseRenderer\` delegates to Canvas, D3, or WebGPU renderers
-          - [ ] Learn about the observer pattern used in simulations
-          - [ ] Exercise: Add unit tests for the integrator modules
-          - [ ] Exercise: Implement a simple visual test for the pendulum simulation
+          ## 4-Week Learning Plan
           
-          ## Code Review Practice
+          ### Week 1: Codebase Deep Dive
           
-          ### Tasks for Code Review
-          1. Review recent PRs in the repository to understand the review process
-          2. Practice reviewing code changes for:
-             - Adherence to conventions in \`docs/conventions.md\`
-             - Proper separation of concerns (physics vs rendering)
-             - Code quality and maintainability
-          3. Focus on providing constructive feedback
+          **Focus:** Understanding architecture and conventions
+          
+          - [ ] Complete monthly quiz
+          - [ ] Read \`docs/architecture.md\` thoroughly
+          - [ ] Read \`docs/conventions.md\` thoroughly
+          - [ ] Review all files in \`js/integrators/\` directory
+          - [ ] Trace code execution from \`main.js\` through a simulation cycle
+          - [ ] Document findings in \`training/week1-notes.md\`
+          
+          **Pairing Session:** Schedule 30 min with senior dev to discuss layer boundaries
+          
+          ### Week 2: Build Something Small
+          
+          **Focus:** Applying patterns and conventions
+          
+          - [ ] Start coding challenge (Oscillator simulation)
+          - [ ] Implement engine with proper interface
+          - [ ] Add JSDoc comments as you code
+          - [ ] Test physics calculations independently
+          - [ ] Ask for code review on WIP branch
+          
+          **Pairing Session:** Review WIP code with senior dev
+          
+          ### Week 3: Advanced Concepts
+          
+          **Focus:** TypeScript concepts and testing
+          
+          - [ ] Complete oscillator simulation
+          - [ ] Study how our interface pattern relates to TypeScript interfaces
+          - [ ] Write comparison document: "JSDoc vs TypeScript" (1 page)
+          - [ ] Complete prompt engineering exercise
+          - [ ] Research testing frameworks suitable for our "no build" constraint
+          
+          **Pairing Session:** Discuss TypeScript migration strategy
+          
+          ### Week 4: Polish & Code Review
+          
+          **Focus:** Code quality and review skills
+          
+          - [ ] Submit completed coding challenge
+          - [ ] Review 3 recent PRs in the repository
+          - [ ] Write review comments using our conventions as criteria
+          - [ ] Refactor one area of your oscillator code for clarity
+          - [ ] Update this training plan with lessons learned
+          
+          **Pairing Session:** Practice code review with senior dev
+          
+          ---
           
           ## Suggested Sprint Tasks
           
-          ### Beginner Tasks
-          - Add JSDoc comments to any undocumented public methods
-          - Update README.md with clearer setup instructions
-          - Fix any linting issues in the codebase
+          These tasks are selected to support your growth while contributing to the project.
           
-          ### Intermediate Tasks
-          - Implement a new integrator method (e.g., Midpoint or Heun's method)
-          - Add keyboard controls to the gravity simulation
-          - Improve error handling in the physics engines
+          ### Sprint Task 1: Documentation (Easy) 🟢
           
-          ### Advanced Tasks
-          - Design and implement a new simple simulation (e.g., spring system)
-          - Add performance benchmarking for different integrators
-          - Implement save/load functionality for simulation state
+          **Task:** Add missing JSDoc comments to integrator modules  
+          **File:** \`js/integrators/*.js\`  
+          **Skills:** Code reading, documentation  
+          **Estimated:** 2-4 hours
+          
+          **Why this helps you:**
+          - Forces you to understand the integrator interface deeply
+          - Practice writing good documentation
+          - Low risk, high learning
+          
+          ### Sprint Task 2: Error Handling (Medium) 🟡
+          
+          **Task:** Add proper NaN/Infinity checks in gravity engine  
+          **File:** \`js/physics-sims/Gravity/gravity-engine.js\`  
+          **Skills:** Physics debugging, error handling  
+          **Estimated:** 4-6 hours
+          
+          **Why this helps you:**
+          - Learn physics edge cases
+          - Practice defensive coding
+          - Real bug that affects users
+          
+          **Hint:** Look for division by distance without softening
+          
+          ### Sprint Task 3: New Feature (Hard) 🔴
+          
+          **Task:** Implement velocity trails for bodies in gravity sim  
+          **Files:** \`gravity-renderer.js\`, potentially \`gravity-engine.js\`  
+          **Skills:** Rendering, state management  
+          **Estimated:** 6-8 hours
+          
+          **Why this helps you:**
+          - Practice separating rendering from physics
+          - Learn how to add features without breaking architecture
+          - Visual feature that's fun to demo
+          
+          **Requirements:**
+          - Store last N positions per body (circular buffer)
+          - Render as fading lines or points
+          - Add toggle control to UI
+          - Performance: should work with 50+ bodies
+          
+          ### Sprint Task 4: Testing Infrastructure (Medium) 🟡
+          
+          **Task:** Create unit tests for integrators  
+          **New Files:** \`test/integrators/\` directory  
+          **Skills:** Testing, numerical validation  
+          **Estimated:** 6-8 hours
+          
+          **Why this helps you:**
+          - Learn testing best practices
+          - Understand numerical methods better
+          - Build confidence in code changes
+          
+          **Requirements:**
+          - Use a testing framework compatible with "no build" philosophy
+          - Test each integrator against known analytical solutions
+          - Document how to run tests in README
+          
+          ---
+          
+          ## Success Metrics
+          
+          ### This Month
+          - [ ] Complete quiz with score ≥ 75
+          - [ ] Complete coding challenge with score ≥ 80
+          - [ ] Complete prompt engineering exercise
+          - [ ] Complete at least 1 sprint task
+          - [ ] Submit at least 1 code review comment on a PR
+          
+          ### Next Month Goals
+          - [ ] Lead implementation of a small feature
+          - [ ] Mentor another junior on the oscillator challenge
+          - [ ] Score ≥ 85 on next month's quiz
+          - [ ] Complete 2 sprint tasks
+          
+          ---
           
           ## Resources
           
-          ### JavaScript/TypeScript
-          - MDN Web Docs: https://developer.mozilla.org/
-          - TypeScript Handbook: https://www.typescriptlang.org/docs/handbook/intro.html
+          ### Bookmarked for You
+          - Project docs: \`/docs/\` directory
+          - Example simulation: \`js/physics-sims/Gravity/\`
+          - Integrator examples: \`js/integrators/\`
           
-          ### Physics Simulations
-          - Numerical Methods for ODE: https://en.wikipedia.org/wiki/Numerical_methods_for_ordinary_differential_equations
-          - Interactive Physics Simulations: https://www.myphysicslab.com/
+          ### External Learning
+          - JavaScript.info (advanced topics)
+          - TypeScript Handbook
+          - Clean Code by Robert Martin (chapters 2-3)
+          - Physics simulations: https://www.myphysicslab.com/
           
-          ### Code Quality
-          - Clean Code principles
-          - SOLID principles (especially Single Responsibility)
+          ---
           
-          ## Notes
+          ## Notes & Reflections
           
-          This training plan is generated monthly based on the junior developer profile.
-          Adjust the pace and focus based on actual progress and interests.
+          _Space for you to add notes throughout the month_
+          
+          ### Week 1
+          
+          
+          ### Week 2
+          
+          
+          ### Week 3
+          
+          
+          ### Week 4
+          
+          
           EOF
           
-          echo "Training plan generated: $OUTPUT_FILE"
+          echo "✅ Generated quiz: $QUIZ_FILE"
+          echo "✅ Generated coding challenge: $CHALLENGE_FILE"
+          echo "✅ Generated prompt engineering exercise: $PROMPT_FILE"
+          echo "✅ Generated personalized training plan: $PLAN_FILE"
+          echo ""
+          echo "📊 Training materials ready for review!"
 
       - name: Commit training plan
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add training/
-          git commit -m "Monthly junior training plan - $(date +%F)"
+          git commit -m "🎓 Monthly junior training materials - $(date +%B\ %Y)
+
+          Generated:
+          - Knowledge quiz
+          - Coding challenge (Damped Harmonic Oscillator)
+          - Prompt engineering exercise
+          - Personalized training plan with sprint task suggestions"
           git push
