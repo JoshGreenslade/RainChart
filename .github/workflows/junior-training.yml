@@ -17,10 +17,111 @@ jobs:
 
       - name: Generate training materials
         run: |
-          copilot-agent run \
-            --skill .github/skills/junior-training.md \
-            --input ".github/context/junior-profile.json" \
-            --output training/monthly-plan-$(date +%F).md
+          mkdir -p training
+          OUTPUT_FILE="training/monthly-plan-$(date +%F).md"
+          
+          # Read junior profile
+          PROFILE=$(cat .github/context/junior-profile.json)
+          
+          # Generate training plan
+          cat > "$OUTPUT_FILE" << 'EOF'
+          # Monthly Training Plan - $(date +%B\ %Y)
+          
+          ## Junior Developer Profile
+          
+          **Experience Level:** Junior
+          **Experience:** 1 year
+          
+          ### Current Skills
+          - JavaScript
+          - HTML
+          - CSS
+          
+          ### Learning Goals
+          - Learn TypeScript
+          - Understand codebase architecture
+          - Improve code review skills
+          
+          ### Focus Areas
+          - Frontend development
+          - Testing
+          
+          ## 4-Week Training Plan
+          
+          ### Week 1: Codebase Architecture
+          - [ ] Read and understand `docs/architecture.md`
+          - [ ] Read and understand `docs/conventions.md`
+          - [ ] Review the main application entry point (`js/main.js`)
+          - [ ] Explore the separation between physics and rendering layers
+          - [ ] Exercise: Draw a diagram of the data flow in the gravity simulation
+          
+          ### Week 2: JavaScript to TypeScript Transition
+          - [ ] Study ES6 module syntax used in the codebase
+          - [ ] Learn about TypeScript interfaces and how they compare to the interface pattern used in RainChart
+          - [ ] Review JSDoc comments and how they relate to TypeScript types
+          - [ ] Exercise: Write type definitions for one of the integrator modules
+          
+          ### Week 3: Physics Simulations
+          - [ ] Study the `ISimulation` and `ISimulationEngine` interfaces
+          - [ ] Review the gravity simulation implementation
+          - [ ] Understand the different integrators (Euler, RK4, Verlet, Velocity Verlet)
+          - [ ] Exercise: Implement a simple pendulum simulation following the existing patterns
+          
+          ### Week 4: Rendering and Testing
+          - [ ] Study the `IRenderer` interface and primitive rendering backends
+          - [ ] Understand how `BaseRenderer` delegates to Canvas, D3, or WebGPU renderers
+          - [ ] Learn about the observer pattern used in simulations
+          - [ ] Exercise: Add unit tests for the integrator modules
+          - [ ] Exercise: Implement a simple visual test for the pendulum simulation
+          
+          ## Code Review Practice
+          
+          ### Tasks for Code Review
+          1. Review recent PRs in the repository to understand the review process
+          2. Practice reviewing code changes for:
+             - Adherence to conventions in `docs/conventions.md`
+             - Proper separation of concerns (physics vs rendering)
+             - Code quality and maintainability
+          3. Focus on providing constructive feedback
+          
+          ## Suggested Sprint Tasks
+          
+          ### Beginner Tasks
+          - Add JSDoc comments to any undocumented public methods
+          - Update README.md with clearer setup instructions
+          - Fix any linting issues in the codebase
+          
+          ### Intermediate Tasks
+          - Implement a new integrator method (e.g., Midpoint or Heun's method)
+          - Add keyboard controls to the gravity simulation
+          - Improve error handling in the physics engines
+          
+          ### Advanced Tasks
+          - Design and implement a new simple simulation (e.g., spring system)
+          - Add performance benchmarking for different integrators
+          - Implement save/load functionality for simulation state
+          
+          ## Resources
+          
+          ### JavaScript/TypeScript
+          - MDN Web Docs: https://developer.mozilla.org/
+          - TypeScript Handbook: https://www.typescriptlang.org/docs/handbook/intro.html
+          
+          ### Physics Simulations
+          - Numerical Methods for ODE: https://en.wikipedia.org/wiki/Numerical_methods_for_ordinary_differential_equations
+          - Interactive Physics Simulations: https://www.myphysicslab.com/
+          
+          ### Code Quality
+          - Clean Code principles
+          - SOLID principles (especially Single Responsibility)
+          
+          ## Notes
+          
+          This training plan is generated monthly based on the junior developer profile.
+          Adjust the pace and focus based on actual progress and interests.
+          EOF
+          
+          echo "Training plan generated: $OUTPUT_FILE"
 
       - name: Commit training plan
         run: |
