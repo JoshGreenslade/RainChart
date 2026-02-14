@@ -2,6 +2,8 @@
 
 Ground rules for keeping this codebase simple, understandable, maintainable and extendable.
 
+> **For AI agents:** Read this document in full before making any changes to the repository.
+
 ## General Philosophy
 
 - **Prefer simplicity over cleverness.** If someone new to the project cannot understand a file in five minutes, it is too complex.
@@ -12,11 +14,13 @@ Ground rules for keeping this codebase simple, understandable, maintainable and 
 ## Project Structure
 
 ```
-docs/           Architecture and planning documents (you are here)
+docs/           Architecture, conventions, and planning documents (you are here)
 js/
+  main.js       Application entry point (generic simulation runner)
+  rainchart.js  Barrel export for all public modules
   integrators/  Generic numerical solvers
-  physics-sims/ Physics engines, simulation controllers, simulation renderers
-  renderer/     Primitive rendering backends and config
+  physics-sims/ Simulation interfaces, engines, controllers, renderers, configs, controls
+  renderer/     Primitive rendering backends (Canvas and D3/SVG)
 lib/            Vendored third-party libraries
 styles/         CSS
 ```
@@ -26,38 +30,46 @@ styles/         CSS
 | Item | Convention | Example |
 |---|---|---|
 | Files | `kebab-case.js` | `gravity-engine.js` |
+| Directories (simulations) | `PascalCase` | `Gravity/` |
 | Classes | `PascalCase` | `GravityEngine` |
+| Interfaces | `I` prefix + `PascalCase` | `ISimulation` |
 | Methods/functions | `camelCase` | `calculateForce()` |
-| Constants | `UPPER_SNAKE_CASE` | `CONFIG.softening_factor` |
+| Constants | `UPPER_SNAKE_CASE` | `SIMULATION_CONFIG_PATH` |
+| Config object keys | `camelCase` | `bodyCount`, `maxMass` |
 | Private methods | `_camelCase` prefix | `_drawBodies()` |
 | CSS variables | `--kebab-case` | `--primary-color` |
 | HTML IDs | `kebab-case` | `gravity-chart` |
 
 ### File Naming Pattern for Simulations
 
-Each simulation has up to three files:
+Each simulation lives in its own folder under `js/physics-sims/` and contains five files:
 
 ```
-<name>-engine.js       Pure physics calculations
-<name>-renderer.js     Visual scene composition using primitives
-<name>-simulation.js   Controller: lifecycle, observers, animation loop
+<Name>/
+  <name>-engine.js       Pure physics calculations (extends ISimulationEngine)
+  <name>-renderer.js     Scene composition using primitive draw calls
+  <name>-simulation.js   Controller: lifecycle, observers, animation loop (extends ISimulation)
+  <name>-config.js       Module metadata + renderer/engine configuration (ISimulationConfig)
+  <name>-controls.js     UI control definitions (ISimulationControls)
 ```
 
 ## Coding Style
 
 ### JavaScript
 
+- Use ES6 modules (`import` / `export`). Every file is a module.
 - Use `class` for objects with state and behaviour.
-- Use plain objects/closures for stateless utilities (e.g. `Integrators`, `ChartConfig`).
+- Use plain objects/closures for stateless utilities (e.g. `Integrators`, `GravityConfig`).
 - Use `const` by default; `let` when reassignment is needed; never `var`.
 - Use `===` for comparisons, never `==`.
 - Keep functions short. If a function exceeds ~30 lines, consider splitting it.
 - Use JSDoc `/** */` comments on every public method and class. Include `@param` and `@returns`.
 - Avoid inline comments unless clarifying non-obvious logic.
+- Relative paths in imports must include the `.js` extension.
 
 ### HTML
 
-- Load scripts at the end of `<body>` in dependency order.
+- Load D3.js as a regular `<script>` tag before any `<script type="module">` that needs it.
 - Keep inline styles minimal; prefer CSS classes or CSS variables.
 
 ### CSS
@@ -87,6 +99,13 @@ These rules keep the architecture clean:
 - Not contain physics logic or rendering logic.
 - Delegate to simulation controllers for lifecycle management.
 
+## Interface & Config Patterns
+
+- All simulations implement four interfaces: `ISimulation`, `ISimulationEngine`, `ISimulationConfig`, `ISimulationControls`.
+- Interfaces are enforced by convention: base classes throw on unimplemented methods; config/controls use static `validate()` methods.
+- Configs contain a `module` section with loading metadata so `main.js` can dynamically import the simulation without hardcoded references.
+- Controls define UI elements declaratively; `main.js` iterates the array and attaches DOM event listeners.
+
 ## Extending the Renderer
 
 When adding a new primitive method (e.g. `addText`):
@@ -113,7 +132,7 @@ Both backends must always implement the same interface.
 ## Documentation
 
 - Keep `docs/` as the single source of truth for architecture and planning.
-- Root-level markdown files (`README.md`, `QUICKSTART.md`, etc.) are user-facing overviews and should remain concise.
+- `README.md` is the user-facing overview and should remain concise.
 - When refactoring, update documentation in the same commit.
 
 ## Version Control

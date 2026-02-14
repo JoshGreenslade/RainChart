@@ -1,120 +1,61 @@
 # RainChart
 
-Interactive physics simulations rendered in the browser with highly customizable visualizations.
+Interactive physics simulations rendered in the browser with pluggable visualisation backends.
 
-## Overview
+## Quick Start
 
-This project provides a collection of interactive physics simulations that can be viewed in a web browser. The architecture is designed with a **clear separation between physics calculations and visualization**, allowing each layer to be developed and maintained independently.
+Open `index.html` in any modern browser. No build step, no `npm install` – it just works.
 
-**✨ Now built with ES6 modules** - No more worrying about script loading order! Import only what you need. See [MODULES.md](MODULES.md) for detailed usage instructions.
+- **`index.html`** – Gravity simulator (N-body gravitational interactions).
+- **`chart.html`** – Primitive drawing demo (add circles, lines, rectangles, curves).
 
-## Architecture
+## What's Inside
 
-The project is structured in three distinct layers:
+| Simulation | Status | Description |
+|---|---|---|
+| Gravity | ✅ Implemented | N-body gravitational interactions with configurable body count and G constant |
+| Temperature | 🔲 Planned | Heat diffusion along a 1D bar |
+| Trajectory | 🔲 Planned | Projectile motion with air resistance |
 
-### 1. Physics Layer (Pure JavaScript - No Dependencies)
-Location: `js/*-sim.js` and `js/physics-engine.js`
+The architecture cleanly separates **physics** from **rendering**. Physics engines produce plain data; renderers consume it through a primitive drawing interface (`addCircle`, `addLine`, etc.). You can swap between Canvas and SVG (D3.js) at runtime.
 
-- **`physics-engine.js`**: Core physics calculations (gravity, heat diffusion, projectile motion)
-- **`gravity-sim.js`**: Gravity simulation logic
-- **`temperature-sim.js`**: Heat equalization simulation logic
-- **`trajectory-sim.js`**: Projectile trajectory simulation logic
+## Project Structure
 
-**Key Characteristics:**
-- Zero dependencies on visualization libraries
-- Pure data output (no rendering logic)
-- Observer pattern for state updates
-- Can be extracted to a separate repository
+```
+js/
+├── main.js                              # Application entry point (generic simulation runner)
+├── rainchart.js                         # Barrel export for all public modules
+├── integrators/
+│   └── integrators.js                   # Generic ODE solvers (Euler, RK4, Verlet, Velocity Verlet)
+├── physics-sims/
+│   ├── simulation-interface.js          # ISimulation – abstract base class
+│   ├── engine-interface.js              # ISimulationEngine – abstract base class
+│   ├── config-interface.js              # ISimulationConfig – validation helper
+│   ├── controls-interface.js            # ISimulationControls – validation helper
+│   └── Gravity/
+│       ├── gravity-simulation.js        # Controller: lifecycle, observers, animation loop
+│       ├── gravity-engine.js            # Pure physics: N-body force/position calculations
+│       ├── gravity-renderer.js          # Scene composition: maps state → primitives
+│       ├── gravity-config.js            # Module metadata + renderer/engine configuration
+│       └── gravity-controls.js          # UI control definitions
+└── renderer/
+    ├── base-renderer.js                 # Factory/adapter – delegates to Canvas or D3
+    ├── canvas-renderer.js               # HTML5 Canvas primitives
+    └── d3-renderer.js                   # SVG/D3.js primitives
 
-### 2. Visualization Layer (HTML5 Canvas or D3.js)
-Location: `js/chart-renderer.js`
+styles/
+└── main.css                             # Shared CSS variables
 
-- Consumes pure physics data through a clean interface
-- Currently implemented with HTML5 Canvas (no external dependencies)
-- Can easily be replaced with D3.js, Three.js, or other visualization libraries
-- Highly customizable styling through CSS variables
-- Can be swapped with other charting libraries
+lib/
+└── d3.v7.min.js                         # Vendored D3 (only needed for SVG mode)
 
-**Note:** The current implementation uses Canvas to avoid external dependencies. To use D3.js instead, simply rewrite `chart-renderer.js` - no changes needed to physics code!
-
-### 3. Application Layer
-Location: `js/main.js`
-
-- Connects physics simulations to chart renderers
-- Handles UI interactions
-- Manages simulation lifecycle
-
-## Features
-
-### Included Simulations
-
-1. **Gravity Simulator**
-   - Multi-body gravitational interactions
-   - Configurable gravitational constant
-   - Variable number of bodies
-   - Real-time visualization
-
-2. **Temperature Equalization**
-   - Heat diffusion along a 1D bar
-   - Configurable thermal diffusivity
-   - Variable spatial resolution
-   - Color-coded temperature visualization
-
-3. **Trajectory Simulator**
-   - Projectile motion simulation
-   - Three air resistance modes:
-     - None (vacuum)
-     - Linear drag
-     - Quadratic drag
-   - Configurable initial conditions
-
-## Customization
-
-### Styling
-
-All visual styling is controlled through CSS variables in `styles/main.css`:
-
-```css
-:root {
-    --primary-color: #2c3e50;
-    --secondary-color: #3498db;
-    --accent-color: #e74c3c;
-    --background-color: #ecf0f1;
-    --text-color: #2c3e50;
-    --border-color: #bdc3c7;
-    --chart-bg: #ffffff;
-    --button-hover: #2980b9;
-}
+docs/
+├── architecture.md                      # Detailed architecture reference
+├── conventions.md                       # Coding conventions and patterns
+└── risks-and-improvements.md            # Known issues and improvement options
 ```
 
-Simply modify these variables to change the entire look and feel.
-
-### Physics Parameters
-
-Each simulation exposes parameters through the UI:
-- Gravity: body count, gravitational constant
-- Temperature: number of points, thermal diffusivity
-- Trajectory: velocity, angle, air resistance type, drag coefficient
-
-### Adding New Simulations
-
-1. **Create Physics Module**: Implement simulation logic in a new file (e.g., `js/new-sim.js`)
-   - Extend with state management and observer pattern
-   - Keep it independent of visualization libraries
-
-2. **Create Renderer**: Add rendering function to `js/chart-renderer.js`
-   - Consume pure physics data
-   - Use D3.js for visualization
-
-3. **Connect in main.js**: Wire up the simulation and renderer
-
-## Usage
-
-Simply open `index.html` or `chart.html` in a modern web browser. No build step required.
-
-### Using as a Module
-
-You can also import RainChart components in your own projects:
+## Using as a Module
 
 ```javascript
 import { BaseRenderer, GravitySimulation } from './js/rainchart.js';
@@ -122,7 +63,7 @@ import { BaseRenderer, GravitySimulation } from './js/rainchart.js';
 const renderer = new BaseRenderer('my-container', {
     width: 800,
     height: 600,
-    renderMode: 'canvas'
+    renderMode: 'canvas' // or 'svg'
 });
 
 const simulation = new GravitySimulation(800, 600, 3, 1.0);
@@ -130,14 +71,27 @@ simulation.onUpdate(() => simulation.render(renderer));
 simulation.start();
 ```
 
-See [MODULES.md](MODULES.md) for complete module documentation and examples.
+See `example-module.html` for a working example.
 
-## Future Plans
+## Adding a New Simulation
 
-- Extract physics layer to separate repository
-- Add more simulations (waves, electromagnetism, etc.)
-- Support for 3D visualizations
-- Export simulation data
+1. Create a folder under `js/physics-sims/YourSim/`.
+2. Add five files following the gravity pattern: `*-engine.js`, `*-renderer.js`, `*-simulation.js`, `*-config.js`, `*-controls.js`.
+3. Change the `SIMULATION_CONFIG_PATH` in `main.js` to point at your new config.
+
+Full details are in [docs/architecture.md](docs/architecture.md).
+
+## Documentation
+
+| Document | Purpose |
+|---|---|
+| [docs/architecture.md](docs/architecture.md) | Layer design, data flow, component responsibilities, and extension guide |
+| [docs/conventions.md](docs/conventions.md) | Naming rules, coding style, layer boundaries, and contribution guidelines |
+| [docs/risks-and-improvements.md](docs/risks-and-improvements.md) | Known technical debt and improvement options |
+
+## Browser Compatibility
+
+ES6 modules are required: Chrome 61+, Firefox 60+, Safari 11+, Edge 16+.
 
 ## License
 
