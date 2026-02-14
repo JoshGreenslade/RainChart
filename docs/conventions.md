@@ -35,7 +35,7 @@ styles/         CSS
 | Interfaces | `I` prefix + `PascalCase` | `ISimulation` |
 | Methods/functions | `camelCase` | `calculateForce()` |
 | Constants | `UPPER_SNAKE_CASE` | `SIMULATION_CONFIG_PATH` |
-| Config object keys | `camelCase` | `bodyCount`, `softening_factor` |
+| Config object keys | `camelCase` | `bodyCount`, `maxMass` |
 | Private methods | `_camelCase` prefix | `_drawBodies()` |
 | CSS variables | `--kebab-case` | `--primary-color` |
 | HTML IDs | `kebab-case` | `gravity-chart` |
