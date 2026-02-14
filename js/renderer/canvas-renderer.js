@@ -3,6 +3,8 @@
  * Implements only primitive drawing methods, no simulation-specific logic
  */
 
+import { BASE_COLOR_PALETTE } from '../utils/color-palette.js';
+
 export class CanvasRenderer {
     constructor(containerId, options = {}) {
         this.containerId = containerId;
@@ -10,10 +12,7 @@ export class CanvasRenderer {
         this.idCounter = 0;
         
         // Simple default colors for objects
-        this.defaultColors = [
-            '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', 
-            '#1abc9c', '#e67e22', '#34495e', '#16a085', '#27ae60'
-        ];
+        this.defaultColors = BASE_COLOR_PALETTE;
         
         // Set default options - use provided options or defaults
         this.options = {
@@ -335,6 +334,7 @@ export class CanvasRenderer {
     updateElement(id, attributes) {
         // For canvas mode, would need to redraw entire canvas
         // This is a limitation of canvas rendering
+        console.warn('CanvasRenderer.updateElement() is a no-op. Canvas requires full redraw. Use clear() and re-render instead.');
     }
     
     /**
@@ -348,6 +348,7 @@ export class CanvasRenderer {
             this.elements.splice(index, 1);
         }
         // For canvas mode, would need to redraw entire canvas
+        console.warn('CanvasRenderer.removeElement() is a no-op. Canvas requires full redraw. Use clear() and re-render instead.');
     }
     
     /**

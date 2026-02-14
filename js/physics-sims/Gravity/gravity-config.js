@@ -10,6 +10,7 @@
 
 import { Integrators } from '../../integrators/integrators.js';
 import { ISimulationConfig } from '../config-interface.js';
+import { DEFAULT_COLOR_PALETTE } from '../../utils/color-palette.js';
 
 export const GravityConfig = {
     // Module loading metadata - tells main.js how to load this simulation
@@ -50,9 +51,7 @@ export const GravityConfig = {
         borderWidth: 1,
         
         // Body appearance
-        bodyColors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', 
-                     '#1abc9c', '#e67e22', '#34495e', '#16a085', '#27ae60',
-                     '#c0392b', '#2980b9', '#27ae60', '#d35400', '#8e44ad'],
+        bodyColors: DEFAULT_COLOR_PALETTE,
         bodyStrokeColor: '#000000',
         bodyStrokeWidth: 1,
         bodyOpacity: 0.9,
@@ -79,7 +78,7 @@ export const GravityConfig = {
         integrator: Integrators.rk4,
         
         // Constants
-        softening_factor: 5,
+        softeningFactor: 5,
         
         // Mass power law generator
         minMass: 2,

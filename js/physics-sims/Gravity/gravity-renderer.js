@@ -28,12 +28,6 @@ export class GravityRenderer {
         
         // Draw bodies
         this._drawBodies(state.bodies);
-        
-        // Draw body count if exceeding display limit
-        if (state.bodies.length > (this.config.maxBodies || 10000)) {
-            // Note: Text primitive would be needed for this
-            // For now, skip or add it to BaseRenderer
-        }
     }
 
     /**

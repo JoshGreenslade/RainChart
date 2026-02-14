@@ -47,33 +47,6 @@ export class ISimulationConfig {
         
         return true;
     }
-    
-    /**
-     * Get module loading metadata
-     * @returns {Object} Module metadata
-     */
-    static getModuleMetadata(config) {
-        ISimulationConfig.validate(config);
-        return config.module;
-    }
-    
-    /**
-     * Get renderer configuration
-     * @returns {Object} Renderer config
-     */
-    static getRendererConfig(config) {
-        ISimulationConfig.validate(config);
-        return config.renderer;
-    }
-    
-    /**
-     * Get engine configuration
-     * @returns {Object} Engine config
-     */
-    static getEngineConfig(config) {
-        ISimulationConfig.validate(config);
-        return config.engine;
-    }
 }
 
 /**

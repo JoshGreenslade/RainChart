@@ -24,9 +24,10 @@ export class GravitySimulation extends ISimulation {
     }
 
     /**
-     * Set the renderer for this simulation
+     * Set the renderer for this simulation (private)
+     * @private
      */
-    setRenderer(renderer) {
+    _setRenderer(renderer) {
         this.renderer = new GravityRenderer(renderer);
     }
 
@@ -131,7 +132,7 @@ export class GravitySimulation extends ISimulation {
     render(baseRenderer) {
         if (!this.renderer) {
             // If renderer hasn't been set, create it
-            this.setRenderer(baseRenderer);
+            this._setRenderer(baseRenderer);
         } else {
             // Update the underlying base renderer if it changed
             this.renderer.setRenderer(baseRenderer);

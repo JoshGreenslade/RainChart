@@ -68,7 +68,7 @@ export class GravityEngine extends ISimulationEngine {
 
         const config = GravityConfig.engine;
         // The softened distance ensures we don't encounter errors when distance = 0
-        const softenedDistanceSquared = distanceSquared + config.softening_factor * config.softening_factor;
+        const softenedDistanceSquared = distanceSquared + config.softeningFactor * config.softeningFactor;
         const softenedDistance = Math.sqrt(softenedDistanceSquared);
         
         const forceMagnitude = G * body1.mass * body2.mass / softenedDistanceSquared;
