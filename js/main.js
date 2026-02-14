@@ -136,7 +136,7 @@ function handleControlAction(action, event) {
             break;
         }
         
-        case 'setRendererMode':
+        case 'setRendererMode': {
             const renderMode = event.target.value;
             const backgroundColor = GravityConfig.renderer.backgroundColor;
             baseRenderer = new BaseRenderer('gravity-chart', {
@@ -152,6 +152,7 @@ function handleControlAction(action, event) {
             // Re-render
             simulation.render(baseRenderer);
             break;
+        }
         
         default:
             console.warn(`Unknown control action: ${action}`);
