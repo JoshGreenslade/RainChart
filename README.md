@@ -73,6 +73,18 @@ simulation.start();
 
 See `example-module.html` for a working example.
 
+## Testing
+
+The project includes comprehensive unit and integration tests:
+
+```bash
+npm test              # Run all tests
+npm run test:unit     # Run unit tests only
+npm run test:integration  # Run integration tests only
+```
+
+See [test/README.md](test/README.md) for detailed testing documentation.
+
 ## Adding a New Simulation
 
 1. Create a folder under `js/physics-sims/YourSim/`.

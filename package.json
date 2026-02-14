@@ -1,0 +1,23 @@
+{
+  "name": "rainchart",
+  "version": "1.0.0",
+  "description": "Interactive physics simulations rendered in the browser",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/**/*.test.js",
+    "test:unit": "node --test test/unit/*.test.js",
+    "test:integration": "node --test test/integration/*.test.js",
+    "test:watch": "node --test --watch test/**/*.test.js"
+  },
+  "keywords": [
+    "physics",
+    "simulation",
+    "visualization",
+    "canvas",
+    "d3",
+    "gravity"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {}
+}
