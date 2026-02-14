@@ -1,6 +1,36 @@
 import { Integrators } from '../../integrators/integrators.js';
 
 export const GravityConfig = {
+    // Module loading metadata - tells main.js how to load this simulation
+    module: {
+        // Name of the simulation (used for display purposes)
+        name: 'Gravity',
+        
+        // Path to the simulation class module (relative to this config file)
+        simulationPath: './gravity-simulation.js',
+        
+        // Class name to import from the simulation module
+        simulationClass: 'GravitySimulation',
+        
+        // Path to the controls module (relative to this config file)
+        controlsPath: './gravity-controls.js',
+        
+        // Controls object name to import
+        controlsClass: 'GravityControls',
+        
+        // Initial parameters for the simulation constructor
+        initialParams: {
+            bodyCount: 3,
+            G: 1.0
+        },
+        
+        // Container element ID for the renderer
+        containerId: 'gravity-chart',
+        
+        // Default render mode
+        defaultRenderMode: 'canvas'
+    },
+
     // Gravity Simulation Visual Config
     renderer: {
         // Canvas settings

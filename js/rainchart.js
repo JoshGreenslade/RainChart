@@ -3,9 +3,6 @@
  * This file provides convenient barrel exports for all RainChart modules
  */
 
-// Application configuration
-export { AppConfig } from './app-config.js';
-
 // Renderer modules
 export { BaseRenderer } from './renderer/base-renderer.js';
 export { CanvasRenderer } from './renderer/canvas-renderer.js';

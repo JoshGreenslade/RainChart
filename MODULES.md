@@ -7,28 +7,42 @@ RainChart has been modularized using ES6 modules with complete separation betwee
 The application follows a **clean architecture** pattern:
 
 - **`main.js`** - Generic simulation runner (works with ANY simulation through ISimulation interface)
-- **`app-config.js`** - Configuration specifying which simulation to load
+- **Simulation config** - Each simulation defines its own loading metadata in its config file
 - **Simulation modules** - Self-contained folders with simulation, engine, renderer, config, and controls
 
-**Key principle**: `main.js` has NO hardcoded dependencies on specific simulations. It dynamically loads simulations based on `app-config.js` and works purely through the `ISimulation` interface.
+**Key principle**: `main.js` has NO hardcoded dependencies on specific simulations. It points to a single simulation config path and dynamically loads everything from there, working purely through the `ISimulation` interface.
 
 ## Switching Simulations
 
-To run a different simulation, simply edit `app-config.js`:
+To run a different simulation, change ONE line in `main.js`:
 
 ```javascript
-export const AppConfig = {
-    simulation: {
-        name: 'Gravity',  // Change this
-        modulePath: './physics-sims/Gravity/gravity-simulation.js',
-        className: 'GravitySimulation',
-        // ... config and controls paths
-        initialParams: { bodyCount: 3, G: 1.0 }
-    }
-};
+// In main.js
+const SIMULATION_CONFIG_PATH = './physics-sims/Temperature/temperature-config.js';
 ```
 
-No changes to `main.js` or `index.html` required!
+That's it! The simulation config contains all the metadata needed to load the simulation.
+
+## Simulation Config Structure
+
+Each simulation's config file contains module loading metadata:
+
+```javascript
+export const GravityConfig = {
+    module: {
+        name: 'Gravity',
+        simulationPath: './gravity-simulation.js',
+        simulationClass: 'GravitySimulation',
+        controlsPath: './gravity-controls.js',
+        controlsClass: 'GravityControls',
+        initialParams: { bodyCount: 3, G: 1.0 },
+        containerId: 'gravity-chart',
+        defaultRenderMode: 'canvas'
+    },
+    renderer: { /* visual config */ },
+    engine: { /* physics config */ }
+};
+```
 
 ## Using RainChart Modules
 
@@ -63,10 +77,6 @@ import { BaseRenderer } from './js/renderer/base-renderer.js';
 import { CanvasRenderer } from './js/renderer/canvas-renderer.js';
 import { D3Renderer } from './js/renderer/d3-renderer.js';
 import { ColorScheme } from './js/renderer/color-scheme.js';
-
-// Import application configuration
-import { AppConfig } from './js/app-config.js';
-
 // Import physics modules
 import { GravitySimulation } from './js/physics-sims/Gravity/gravity-simulation.js';
 import { GravityEngine } from './js/physics-sims/Gravity/gravity-engine.js';
@@ -79,10 +89,6 @@ import { ChartConfig } from './js/renderer/chart-config.js';
 ```
 
 ## Available Modules
-
-### Application Configuration
-
-- **`AppConfig`** (`js/app-config.js`) - Specifies which simulation to load and run
 
 ### Renderer Modules (`js/renderer/`)
 
@@ -99,7 +105,7 @@ import { ChartConfig } from './js/renderer/chart-config.js';
   - **`GravitySimulation`** - Gravity simulation controller
   - **`GravityEngine`** - Physics engine for gravity calculations
   - **`GravityRenderer`** - Rendering logic for gravity visualization
-  - **`GravityConfig`** - Configuration for gravity simulation
+  - **`GravityConfig`** - Configuration for gravity simulation (includes module loading metadata)
   - **`GravityControls`** - UI control definitions for gravity simulation
 
 ### Utility Modules

@@ -3,11 +3,16 @@
  * Generic simulation runner that works with any simulation through interfaces
  * 
  * This file is completely independent of concrete simulations.
- * Configure which simulation to run in app-config.js
+ * To switch simulations, change the SIMULATION_CONFIG_PATH below.
  */
 
 import { BaseRenderer } from './renderer/base-renderer.js';
-import { AppConfig } from './app-config.js';
+
+// ============================================================================
+// CONFIGURATION: Change this path to switch simulations
+// ============================================================================
+const SIMULATION_CONFIG_PATH = './physics-sims/Gravity/gravity-config.js';
+// ============================================================================
 
 let simulation;
 let simulationConfig;
@@ -35,28 +40,36 @@ document.addEventListener('DOMContentLoaded', async () => {
  * Initialize Simulation (Generic - works with any simulation)
  */
 async function initSimulation() {
-    // Dynamically import the simulation, config, and controls based on AppConfig
-    const { simulation: simConfig } = AppConfig;
+    // Load the simulation config module
+    const ConfigModule = await import(SIMULATION_CONFIG_PATH);
+    const configName = Object.keys(ConfigModule).find(key => key.endsWith('Config'));
+    simulationConfig = ConfigModule[configName];
+    
+    // Get the base path of the config file for resolving relative paths
+    const configBasePath = SIMULATION_CONFIG_PATH.substring(0, SIMULATION_CONFIG_PATH.lastIndexOf('/'));
+    
+    // Extract module loading metadata from the config
+    const { module: moduleConfig } = simulationConfig;
+    
+    // Resolve relative paths from the config file location
+    const simulationPath = `${configBasePath}/${moduleConfig.simulationPath}`;
+    const controlsPath = `${configBasePath}/${moduleConfig.controlsPath}`;
     
     // Load simulation module
-    const SimulationModule = await import(simConfig.modulePath);
-    const SimulationClass = SimulationModule[simConfig.className];
-    
-    // Load config module
-    const ConfigModule = await import(simConfig.configPath);
-    simulationConfig = ConfigModule[simConfig.configName];
+    const SimulationModule = await import(simulationPath);
+    const SimulationClass = SimulationModule[moduleConfig.simulationClass];
     
     // Load controls module
-    const ControlsModule = await import(simConfig.controlsPath);
-    simulationControls = ControlsModule[simConfig.controlsName];
+    const ControlsModule = await import(controlsPath);
+    simulationControls = ControlsModule[moduleConfig.controlsClass];
     
     // Get background color from config (if available)
     const backgroundColor = simulationConfig?.renderer?.backgroundColor;
     
     // Create base renderer with full window size
     const rendererModeElement = document.getElementById('renderer-mode');
-    const renderMode = (rendererModeElement && rendererModeElement.value) || AppConfig.renderer.defaultMode;
-    baseRenderer = new BaseRenderer(AppConfig.renderer.containerId, {
+    const renderMode = (rendererModeElement && rendererModeElement.value) || moduleConfig.defaultRenderMode;
+    baseRenderer = new BaseRenderer(moduleConfig.containerId, {
         width: window.innerWidth,
         height: window.innerHeight,
         renderMode: renderMode,
@@ -67,7 +80,7 @@ async function initSimulation() {
     updateControlsBackground();
     
     // Create simulation instance using configured parameters
-    const params = simConfig.initialParams;
+    const params = moduleConfig.initialParams;
     simulation = new SimulationClass(
         window.innerWidth,
         window.innerHeight,
@@ -162,7 +175,8 @@ function handleControlAction(action, event) {
         case 'setRendererMode': {
             const renderMode = event.target.value;
             const backgroundColor = simulationConfig?.renderer?.backgroundColor;
-            baseRenderer = new BaseRenderer(AppConfig.renderer.containerId, {
+            const containerId = simulationConfig.module.containerId;
+            baseRenderer = new BaseRenderer(containerId, {
                 width: window.innerWidth,
                 height: window.innerHeight,
                 renderMode: renderMode,

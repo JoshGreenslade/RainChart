@@ -4,23 +4,48 @@
 
 Each simulation defines its UI controls within its own folder, following the same pattern as configuration files. This makes simulations self-contained and easier to maintain.
 
-The **main application layer** (`main.js`) is completely independent of concrete simulations and works through the `ISimulation` interface. It dynamically loads the simulation, config, and controls based on `app-config.js`.
+The **main application layer** (`main.js`) is completely independent of concrete simulations and works through the `ISimulation` interface. It dynamically loads the simulation based on a single config path specified in `main.js`.
 
 ## Structure
 
-Controls are defined in a `{simulation}-controls.js` file within each simulation folder, following this pattern:
+Each simulation is fully self-contained with all metadata defined in its config file:
 
 ```
 js/
-├── app-config.js              (Specifies which simulation to load)
-├── main.js                    (Generic - works with any simulation via interfaces)
+├── main.js                    (Generic - points to simulation config)
 └── physics-sims/
     └── Gravity/
         ├── gravity-simulation.js  (MVC controller)
         ├── gravity-engine.js       (Physics engine)
         ├── gravity-renderer.js     (Rendering logic)
-        ├── gravity-config.js       (Visual/physics config)
+        ├── gravity-config.js       (Config + module metadata)
         └── gravity-controls.js     (UI controls definition)
+```
+
+## Simulation Config Structure
+
+Each simulation's config file contains both visual/physics configuration AND module loading metadata:
+
+```javascript
+export const GravityConfig = {
+    // Module loading metadata - tells main.js how to load this simulation
+    module: {
+        name: 'Gravity',
+        simulationPath: './gravity-simulation.js',
+        simulationClass: 'GravitySimulation',
+        controlsPath: './gravity-controls.js',
+        controlsClass: 'GravityControls',
+        initialParams: { bodyCount: 3, G: 1.0 },
+        containerId: 'gravity-chart',
+        defaultRenderMode: 'canvas'
+    },
+    
+    // Visual configuration
+    renderer: { /* ... */ },
+    
+    // Physics configuration
+    engine: { /* ... */ }
+};
 ```
 
 ## Control Definition Format
@@ -82,83 +107,84 @@ export const GravityControls = {
 
 ## Usage in Application Layer
 
-The application layer (`main.js`) is **completely generic** and works with any simulation through interfaces. It dynamically loads the simulation based on `app-config.js`:
+The application layer (`main.js`) is **completely generic** and works with any simulation through interfaces. It points to a single simulation config path:
 
 ```javascript
-// app-config.js - Configure which simulation to run
-export const AppConfig = {
-    simulation: {
-        name: 'Gravity',
-        modulePath: './physics-sims/Gravity/gravity-simulation.js',
-        className: 'GravitySimulation',
-        configPath: './physics-sims/Gravity/gravity-config.js',
-        configName: 'GravityConfig',
-        controlsPath: './physics-sims/Gravity/gravity-controls.js',
-        controlsName: 'GravityControls',
-        initialParams: { bodyCount: 3, G: 1.0 }
-    }
-};
-
-// main.js - Generic, works with any simulation
-import { AppConfig } from './app-config.js';
+// main.js - Single configuration point
+const SIMULATION_CONFIG_PATH = './physics-sims/Gravity/gravity-config.js';
 
 async function initSimulation() {
-    // Dynamically import simulation, config, and controls
-    const SimulationModule = await import(AppConfig.simulation.modulePath);
-    const SimulationClass = SimulationModule[AppConfig.simulation.className];
+    // Load the simulation config
+    const ConfigModule = await import(SIMULATION_CONFIG_PATH);
+    const simulationConfig = ConfigModule.GravityConfig;
     
-    const ConfigModule = await import(AppConfig.simulation.configPath);
-    const simulationConfig = ConfigModule[AppConfig.simulation.configName];
+    // Config tells us how to load the simulation
+    const { module } = simulationConfig;
     
-    const ControlsModule = await import(AppConfig.simulation.controlsPath);
-    const simulationControls = ControlsModule[AppConfig.simulation.controlsName];
+    // Dynamically load simulation and controls
+    const SimulationModule = await import(`${configBasePath}/${module.simulationPath}`);
+    const ControlsModule = await import(`${configBasePath}/${module.controlsPath}`);
     
+    // Create simulation using metadata from config
+    const simulation = new SimulationModule[module.simulationClass](...);
+    // ... (main.js has NO hardcoded references to specific simulations)
+}
+```
+
+**Key Point**: `main.js` only needs to change ONE line (the config path) to switch simulations.
     // Create simulation and wire up controls generically
     // ... (main.js has NO hardcoded references to GravitySimulation)
 }
 ```
 
-**Key Point**: `main.js` has NO imports of concrete simulations. It only imports `BaseRenderer`, `AppConfig`, and works through the `ISimulation` interface.
+**Key Point**: `main.js` only imports `BaseRenderer` and works through the `ISimulation` interface. All simulation-specific metadata is in the simulation's config file.
 
 ## Benefits
 
-1. **Self-Contained Simulations**: Each simulation folder contains everything it needs
-2. **Consistent Pattern**: Same approach as config files (gravity-config.js)
+1. **Self-Contained Simulations**: Each simulation folder contains everything it needs including loading metadata
+2. **Consistent Pattern**: Module metadata lives with simulation config
 3. **Easy to Extend**: Adding new controls is simple and declarative
 4. **Better Organization**: Control definitions live with the simulation code
 5. **Reusability**: Controls can be queried and manipulated programmatically
 6. **Complete Decoupling**: Main application is 100% independent of concrete simulations
 7. **Interface-Driven**: Main.js works through ISimulation interface only
-8. **Simple Configuration**: Switch simulations by editing app-config.js
+8. **Single Configuration Point**: Only change one line in main.js to switch simulations
 
 ## Switching Simulations
 
-To switch to a different simulation, simply update `app-config.js`:
+To switch to a different simulation, simply change ONE line in `main.js`:
 
 ```javascript
-export const AppConfig = {
-    simulation: {
-        name: 'Temperature',
-        modulePath: './physics-sims/Temperature/temperature-simulation.js',
-        className: 'TemperatureSimulation',
-        configPath: './physics-sims/Temperature/temperature-config.js',
-        configName: 'TemperatureConfig',
-        controlsPath: './physics-sims/Temperature/temperature-controls.js',
-        controlsName: 'TemperatureControls',
-        initialParams: { points: 50, diffusivity: 0.1 }
-    }
-};
+// In main.js, change this line:
+const SIMULATION_CONFIG_PATH = './physics-sims/Temperature/temperature-config.js';
 ```
 
-**No changes to main.js required!**
+**That's it!** No other changes needed.
 
 ## Adding Controls to a New Simulation
 
 When creating a new simulation, follow these steps:
 
-1. **Create the controls file**: `js/physics-sims/YourSim/yoursim-controls.js`
+1. **Create the config file with module metadata**: `js/physics-sims/YourSim/yoursim-config.js`
 
-2. **Define your controls**:
+```javascript
+export const YourSimConfig = {
+    // Module loading metadata
+    module: {
+        name: 'YourSim',
+        simulationPath: './yoursim-simulation.js',
+        simulationClass: 'YourSimSimulation',
+        controlsPath: './yoursim-controls.js',
+        controlsClass: 'YourSimControls',
+        initialParams: { /* your params */ },
+        containerId: 'yoursim-chart',
+        defaultRenderMode: 'canvas'
+    },
+    // ... renderer and engine config
+};
+```
+
+2. **Create the controls file**: `js/physics-sims/YourSim/yoursim-controls.js`
 ```javascript
 export const YourSimControls = {
     controls: [
