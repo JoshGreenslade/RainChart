@@ -51,7 +51,8 @@ export const GravityControls = {
             label: 'Renderer',
             options: [
                 { value: 'canvas', label: 'Canvas' },
-                { value: 'svg', label: 'SVG' }
+                { value: 'svg', label: 'SVG' },
+                { value: 'webgpu', label: 'WebGPU (10k+ objects)' }
             ],
             value: 'canvas',
             action: 'setRendererMode'

@@ -18,9 +18,9 @@ docs/           Architecture, conventions, and planning documents (you are here)
 js/
   main.js       Application entry point (generic simulation runner)
   rainchart.js  Barrel export for all public modules
-  integrators/  Generic numerical solvers
+  integrators/  Generic numerical solvers (each integrator in its own file)
   physics-sims/ Simulation interfaces, engines, controllers, renderers, configs, controls
-  renderer/     Primitive rendering backends (Canvas and D3/SVG)
+  renderer/     Primitive rendering backends (Canvas, D3/SVG, and WebGPU/WGSL)
 lib/            Vendored third-party libraries
 styles/         CSS
 ```
@@ -110,11 +110,12 @@ These rules keep the architecture clean:
 
 When adding a new primitive method (e.g. `addText`):
 
-1. Add the method to **both** `CanvasRenderer` and `D3Renderer`.
+1. Add the method to **all** renderer implementations (`CanvasRenderer`, `D3Renderer`, and `WGSLRenderer`).
 2. Add a delegating method to `BaseRenderer`.
-3. Document the method in the renderer contract table in `docs/architecture.md`.
+3. Update the `IRenderer` interface validation in `renderer-interface.js`.
+4. Document the method in the renderer contract table in `docs/architecture.md`.
 
-Both backends must always implement the same interface.
+All backends must implement the same interface. Note that `WGSLRenderer` is optimized for circles and may not efficiently support all primitives.
 
 ## Error Handling
 
