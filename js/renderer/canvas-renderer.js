@@ -334,6 +334,7 @@ export class CanvasRenderer {
     updateElement(id, attributes) {
         // For canvas mode, would need to redraw entire canvas
         // This is a limitation of canvas rendering
+        console.warn('CanvasRenderer.updateElement() is a no-op. Canvas requires full redraw. Use clear() and re-render instead.');
     }
     
     /**
@@ -347,6 +348,7 @@ export class CanvasRenderer {
             this.elements.splice(index, 1);
         }
         // For canvas mode, would need to redraw entire canvas
+        console.warn('CanvasRenderer.removeElement() is a no-op. Canvas requires full redraw. Use clear() and re-render instead.');
     }
     
     /**
