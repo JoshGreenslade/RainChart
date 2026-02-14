@@ -15,6 +15,7 @@ export { GravitySimulation } from './physics-sims/Gravity/gravity-simulation.js'
 export { GravityEngine } from './physics-sims/Gravity/gravity-engine.js';
 export { GravityRenderer } from './physics-sims/Gravity/gravity-renderer.js';
 export { GravityConfig } from './physics-sims/Gravity/gravity-config.js';
+export { GravityControls } from './physics-sims/Gravity/gravity-controls.js';
 
 // Integrator utilities
 export { Integrators } from './integrators/integrators.js';

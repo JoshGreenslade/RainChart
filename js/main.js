@@ -6,6 +6,7 @@
 import { BaseRenderer } from './renderer/base-renderer.js';
 import { GravitySimulation } from './physics-sims/Gravity/gravity-simulation.js';
 import { GravityConfig } from './physics-sims/Gravity/gravity-config.js';
+import { GravityControls } from './physics-sims/Gravity/gravity-controls.js';
 
 let simulation;
 let baseRenderer;
@@ -82,46 +83,72 @@ function updateControlsBackground() {
 }
 
 /**
- * Setup UI control event handlers
+ * Setup UI control event handlers using control definitions from GravityControls
  */
 function setupUIControls() {
-    document.getElementById('gravity-start').addEventListener('click', () => {
-        simulation.start();
-    });
-    
-    document.getElementById('gravity-stop').addEventListener('click', () => {
-        simulation.stop();
-    });
-    
-    document.getElementById('gravity-reset').addEventListener('click', () => {
-        const bodyCount = parseInt(document.getElementById('gravity-bodies').value);
-        simulation.reset(bodyCount);
-    });
-    
-    document.getElementById('gravity-constant').addEventListener('change', (e) => {
-        simulation.setG(parseFloat(e.target.value));
-    });
-    
-    document.getElementById('gravity-bodies').addEventListener('change', (e) => {
-        const bodyCount = parseInt(e.target.value);
-        simulation.reset(bodyCount);
-    });
-    
-    // Renderer mode change
-    document.getElementById('renderer-mode').addEventListener('change', (e) => {
-        const renderMode = e.target.value;
-        const backgroundColor = GravityConfig.renderer.backgroundColor;
-        baseRenderer = new BaseRenderer('gravity-chart', {
-            width: window.innerWidth,
-            height: window.innerHeight,
-            renderMode: renderMode,
-            background: backgroundColor
+    // Iterate through all controls defined in GravityControls
+    GravityControls.controls.forEach(control => {
+        const element = document.getElementById(control.id);
+        if (!element) {
+            console.warn(`Control element with id '${control.id}' not found in DOM`);
+            return;
+        }
+
+        // Determine the event type based on control type
+        const eventType = control.type === 'button' ? 'click' : 'change';
+
+        // Add event listener based on the action defined in the control
+        element.addEventListener(eventType, (e) => {
+            handleControlAction(control.action, e);
         });
-        
-        // Update background colors
-        updateControlsBackground();
-        
-        // Re-render
-        simulation.render(baseRenderer);
     });
+}
+
+/**
+ * Handle control actions
+ */
+function handleControlAction(action, event) {
+    switch (action) {
+        case 'start':
+            simulation.start();
+            break;
+        
+        case 'stop':
+            simulation.stop();
+            break;
+        
+        case 'reset':
+            const bodyCount = parseInt(document.getElementById('gravity-bodies').value);
+            simulation.reset(bodyCount);
+            break;
+        
+        case 'setG':
+            simulation.setG(parseFloat(event.target.value));
+            break;
+        
+        case 'setBodies':
+            const bodies = parseInt(event.target.value);
+            simulation.reset(bodies);
+            break;
+        
+        case 'setRendererMode':
+            const renderMode = event.target.value;
+            const backgroundColor = GravityConfig.renderer.backgroundColor;
+            baseRenderer = new BaseRenderer('gravity-chart', {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                renderMode: renderMode,
+                background: backgroundColor
+            });
+            
+            // Update background colors
+            updateControlsBackground();
+            
+            // Re-render
+            simulation.render(baseRenderer);
+            break;
+        
+        default:
+            console.warn(`Unknown control action: ${action}`);
+    }
 }
