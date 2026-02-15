@@ -1,0 +1,32 @@
+{
+  "senior_engineer_name": "Senior Engineer",
+  "level": 1,
+  "total_xp": 0,
+  "current_xp": 0,
+  "xp_to_next_level": 100,
+  "badges": [],
+  "completed_modules": [],
+  "active_challenges": [],
+  "streaks": {
+    "current_daily_streak": 1,
+    "longest_daily_streak": 1,
+    "last_activity_date": "2026-02-15"
+  },
+  "module_scores": {},
+  "achievement_history": [
+    {
+      "date": "2026-02-15",
+      "type": "system_initialized",
+      "description": "AI-First Training Program Started!",
+      "xp": 0
+    }
+  ],
+  "skill_tree": {
+    "ai_mastery": 0,
+    "code_quality": 0,
+    "leadership": 0,
+    "communication": 0,
+    "technical_strategy": 0
+  },
+  "initialized_date": "2026-02-15"
+}
