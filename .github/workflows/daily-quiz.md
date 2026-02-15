@@ -55,8 +55,8 @@ When triggered on schedule (daily):
    - Actual code patterns in the repository
 
 3. **Create a GitHub issue** for each developer with:
-   - Title: `[Daily Quiz] {Developer Name} - {Date}`
-   - **Create the issue in an open state** (do not close it)
+   - Title: `[Daily Quiz] {Developer Name} - {Date}` (e.g., `[Daily Quiz] Junior Developer - 2026-02-14`)
+   - **Leave the issue open** - do not close it after creation; users will comment on the open issue
    - Content including:
      - A personalized greeting
      - The quiz question or exercise (code review, debugging challenge, design question, etc.)
@@ -90,8 +90,12 @@ When triggered on schedule (daily):
 When a comment is added to a quiz issue (either on an open or closed issue):
 
 1. **Check if the issue is a quiz** (has `[Daily Quiz]` in title and `quiz` label)
-2. **Check if this is the first user response** (grade only on the first comment from the developer, not subsequent comments)
-3. **Read the developer's response** from the comment
+2. **Check if this is the first user response**:
+   - Look at all comments on the issue
+   - Ignore comments from the bot/workflow itself
+   - Grade only if this is the first comment from a human user (the developer responding to the quiz)
+   - Skip grading if there's already a grading comment (look for "Score:" in previous comments)
+3. **Read the developer's response** from the comment that just triggered this workflow
 4. **Grade the response** (0-100 scale):
    - **0-20**: Beginner/never coded before - fundamental misunderstandings
    - **20-40**: Junior level - basic understanding but missing key concepts
@@ -112,7 +116,9 @@ When a comment is added to a quiz issue (either on an open or closed issue):
 
 7. **Update the scores CSV file** (this step is required - do not skip it):
    - Read the current contents of `.github/context/scores.csv` (create with header row if it doesn't exist: `date,developer_name,score,max_score,missed`)
-   - Add a new row with today's date, the developer's name from the issue title, their score, max score for the quiz, and `false` for missed
+   - Parse the developer's name from the issue title using this pattern: `[Daily Quiz] {Developer Name} - {Date}`
+     - Extract the text between `[Daily Quiz] ` and ` - ` (e.g., from `[Daily Quiz] Junior Developer - 2026-02-14`, extract `Junior Developer`)
+   - Add a new row with today's date (YYYY-MM-DD format), the developer's name, their score, max score for the quiz, and `false` for missed
    - Format: `2026-02-14,Junior Developer,55,60,false`
    - **You must create a pull request** with the updated scores file using the `create-pull-request` safe output
    - The PR should have a clear title like "Update quiz scores for [Developer Name] - [Date]"
