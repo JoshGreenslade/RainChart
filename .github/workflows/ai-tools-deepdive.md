@@ -317,8 +317,9 @@ Allow trainee to request specific deep-dive topics:
 
 **Hands-On Focus:**
 - Every deep-dive must include real coding
-- Use actual repository code when possible
-- Provide starter code or files to work with
+- **IMPORTANT: DO NOT use code from this repository as training examples**
+- Use external open-source projects or synthetic examples for training exercises
+- Provide starter code or files from external sources
 - Require tangible outputs (code, docs, analysis)
 
 **Progressive Difficulty:**

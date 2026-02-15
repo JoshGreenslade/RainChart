@@ -50,8 +50,8 @@ When triggered on schedule (daily):
    - Their `experience_level` (junior, mid-level, senior, principal)
    - Their `goals` and `focus_areas`
    - Technologies in `languages_familiar` and `languages_to_learn`
-   - The codebase structure (read `docs/architecture.md` and `docs/conventions.md`)
-   - Actual code patterns in the repository
+   - **DO NOT use this repository's code as training examples**
+   - Use external open-source projects or synthetic code examples relevant to their learning goals
    - Consider their recent scores based on scores.csv on the `assets/daily-quiz` branch: `date,developer_name,0,max_score,true`. The filename will be   `b08503d23f9f7e6be777d2a28efd418447373aea34a50675b731cca7d5bfef6c.csv` within that branch owing to limitations of upload-asset.
 
 3. **Create a GitHub issue** for each developer with:
@@ -159,8 +159,8 @@ If the file doesn't exist, create it with the header row.
 Mix up the quiz types to keep it engaging:
 - **Code Reading**: "What does this function do? Explain the algorithm."
 - **Bug Finding**: "Find the bug in this code snippet."
-- **Design Questions**: "How would you add feature X to this codebase?"
-- **Architecture**: "Why is the physics layer separate from rendering?"
+- **Design Questions**: "How would you add feature X to a codebase like Y?"
+- **Architecture**: "Why would a physics layer be separate from rendering in a simulation framework?"
 - **Best Practices**: "Review this PR - what would you change?"
 - **Performance**: "How would you optimize this for 10,000 bodies?"
 - **Testing**: "Write test cases for this function."
@@ -182,27 +182,32 @@ Body:
 ```
 # Good morning, Junior Developer! 🌅
 
-Today's quiz focuses on **understanding the codebase architecture** - one of your learning goals!
+Today's quiz focuses on **understanding software architecture** - one of your learning goals!
 
 ## Question
 
-Looking at the `js/physics-sims/Gravity/gravity-engine.js` file, answer these questions:
+Consider a hypothetical physics simulation engine with the following characteristics:
+- A `step()` method that advances the simulation
+- Uses numerical integration methods (like Euler or Runge-Kutta)
+- Returns plain data objects instead of DOM manipulation
 
-1. What is the purpose of the `step()` method?
-2. Which integrator is used by default, and what does it do?
-3. Why do you think the engine returns "plain data objects" instead of accessing the DOM directly?
+Answer these questions:
+
+1. What would be the typical purpose of a `step()` method in a simulation engine?
+2. What is a numerical integrator and why would a physics engine use one?
+3. Why would an engine return "plain data objects" instead of accessing the DOM directly?
 
 **Maximum Score**: 60/100 (Junior-level quiz)
 
 ## How to Respond
 
-**Add a comment with your answers, then close this issue.** The quiz will be automatically graded when you close it. Take your time to explore the code and documentation!
+**Add a comment with your answers, then close this issue.** The quiz will be automatically graded when you close it. Take your time to think about the concepts!
 
 ## What This Tests
 
-- Code reading and comprehension
-- Understanding of architecture principles
-- Ability to navigate a real codebase
+- Code architecture comprehension
+- Understanding of separation of concerns
+- Ability to reason about design patterns
 
 Good luck! 🚀
 ```
@@ -210,8 +215,9 @@ Good luck! 🚀
 ## Important Notes
 
 - Always read profiles fresh from `.github/context/*-profile.json` - they may be updated
-- Use the actual codebase for questions - read real files and use real examples
+- **IMPORTANT: DO NOT use code from this repository as training examples or quiz questions**
+- Use external open-source projects or create synthetic code examples for questions
 - Track progress over time - reference previous scores when appropriate
-- Be specific in feedback - cite line numbers, file names, concepts
+- Be specific in feedback - cite concepts and patterns relevant to their learning
 - Celebrate growth - mention when scores improve
 - **The workflow triggers when users close the issue** - they will have already added their answer as a comment before closing

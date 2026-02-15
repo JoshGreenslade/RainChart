@@ -511,9 +511,10 @@ Use the `upload-asset` safe output to write updated files back.
 - Make them feel like they're on an epic journey
 
 **Keep it real!**
-- Use actual code from the repository
-- Reference real PRs and issues
-- Create scenarios based on real situations
+- **IMPORTANT: DO NOT use code from this repository as training examples**
+- Use external open-source projects or synthetic examples for training scenarios
+- Reference hypothetical PRs and issues based on realistic situations
+- Create scenarios based on real-world situations from other codebases
 - Tie learning to tangible outcomes
 - Show how skills impact their team
 
@@ -540,7 +541,7 @@ A junior engineer just submitted a PR that refactors a core module. The code wor
 
 ## The Code Change
 
-[The AI coach will include an actual code diff or point to a real file from your repository]
+[The AI coach will provide a synthetic code diff or example from an external open-source project - NOT from this repository]
 
 ## Your Task
 
