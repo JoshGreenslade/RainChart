@@ -1,0 +1,172 @@
+{
+  "name": "Josh Greenslade",
+  "experience_level": "senior",
+  "experience_years": 6,
+  "role": "senior-engineer-lead",
+  "current_title": "Senior Software Engineer",
+  "aspiring_title": "Principal Engineer",
+  
+  "goals": [
+    "Transform my team to an AI-first approach",
+    "Become a principal engineer",
+    "Master AI tools and champion adoption company-wide",
+    "Build world-class code review and quality practices",
+    "Develop exceptional stakeholder communication skills",
+    "Make strategic tech debt and prioritization decisions",
+    "Create a culture of continuous learning and innovation"
+  ],
+  
+  "languages_familiar": [
+    "JavaScript",
+    "TypeScript", 
+    "Python",
+    "Java",
+    "Go"
+  ],
+  
+  "languages_to_learn": [
+    "Rust",
+    "Kotlin"
+  ],
+  
+  "focus_areas": [
+    "ai-mastery",
+    "team-leadership",
+    "stakeholder-communication",
+    "strategic-thinking",
+    "code-quality-at-scale"
+  ],
+  
+  "team_context": {
+    "team_size": 0,
+    "team_composition": {
+      "juniors": 0,
+      "mid_level": 0,
+      "senior": 0
+    },
+    "team_experience": [
+      "Currently working solo, planning to build and lead a team"
+    ],
+    "team_challenges": [
+      "Building AI-first practices from the ground up",
+      "Establishing code quality standards and processes",
+      "Preparing to lead and mentor future team members",
+      "Creating scalable development practices",
+      "Balancing innovation with pragmatism"
+    ]
+  },
+  
+  "stakeholder_context": {
+    "reports_to": "Engineering Manager",
+    "works_with": [
+      "Product Manager - defining features and priorities",
+      "VP Engineering - strategic planning",
+      "Design team - UI/UX collaboration",
+      "Security team - ensuring code safety",
+      "DevOps team - infrastructure and deployment"
+    ],
+    "common_challenges": [
+      "Balancing feature requests with technical excellence",
+      "Explaining technical complexity to non-technical stakeholders",
+      "Negotiating realistic timelines under pressure",
+      "Building trust in AI tools and practices",
+      "Managing expectations and communicating trade-offs"
+    ]
+  },
+  
+  "current_challenges": [
+    "Establishing AI-first development practices",
+    "Building systems for scalability and maintainability",
+    "Balancing rapid development with code quality",
+    "Preparing for team growth and leadership",
+    "Creating processes that will scale with the team",
+    "Managing technical decisions independently",
+    "Building expertise in AI tools and best practices"
+  ],
+  
+  "strengths": [
+    "Strong technical fundamentals and architecture knowledge",
+    "Care deeply about code quality and best practices",
+    "Good at debugging complex problems",
+    "Willing to learn and experiment with new tools",
+    "Committed to team growth and success"
+  ],
+  
+  "growth_areas": [
+    "Building and leading high-performing teams",
+    "Effective delegation and team empowerment",
+    "Communicating technical decisions to executives",
+    "Mentoring and developing junior engineers",
+    "Making strategic architectural decisions",
+    "Building consensus across stakeholders",
+    "Scaling personal impact through leadership"
+  ],
+  
+  "ai_experience": {
+    "tools_used": [
+      "GitHub Copilot (daily use)",
+      "ChatGPT (frequent use for problem-solving)",
+      "Claude (experimenting with various use cases)"
+    ],
+    "comfort_level": "intermediate-to-advanced",
+    "success_stories": [
+      "Successfully using AI tools to accelerate development",
+      "Experimenting with AI-assisted code generation and refactoring",
+      "Building workflows and automation with AI assistance"
+    ],
+    "concerns": [
+      "Ensuring AI-generated code quality and security",
+      "Understanding when to use AI vs traditional approaches",
+      "Building best practices for AI tool usage",
+      "Preparing to teach others about responsible AI use"
+    ]
+  },
+  
+  "learning_style": {
+    "preferences": [
+      "Hands-on practice over theory",
+      "Real-world examples from actual codebases",
+      "Step-by-step guides with clear outcomes",
+      "Scenario-based learning (simulations)",
+      "Immediate application to my team"
+    ],
+    "best_times": [
+      "Early morning (7-9 AM) for focused learning",
+      "Lunch break (30-45 min) for quick exercises",
+      "Friday afternoons for reflection and planning"
+    ],
+    "motivated_by": [
+      "Seeing my team succeed and grow",
+      "Measurable progress and achievements",
+      "Recognition from leadership",
+      "Building something that lasts",
+      "Becoming the leader my team deserves"
+    ]
+  },
+  
+  "training_goals": {
+    "short_term": [
+      "Complete AI Tools Mastery module",
+      "Build confidence in stakeholder communication",
+      "Establish AI code review processes and standards",
+      "Develop mentoring and teaching skills for future team"
+    ],
+    "medium_term": [
+      "Master all core training modules",
+      "Build comprehensive AI-first development practices",
+      "Prepare for hiring and leading a team",
+      "Develop strategic technical leadership skills"
+    ],
+    "long_term": [
+      "Achieve AI Expert level (Level 15+)",
+      "Successfully build and lead an AI-first team",
+      "Be recognized as an AI champion and thought leader",
+      "Advance to Principal Engineer",
+      "Mentor other senior engineers in AI adoption"
+    ]
+  },
+  
+  "time_commitment": "5-8 hours per week",
+  "start_date": "2026-02-15",
+  "completion_target": "2026-08-15"
+}
