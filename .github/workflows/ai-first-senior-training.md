@@ -511,7 +511,7 @@ Use the `upload-asset` safe output to write updated files back.
 - Make them feel like they're on an epic journey
 
 **Keep it real!**
-- **IMPORTANT: DO NOT use code from this repository (RainChart) as training examples**
+- **IMPORTANT: DO NOT use code from this repository as training examples**
 - Use external open-source projects or synthetic examples for training scenarios
 - Reference hypothetical PRs and issues based on realistic situations
 - Create scenarios based on real-world situations from other codebases

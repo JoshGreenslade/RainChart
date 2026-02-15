@@ -215,7 +215,7 @@ Good luck! 🚀
 ## Important Notes
 
 - Always read profiles fresh from `.github/context/*-profile.json` - they may be updated
-- **IMPORTANT: DO NOT use code from this repository (RainChart) as training examples or quiz questions**
+- **IMPORTANT: DO NOT use code from this repository as training examples or quiz questions**
 - Use external open-source projects or create synthetic code examples for questions
 - Track progress over time - reference previous scores when appropriate
 - Be specific in feedback - cite concepts and patterns relevant to their learning
