@@ -123,7 +123,7 @@ When a quiz issue is closed (triggered by `issues: types: [closed]`):
    - **Upload the updated scores file** using the `upload-asset` safe output
      - The file will be uploaded to the orphaned `assets/daily-quiz` branch
      - The file name should be: `scores.csv`
-     - The file will be accessible at: `https://raw.githubusercontent.com/{owner}/{repo}/assets/daily-quiz/scores.csv`
+     - The file will be accessible at: `https://raw.githubusercontent.com/{owner}/{repo}/assets/daily-quiz/scores.csv` (replace {owner} and {repo} with the actual repository owner and name)
 
 8. **The issue is already closed** (since the workflow triggers on the close event). Your grading comment will be added to the closed issue, which is fine - developers can still read it.
 
@@ -147,8 +147,8 @@ date,developer_name,score,max_score,missed
 
 **Branch Strategy**: Scores are tracked in an orphaned `assets/daily-quiz` branch to keep them separate from code. The workflow automatically:
 - Uploads the scores.csv file to the `assets/daily-quiz` branch using the `upload-asset` safe output
-- The file is accessible at: `https://raw.githubusercontent.com/{owner}/{repo}/assets/daily-quiz/scores.csv`
-- This provides a predictable URL for retrieving score history
+- The file is accessible at a predictable URL (see step 7 above for the URL format)
+- This provides a stable location for retrieving score history
 - The orphaned branch is isolated for security and keeps assets separate from code
 
 If the file doesn't exist, create it with the header row.
