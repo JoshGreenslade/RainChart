@@ -8,12 +8,14 @@ on:
   schedule: daily
   workflow_dispatch:
   issues:
-    types: [opened, reopened]
+    types: [opened]
+  issue_comment:
+    types: [created]
 
 permissions:
-  contents: read
-  issues: read
-  pull-requests: read
+  contents: write
+  issues: write
+  pull-requests: write
 
 network: defaults
 
@@ -54,11 +56,12 @@ When triggered on schedule (daily):
 
 3. **Create a GitHub issue** for each developer with:
    - Title: `[Daily Quiz] {Developer Name} - {Date}`
+   - **Create the issue in an open state** (do not close it)
    - Content including:
      - A personalized greeting
      - The quiz question or exercise (code review, debugging challenge, design question, etc.)
      - **Maximum possible score** (e.g., "This quiz has a max score of 60/100 - designed for junior developers")
-     - Clear instructions on how to respond
+     - Clear instructions on how to respond: "**Reply to this issue with a comment containing your answer. The quiz will be automatically graded when you submit your response.**"
      - Encouragement and context about what skills this tests
 
 4. **Quiz Design Guidelines**:
@@ -84,11 +87,12 @@ When triggered on schedule (daily):
 
 ### 2. Grade Quiz Responses
 
-When an issue is opened or reopened (developer responses):
+When a comment is added to a quiz issue (either on an open or closed issue):
 
-1. **Check if the issue is a quiz response** (has `[Daily Quiz]` in title and `quiz` label)
-2. **Read the developer's response** from the issue body or comments
-3. **Grade the response** (0-100 scale):
+1. **Check if the issue is a quiz** (has `[Daily Quiz]` in title and `quiz` label)
+2. **Check if this is the first user response** (grade only on the first comment from the developer, not subsequent comments)
+3. **Read the developer's response** from the comment
+4. **Grade the response** (0-100 scale):
    - **0-20**: Beginner/never coded before - fundamental misunderstandings
    - **20-40**: Junior level - basic understanding but missing key concepts
    - **40-60**: Competent junior - solid fundamentals, some gaps
@@ -97,8 +101,8 @@ When an issue is opened or reopened (developer responses):
    - **85-95**: Very senior - expert knowledge, nuanced thinking
    - **95-100**: Principal level - exceptional insight, strategic thinking
 
-4. **Consider the maximum possible score** for that quiz when grading
-5. **Add a comment to the issue** with:
+5. **Consider the maximum possible score** for that quiz when grading
+6. **Add a comment to the issue** with:
    - Their score (e.g., "Score: 55/60 - Well done!")
    - What they got right
    - What they missed or could improve
@@ -106,12 +110,15 @@ When an issue is opened or reopened (developer responses):
    - Encouragement and next steps
    - Resources to learn more (documentation, articles, code examples)
 
-6. **Update the scores CSV file**:
-   - Read `.github/context/scores.csv` (create if doesn't exist)
-   - Add a new row: `date,developer_name,score,max_score,missed`
+7. **Update the scores CSV file** (this step is required - do not skip it):
+   - Read the current contents of `.github/context/scores.csv` (create with header row if it doesn't exist: `date,developer_name,score,max_score,missed`)
+   - Add a new row with today's date, the developer's name from the issue title, their score, max score for the quiz, and `false` for missed
    - Format: `2026-02-14,Junior Developer,55,60,false`
-   - Create a pull request with the updated scores file using `create-pull-request` safe output
-   - Auto-merge the PR if possible, or leave it for maintainer review
+   - **You must create a pull request** with the updated scores file using the `create-pull-request` safe output
+   - The PR should have a clear title like "Update quiz scores for [Developer Name] - [Date]"
+   - Set auto-merge to true so the PR merges automatically if checks pass
+
+8. **Leave the issue open** after grading so developers can review feedback and continue discussion if needed.
 
 ### 3. Track Missed Quizzes
 
@@ -174,7 +181,7 @@ Looking at the `js/physics-sims/Gravity/gravity-engine.js` file, answer these qu
 
 ## How to Respond
 
-Reply to this issue with your answers. Take your time to explore the code and documentation!
+**Reply to this issue with a comment containing your answers.** The quiz will be automatically graded when you submit your response. Take your time to explore the code and documentation!
 
 ## What This Tests
 
@@ -192,3 +199,4 @@ Good luck! 🚀
 - Track progress over time - reference previous scores when appropriate
 - Be specific in feedback - cite line numbers, file names, concepts
 - Celebrate growth - mention when scores improve
+- **You can comment on and grade quiz responses even if the user has closed the issue** - the grading should still work
