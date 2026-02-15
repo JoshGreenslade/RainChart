@@ -1,19 +1,19 @@
 {
-  "name": "Senior Engineer",
+  "name": "Josh Greenslade",
   "experience_level": "senior",
-  "experience_years": 8,
+  "experience_years": 6,
   "role": "senior-engineer-lead",
   "current_title": "Senior Software Engineer",
   "aspiring_title": "Principal Engineer",
   
   "goals": [
-    "Transform my team of 5 juniors to an AI-first approach",
-    "Become a principal engineer within 18 months",
-    "Master AI tools and teach them company-wide",
+    "Transform my team to an AI-first approach",
+    "Become a principal engineer",
+    "Master AI tools and champion adoption company-wide",
     "Build world-class code review and quality practices",
     "Develop exceptional stakeholder communication skills",
     "Make strategic tech debt and prioritization decisions",
-    "Create a culture of continuous learning"
+    "Create a culture of continuous learning and innovation"
   ],
   
   "languages_familiar": [
@@ -38,55 +38,50 @@
   ],
   
   "team_context": {
-    "team_size": 5,
+    "team_size": 0,
     "team_composition": {
-      "juniors": 3,
-      "mid_level": 2,
+      "juniors": 0,
+      "mid_level": 0,
       "senior": 0
     },
     "team_experience": [
-      "Alex - Junior (1 year exp) - enthusiastic but overconfident with AI",
-      "Priya - Junior (1 year exp) - cautious, resistant to AI tools",
-      "Jordan - Junior (0.5 years exp) - eager but easily overwhelmed",
-      "Sam - Mid-level (3 years exp) - strong fundamentals, promotion candidate",
-      "Taylor - Mid-level (2.5 years exp) - solid performer, imposter syndrome"
+      "Currently working solo, planning to build and lead a team"
     ],
     "team_challenges": [
-      "Uneven AI adoption (some love it, some avoid it)",
-      "Code quality varies significantly between team members",
-      "Tech debt accumulating faster than we can address it",
-      "Knowledge silos forming around certain systems",
-      "Difficulty scaling team culture as we grow"
+      "Building AI-first practices from the ground up",
+      "Establishing code quality standards and processes",
+      "Preparing to lead and mentor future team members",
+      "Creating scalable development practices",
+      "Balancing innovation with pragmatism"
     ]
   },
   
   "stakeholder_context": {
-    "reports_to": "Engineering Manager (David)",
+    "reports_to": "Engineering Manager",
     "works_with": [
-      "Product Manager (Sarah) - sometimes unrealistic deadlines",
-      "VP Engineering (Jennifer) - strategic, data-driven",
-      "Design team (Alex leads) - wants pixel-perfect implementations",
-      "Security team (Sam leads) - concerned about AI-generated code",
-      "DevOps team (Chris leads) - infrastructure partners"
+      "Product Manager - defining features and priorities",
+      "VP Engineering - strategic planning",
+      "Design team - UI/UX collaboration",
+      "Security team - ensuring code safety",
+      "DevOps team - infrastructure and deployment"
     ],
     "common_challenges": [
-      "Balancing feature requests with tech debt",
+      "Balancing feature requests with technical excellence",
       "Explaining technical complexity to non-technical stakeholders",
       "Negotiating realistic timelines under pressure",
-      "Getting buy-in for AI tools and practices",
-      "Managing expectations when things go wrong"
+      "Building trust in AI tools and practices",
+      "Managing expectations and communicating trade-offs"
     ]
   },
   
   "current_challenges": [
-    "AI adoption resistance from some team members",
-    "Tech debt in core systems slowing velocity 40%",
-    "Recent production bug from AI-generated code hurt trust",
-    "Junior developers need more structured mentoring",
-    "Stakeholders don't understand why things take time",
-    "Team culture fraying as we scale from 3 to 5 people",
-    "No clear process for AI code review and quality gates",
-    "Balancing my own coding time with leadership responsibilities"
+    "Establishing AI-first development practices",
+    "Building systems for scalability and maintainability",
+    "Balancing rapid development with code quality",
+    "Preparing for team growth and leadership",
+    "Creating processes that will scale with the team",
+    "Managing technical decisions independently",
+    "Building expertise in AI tools and best practices"
   ],
   
   "strengths": [
@@ -98,32 +93,32 @@
   ],
   
   "growth_areas": [
-    "Delegating effectively without micromanaging",
-    "Saying 'no' to stakeholders constructively",
-    "Mentoring juniors patiently when under pressure",
-    "Presenting technical ideas to executives",
-    "Making quick decisions with incomplete information",
-    "Building consensus when team disagrees",
-    "Managing my time between coding and leadership"
+    "Building and leading high-performing teams",
+    "Effective delegation and team empowerment",
+    "Communicating technical decisions to executives",
+    "Mentoring and developing junior engineers",
+    "Making strategic architectural decisions",
+    "Building consensus across stakeholders",
+    "Scaling personal impact through leadership"
   ],
   
   "ai_experience": {
     "tools_used": [
-      "GitHub Copilot (3 months, daily use)",
-      "ChatGPT (6 months, occasional use)",
-      "Claude (1 month, experimenting)"
+      "GitHub Copilot (daily use)",
+      "ChatGPT (frequent use for problem-solving)",
+      "Claude (experimenting with various use cases)"
     ],
-    "comfort_level": "intermediate",
+    "comfort_level": "intermediate-to-advanced",
     "success_stories": [
-      "Used AI to refactor 5k lines of legacy code successfully",
-      "Generated comprehensive test suite that caught 3 bugs",
-      "Wrote documentation 3x faster with AI assistance"
+      "Successfully using AI tools to accelerate development",
+      "Experimenting with AI-assisted code generation and refactoring",
+      "Building workflows and automation with AI assistance"
     ],
     "concerns": [
-      "AI-generated bug in production damaged team trust",
-      "Some team members using AI without understanding code",
-      "Security team worried about IP leakage",
-      "Uncertainty about when to use vs not use AI"
+      "Ensuring AI-generated code quality and security",
+      "Understanding when to use AI vs traditional approaches",
+      "Building best practices for AI tool usage",
+      "Preparing to teach others about responsible AI use"
     ]
   },
   
@@ -151,23 +146,23 @@
   
   "training_goals": {
     "short_term": [
-      "Complete AI Tools Mastery module (1 month)",
-      "Handle next difficult stakeholder conversation successfully",
-      "Implement AI code review process with team",
-      "Mentor junior through complete feature (pair programming)"
+      "Complete AI Tools Mastery module",
+      "Build confidence in stakeholder communication",
+      "Establish AI code review processes and standards",
+      "Develop mentoring and teaching skills for future team"
     ],
     "medium_term": [
-      "Get entire team confidently using AI tools (3 months)",
-      "Reduce tech debt by 30% (6 months)",
-      "Complete all core training modules (4 months)",
-      "Present technical strategy to VP Engineering successfully"
+      "Master all core training modules",
+      "Build comprehensive AI-first development practices",
+      "Prepare for hiring and leading a team",
+      "Develop strategic technical leadership skills"
     ],
     "long_term": [
-      "Achieve Level 15+ (AI Expert) (6 months)",
-      "Transform team into high-performing AI-first unit (6 months)",
-      "Be recognized as AI champion across organization (9 months)",
-      "Get promoted to Principal Engineer (18 months)",
-      "Train 2 other senior engineers to lead their own teams (12 months)"
+      "Achieve AI Expert level (Level 15+)",
+      "Successfully build and lead an AI-first team",
+      "Be recognized as an AI champion and thought leader",
+      "Advance to Principal Engineer",
+      "Mentor other senior engineers in AI adoption"
     ]
   },
   

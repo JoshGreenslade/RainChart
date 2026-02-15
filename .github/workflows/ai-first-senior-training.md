@@ -536,11 +536,11 @@ Body:
 
 ## Scenario
 
-A junior engineer just submitted a PR that refactors the `gravity-engine.js` file. The code works and all tests pass, but you notice several issues that affect maintainability and performance.
+A junior engineer just submitted a PR that refactors a core module. The code works and all tests pass, but you notice several issues that affect maintainability and performance.
 
 ## The Code Change
 
-[Include actual code diff or point to real file]
+[The AI coach will include an actual code diff or point to a real file from your repository]
 
 ## Your Task
 
