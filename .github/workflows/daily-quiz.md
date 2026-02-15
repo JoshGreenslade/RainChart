@@ -11,9 +11,9 @@ on:
     types: [opened, closed]
 
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+  contents: read
+  issues: read
+  pull-requests: read
 
 network: defaults
 
