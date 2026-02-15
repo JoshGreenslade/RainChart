@@ -1,0 +1,47 @@
+{
+  "version": "1.0.0",
+  "created_at": "2026-02-15T19:04:06Z",
+  "last_updated": "2026-02-15T19:04:06Z",
+  "total_sessions_completed": 0,
+  "total_sessions_created": 1,
+  "current_cycle": 1,
+  "completion_rate": {
+    "week_1": 0,
+    "week_2": 0,
+    "week_3": 0,
+    "week_4": 0,
+    "week_5": 0,
+    "week_6": 0,
+    "week_7": 0,
+    "week_8": 0
+  },
+  "average_scores": {
+    "week_1": null,
+    "week_2": null,
+    "week_3": null,
+    "week_4": null,
+    "week_5": null,
+    "week_6": null,
+    "week_7": null,
+    "week_8": null
+  },
+  "badges_unlocked": [],
+  "sessions": [
+    {
+      "week": 1,
+      "topic": "Prompt Engineering Masterclass",
+      "created_at": "2026-02-15T19:04:06Z",
+      "issue_number": null,
+      "status": "created",
+      "score": null,
+      "xp_awarded": null,
+      "completion_time_days": null
+    }
+  ],
+  "metrics": {
+    "avg_completion_time_days": null,
+    "favorite_topics": [],
+    "most_improved_area": null,
+    "confidence_gains": {}
+  }
+}
