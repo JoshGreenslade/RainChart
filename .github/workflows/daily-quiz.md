@@ -28,10 +28,11 @@ safe-outputs:
   
   add-comment: {}
   
-  create-pull-request:
-    title-prefix: "[Daily Quiz] "
-    labels: [quiz, scores]
-    auto-merge: true
+  create-commit:
+    max: 5
+    branch: scores
+    allowed-paths: [".github/context/scores.csv"]
+    commit-message-prefix: "[Quiz Scores] "
 ---
 
 # Daily Quiz and Training Program
@@ -113,26 +114,30 @@ When a quiz issue is closed (triggered by `issues: types: [closed]`):
    - Resources to learn more (documentation, articles, code examples)
 
 7. **Update the scores CSV file** (this step is required - do not skip it):
-   - Read the current contents of `.github/context/scores.csv` (create with header row if it doesn't exist: `date,developer_name,score,max_score,missed`)
+   - First, check if the `scores` branch exists in the repository
+   - Read the current contents of `.github/context/scores.csv` from the `scores` branch (or from main if scores branch doesn't exist yet)
+   - If the file doesn't exist, create it with header row: `date,developer_name,score,max_score,missed`
    - Parse the developer's name from the issue title using this pattern: `[Daily Quiz] {Developer Name} - {Date}`
      - Extract the text between `[Daily Quiz] ` and ` - ` (e.g., from `[Daily Quiz] Junior Developer - 2026-02-14`, extract `Junior Developer`)
    - Add a new row with today's date (YYYY-MM-DD format), the developer's name, their score, max score for the quiz, and `false` for missed
    - Format: `2026-02-14,Junior Developer,55,60,false`
-   - **You must create a pull request** with the updated scores file using the `create-pull-request` safe output
-   - The PR should have a clear title like "Update quiz scores for [Developer Name] - [Date]"
-   - Set auto-merge to true so the PR merges automatically if checks pass
+   - **Commit the updated scores file directly to the `scores` branch** using the `create-commit` safe output
+     - If the `scores` branch doesn't exist, it will be created automatically from the current state
+     - Commit message should be: "[Quiz Scores] Update scores for [Developer Name] - [Date]"
+     - The file path must be: `.github/context/scores.csv`
 
 8. **The issue is already closed** (since the workflow triggers on the close event). Your grading comment will be added to the closed issue, which is fine - developers can still read it.
 
 ### 3. Track Missed Quizzes
 
 - If a developer hasn't responded to a quiz after 2 days, log it as missed
-- Add entry to scores.csv: `date,developer_name,0,max_score,true`
+- Add entry to scores.csv on the `scores` branch: `date,developer_name,0,max_score,true`
+- Use the same `create-commit` safe output to update the scores branch
 - Consider this when designing future quizzes (maybe make them easier or more engaging)
 
-## CSV File Format
+## CSV File Format and Storage
 
-The `.github/context/scores.csv` file should have this structure:
+The `.github/context/scores.csv` file is stored in a dedicated `scores` branch and has this structure:
 
 ```csv
 date,developer_name,score,max_score,missed
@@ -140,6 +145,12 @@ date,developer_name,score,max_score,missed
 2026-02-15,Junior Developer,0,60,true
 2026-02-16,Junior Developer,48,60,false
 ```
+
+**Branch Strategy**: Scores are tracked in a dedicated `scores` branch to avoid cluttering the main branch with frequent small updates. The workflow automatically:
+- Creates the `scores` branch if it doesn't exist (branching from the current state)
+- Reads the current scores.csv from the `scores` branch
+- Commits updates directly to the `scores` branch (no PR required)
+- This keeps score history separate and easily mergeable when needed
 
 If the file doesn't exist, create it with the header row.
 
