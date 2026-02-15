@@ -1,13 +1,14 @@
 {
   "name": "Junior Developer",
-  "experience_level": "junior",
-  "experience_years": 1,
+  "experience_level": "senior",
+  "experience_years": 6,
   "goals": [
-    "Learn TypeScript",
-    "Understand codebase architecture",
-    "Improve code review skills"
+    "Become principle",
+    "Lead architecural decisions",
+    "Make good trade offs",
+    "Ensure the health, simplicity, extensibility, and flexibility of the codebase is high"
   ],
-  "languages_familiar": ["JavaScript", "HTML", "CSS"],
+  "languages_familiar": ["JavaScript", "HTML", "CSS", "Python", "TypeScript"],
   "languages_to_learn": ["TypeScript", "Python"],
-  "focus_areas": ["frontend", "testing"]
+  "focus_areas": ["architecture", "deep-understanding of language"]
 }
