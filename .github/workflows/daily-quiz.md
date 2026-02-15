@@ -8,12 +8,12 @@ on:
   schedule: daily
   workflow_dispatch:
   issues:
-    types: [opened, reopened]
+    types: [opened, closed]
 
 permissions:
-  contents: read
-  issues: read
-  pull-requests: read
+  contents: write
+  issues: write
+  pull-requests: write
 
 network: defaults
 
@@ -28,10 +28,11 @@ safe-outputs:
   
   add-comment: {}
   
-  create-pull-request:
-    title-prefix: "[Daily Quiz] "
-    labels: [quiz, scores]
-    auto-merge: true
+  create-commit:
+    max: 5
+    branch: scores
+    allowed-paths: [".github/context/scores.csv"]
+    commit-message-prefix: "[Quiz Scores] "
 ---
 
 # Daily Quiz and Training Program
@@ -53,12 +54,13 @@ When triggered on schedule (daily):
    - Actual code patterns in the repository
 
 3. **Create a GitHub issue** for each developer with:
-   - Title: `[Daily Quiz] {Developer Name} - {Date}`
+   - Title: `[Daily Quiz] {Developer Name} - {Date}` (e.g., `[Daily Quiz] Junior Developer - 2026-02-14`)
+   - **Leave the issue open** - do not close it after creation; users will add their answer and close it
    - Content including:
      - A personalized greeting
      - The quiz question or exercise (code review, debugging challenge, design question, etc.)
      - **Maximum possible score** (e.g., "This quiz has a max score of 60/100 - designed for junior developers")
-     - Clear instructions on how to respond
+     - Clear instructions on how to respond: "**Add a comment with your answer, then close this issue. The quiz will be automatically graded when you close it.**"
      - Encouragement and context about what skills this tests
 
 4. **Quiz Design Guidelines**:
@@ -84,11 +86,16 @@ When triggered on schedule (daily):
 
 ### 2. Grade Quiz Responses
 
-When an issue is opened or reopened (developer responses):
+When a quiz issue is closed (triggered by `issues: types: [closed]`):
 
-1. **Check if the issue is a quiz response** (has `[Daily Quiz]` in title and `quiz` label)
-2. **Read the developer's response** from the issue body or comments
-3. **Grade the response** (0-100 scale):
+1. **Check if the issue is a quiz** (has `[Daily Quiz]` in title and `quiz` label)
+2. **Check if this issue should be graded**:
+   - Look at all comments on the issue
+   - Ignore comments from the bot/workflow itself
+   - Grade only if there's at least one comment from a human user (the developer's response)
+   - Skip grading if there's already a grading comment (look for "Score:" in previous comments)
+3. **Read the developer's response** from the most recent human comment before the issue was closed
+4. **Grade the response** (0-100 scale):
    - **0-20**: Beginner/never coded before - fundamental misunderstandings
    - **20-40**: Junior level - basic understanding but missing key concepts
    - **40-60**: Competent junior - solid fundamentals, some gaps
@@ -97,8 +104,8 @@ When an issue is opened or reopened (developer responses):
    - **85-95**: Very senior - expert knowledge, nuanced thinking
    - **95-100**: Principal level - exceptional insight, strategic thinking
 
-4. **Consider the maximum possible score** for that quiz when grading
-5. **Add a comment to the issue** with:
+5. **Consider the maximum possible score** for that quiz when grading
+6. **Add a comment to the issue** with:
    - Their score (e.g., "Score: 55/60 - Well done!")
    - What they got right
    - What they missed or could improve
@@ -106,22 +113,31 @@ When an issue is opened or reopened (developer responses):
    - Encouragement and next steps
    - Resources to learn more (documentation, articles, code examples)
 
-6. **Update the scores CSV file**:
-   - Read `.github/context/scores.csv` (create if doesn't exist)
-   - Add a new row: `date,developer_name,score,max_score,missed`
+7. **Update the scores CSV file** (this step is required - do not skip it):
+   - First, check if the `scores` branch exists in the repository
+   - Read the current contents of `.github/context/scores.csv` from the `scores` branch (or from main if scores branch doesn't exist yet)
+   - If the file doesn't exist, create it with header row: `date,developer_name,score,max_score,missed`
+   - Parse the developer's name from the issue title using this pattern: `[Daily Quiz] {Developer Name} - {Date}`
+     - Extract the text between `[Daily Quiz] ` and ` - ` (e.g., from `[Daily Quiz] Junior Developer - 2026-02-14`, extract `Junior Developer`)
+   - Add a new row with today's date (YYYY-MM-DD format), the developer's name, their score, max score for the quiz, and `false` for missed
    - Format: `2026-02-14,Junior Developer,55,60,false`
-   - Create a pull request with the updated scores file using `create-pull-request` safe output
-   - Auto-merge the PR if possible, or leave it for maintainer review
+   - **Commit the updated scores file directly to the `scores` branch** using the `create-commit` safe output
+     - If the `scores` branch doesn't exist, it will be created automatically from the current state
+     - Commit message should be: "[Quiz Scores] Update scores for [Developer Name] - [Date]"
+     - The file path must be: `.github/context/scores.csv`
+
+8. **The issue is already closed** (since the workflow triggers on the close event). Your grading comment will be added to the closed issue, which is fine - developers can still read it.
 
 ### 3. Track Missed Quizzes
 
 - If a developer hasn't responded to a quiz after 2 days, log it as missed
-- Add entry to scores.csv: `date,developer_name,0,max_score,true`
+- Add entry to scores.csv on the `scores` branch: `date,developer_name,0,max_score,true`
+- Use the same `create-commit` safe output to update the scores branch
 - Consider this when designing future quizzes (maybe make them easier or more engaging)
 
-## CSV File Format
+## CSV File Format and Storage
 
-The `.github/context/scores.csv` file should have this structure:
+The `.github/context/scores.csv` file is stored in a dedicated `scores` branch and has this structure:
 
 ```csv
 date,developer_name,score,max_score,missed
@@ -129,6 +145,12 @@ date,developer_name,score,max_score,missed
 2026-02-15,Junior Developer,0,60,true
 2026-02-16,Junior Developer,48,60,false
 ```
+
+**Branch Strategy**: Scores are tracked in a dedicated `scores` branch to avoid cluttering the main branch with frequent small updates. The workflow automatically:
+- Creates the `scores` branch if it doesn't exist (branching from the current state)
+- Reads the current scores.csv from the `scores` branch
+- Commits updates directly to the `scores` branch (no PR required)
+- This keeps score history separate and easily mergeable when needed
 
 If the file doesn't exist, create it with the header row.
 
@@ -174,7 +196,7 @@ Looking at the `js/physics-sims/Gravity/gravity-engine.js` file, answer these qu
 
 ## How to Respond
 
-Reply to this issue with your answers. Take your time to explore the code and documentation!
+**Add a comment with your answers, then close this issue.** The quiz will be automatically graded when you close it. Take your time to explore the code and documentation!
 
 ## What This Tests
 
@@ -192,3 +214,4 @@ Good luck! 🚀
 - Track progress over time - reference previous scores when appropriate
 - Be specific in feedback - cite line numbers, file names, concepts
 - Celebrate growth - mention when scores improve
+- **The workflow triggers when users close the issue** - they will have already added their answer as a comment before closing
