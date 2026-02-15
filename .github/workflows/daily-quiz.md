@@ -8,9 +8,7 @@ on:
   schedule: daily
   workflow_dispatch:
   issues:
-    types: [opened]
-  issue_comment:
-    types: [created]
+    types: [opened, closed]
 
 permissions:
   contents: write
@@ -56,12 +54,12 @@ When triggered on schedule (daily):
 
 3. **Create a GitHub issue** for each developer with:
    - Title: `[Daily Quiz] {Developer Name} - {Date}` (e.g., `[Daily Quiz] Junior Developer - 2026-02-14`)
-   - **Leave the issue open** - do not close it after creation; users will comment on the open issue
+   - **Leave the issue open** - do not close it after creation; users will add their answer and close it
    - Content including:
      - A personalized greeting
      - The quiz question or exercise (code review, debugging challenge, design question, etc.)
      - **Maximum possible score** (e.g., "This quiz has a max score of 60/100 - designed for junior developers")
-     - Clear instructions on how to respond: "**Reply to this issue with a comment containing your answer. The quiz will be automatically graded when you submit your response.**"
+     - Clear instructions on how to respond: "**Add a comment with your answer, then close this issue. The quiz will be automatically graded when you close it.**"
      - Encouragement and context about what skills this tests
 
 4. **Quiz Design Guidelines**:
@@ -87,15 +85,15 @@ When triggered on schedule (daily):
 
 ### 2. Grade Quiz Responses
 
-When a comment is added to a quiz issue (either on an open or closed issue):
+When a quiz issue is closed (triggered by `issues: types: [closed]`):
 
 1. **Check if the issue is a quiz** (has `[Daily Quiz]` in title and `quiz` label)
-2. **Check if this is the first user response**:
+2. **Check if this issue should be graded**:
    - Look at all comments on the issue
    - Ignore comments from the bot/workflow itself
-   - Grade only if this is the first comment from a human user (the developer responding to the quiz)
+   - Grade only if there's at least one comment from a human user (the developer's response)
    - Skip grading if there's already a grading comment (look for "Score:" in previous comments)
-3. **Read the developer's response** from the comment that just triggered this workflow
+3. **Read the developer's response** from the most recent human comment before the issue was closed
 4. **Grade the response** (0-100 scale):
    - **0-20**: Beginner/never coded before - fundamental misunderstandings
    - **20-40**: Junior level - basic understanding but missing key concepts
@@ -124,7 +122,7 @@ When a comment is added to a quiz issue (either on an open or closed issue):
    - The PR should have a clear title like "Update quiz scores for [Developer Name] - [Date]"
    - Set auto-merge to true so the PR merges automatically if checks pass
 
-8. **Leave the issue open** after grading so developers can review feedback and continue discussion if needed.
+8. **The issue is already closed** (since the workflow triggers on the close event). Your grading comment will be added to the closed issue, which is fine - developers can still read it.
 
 ### 3. Track Missed Quizzes
 
@@ -187,7 +185,7 @@ Looking at the `js/physics-sims/Gravity/gravity-engine.js` file, answer these qu
 
 ## How to Respond
 
-**Reply to this issue with a comment containing your answers.** The quiz will be automatically graded when you submit your response. Take your time to explore the code and documentation!
+**Add a comment with your answers, then close this issue.** The quiz will be automatically graded when you close it. Take your time to explore the code and documentation!
 
 ## What This Tests
 
@@ -205,4 +203,4 @@ Good luck! 🚀
 - Track progress over time - reference previous scores when appropriate
 - Be specific in feedback - cite line numbers, file names, concepts
 - Celebrate growth - mention when scores improve
-- **You can comment on and grade quiz responses even if the user has closed the issue** - the grading should still work
+- **The workflow triggers when users close the issue** - they will have already added their answer as a comment before closing
