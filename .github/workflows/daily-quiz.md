@@ -52,6 +52,7 @@ When triggered on schedule (daily):
    - Technologies in `languages_familiar` and `languages_to_learn`
    - The codebase structure (read `docs/architecture.md` and `docs/conventions.md`)
    - Actual code patterns in the repository
+   - Consider their recent scores based on scores.csv on the `assets/daily-quiz` branch: `date,developer_name,0,max_score,true`
 
 3. **Create a GitHub issue** for each developer with:
    - Title: `[Daily Quiz] {Developer Name} - {Date}` (e.g., `[Daily Quiz] Junior Developer - 2026-02-14`)
