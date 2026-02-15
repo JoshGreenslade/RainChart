@@ -11,9 +11,9 @@ on:
     types: [opened, closed]
 
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+  contents: read
+  issues: read
+  pull-requests: read
 
 network: defaults
 
@@ -28,11 +28,11 @@ safe-outputs:
   
   add-comment: {}
   
-  create-commit:
-    max: 5
-    branch: scores
-    allowed-paths: [".github/context/scores.csv"]
-    commit-message-prefix: "[Quiz Scores] "
+  upload-asset:
+    branch: "assets/daily-quiz"
+    max-size: 5120
+    allowed-exts: [.csv]
+    max: 20
 ---
 
 # Daily Quiz and Training Program
@@ -114,30 +114,29 @@ When a quiz issue is closed (triggered by `issues: types: [closed]`):
    - Resources to learn more (documentation, articles, code examples)
 
 7. **Update the scores CSV file** (this step is required - do not skip it):
-   - First, check if the `scores` branch exists in the repository
-   - Read the current contents of `.github/context/scores.csv` from the `scores` branch (or from main if scores branch doesn't exist yet)
+   - Read the current contents of `scores.csv` from the `assets/daily-quiz` branch if it exists
    - If the file doesn't exist, create it with header row: `date,developer_name,score,max_score,missed`
    - Parse the developer's name from the issue title using this pattern: `[Daily Quiz] {Developer Name} - {Date}`
      - Extract the text between `[Daily Quiz] ` and ` - ` (e.g., from `[Daily Quiz] Junior Developer - 2026-02-14`, extract `Junior Developer`)
    - Add a new row with today's date (YYYY-MM-DD format), the developer's name, their score, max score for the quiz, and `false` for missed
    - Format: `2026-02-14,Junior Developer,55,60,false`
-   - **Commit the updated scores file directly to the `scores` branch** using the `create-commit` safe output
-     - If the `scores` branch doesn't exist, it will be created automatically from the current state
-     - Commit message should be: "[Quiz Scores] Update scores for [Developer Name] - [Date]"
-     - The file path must be: `.github/context/scores.csv`
+   - **Upload the updated scores file** using the `upload-asset` safe output
+     - The file will be uploaded to the orphaned `assets/daily-quiz` branch
+     - The file name should be: `scores.csv`
+     - The file will be accessible at: `https://raw.githubusercontent.com/{owner}/{repo}/assets/daily-quiz/scores.csv` (replace {owner} and {repo} with the actual repository owner and name)
 
 8. **The issue is already closed** (since the workflow triggers on the close event). Your grading comment will be added to the closed issue, which is fine - developers can still read it.
 
 ### 3. Track Missed Quizzes
 
 - If a developer hasn't responded to a quiz after 2 days, log it as missed
-- Add entry to scores.csv on the `scores` branch: `date,developer_name,0,max_score,true`
-- Use the same `create-commit` safe output to update the scores branch
+- Add entry to scores.csv on the `assets/daily-quiz` branch: `date,developer_name,0,max_score,true`
+- Use the same `upload-asset` safe output to upload the updated scores file
 - Consider this when designing future quizzes (maybe make them easier or more engaging)
 
 ## CSV File Format and Storage
 
-The `.github/context/scores.csv` file is stored in a dedicated `scores` branch and has this structure:
+The `scores.csv` file is stored in an orphaned `assets/daily-quiz` branch and has this structure:
 
 ```csv
 date,developer_name,score,max_score,missed
@@ -146,11 +145,11 @@ date,developer_name,score,max_score,missed
 2026-02-16,Junior Developer,48,60,false
 ```
 
-**Branch Strategy**: Scores are tracked in a dedicated `scores` branch to avoid cluttering the main branch with frequent small updates. The workflow automatically:
-- Creates the `scores` branch if it doesn't exist (branching from the current state)
-- Reads the current scores.csv from the `scores` branch
-- Commits updates directly to the `scores` branch (no PR required)
-- This keeps score history separate and easily mergeable when needed
+**Branch Strategy**: Scores are tracked in an orphaned `assets/daily-quiz` branch to keep them separate from code. The workflow automatically:
+- Uploads the scores.csv file to the `assets/daily-quiz` branch using the `upload-asset` safe output
+- The file is accessible at a predictable URL (see step 7 above for the URL format)
+- This provides a stable location for retrieving score history
+- The orphaned branch is isolated for security and keeps assets separate from code
 
 If the file doesn't exist, create it with the header row.
 
