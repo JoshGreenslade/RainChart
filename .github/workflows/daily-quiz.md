@@ -11,7 +11,6 @@ on:
     types: [opened, closed]
 
 permissions:
-  contents: write
   issues: write
   pull-requests: write
 
