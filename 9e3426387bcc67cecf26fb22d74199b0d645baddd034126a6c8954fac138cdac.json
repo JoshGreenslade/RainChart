@@ -1,0 +1,54 @@
+{
+  "participant": "Josh Greenslade",
+  "start_date": "2026-02-15",
+  "total_scenarios_completed": 0,
+  "total_xp_earned": 0,
+  "scenarios_by_category": {
+    "pm_interactions": 0,
+    "manager_interactions": 0,
+    "exec_communication": 0,
+    "cross_functional": 0
+  },
+  "average_scores": {
+    "clarity": null,
+    "empathy": null,
+    "persuasiveness": null,
+    "professionalism": null,
+    "strategic_thinking": null,
+    "overall": null
+  },
+  "badges_earned": [],
+  "badges_in_progress": {
+    "stakeholder_whisperer": {
+      "description": "5+ scenarios with 85%+ average",
+      "progress": "0/5",
+      "avg_score": null
+    },
+    "crisis_master": {
+      "description": "Handle 3 crisis scenarios well (75%+)",
+      "progress": "0/3"
+    },
+    "executive_presence": {
+      "description": "Ace 3 exec scenarios (85%+)",
+      "progress": "0/3"
+    },
+    "negotiation_pro": {
+      "description": "Successfully negotiate 5 scenarios (80%+)",
+      "progress": "0/5"
+    }
+  },
+  "scenario_history": [
+    {
+      "scenario_id": "ai_skeptic_pm",
+      "scenario_title": "The AI Skeptic PM",
+      "category": "pm_interactions",
+      "date_started": "2026-02-15T19:03:59Z",
+      "status": "in_progress",
+      "base_xp": 50,
+      "completed": false
+    }
+  ],
+  "strengths_observed": [],
+  "growth_areas_identified": [],
+  "real_world_applications": []
+}
