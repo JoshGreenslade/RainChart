@@ -1,0 +1,37 @@
+{
+  "initialized": "2026-02-15T19:01:00Z",
+  "scenarios_completed": [],
+  "scenario_history": [
+    {
+      "date": "2026-02-15T19:01:00Z",
+      "type": "mentoring",
+      "scenario": "Junior Stuck on Problem",
+      "difficulty": 1,
+      "status": "pending",
+      "issue_reference": "aw_lead01"
+    }
+  ],
+  "stats": {
+    "total_completed": 0,
+    "by_type": {
+      "mentoring": 0,
+      "difficult_conversations": 0,
+      "team_building": 0,
+      "decision_making": 0
+    },
+    "average_scores": {
+      "empathy": 0,
+      "communication": 0,
+      "problem_solving": 0,
+      "leadership": 0,
+      "overall": 0
+    },
+    "badges_earned": [],
+    "total_xp": 0
+  },
+  "last_scenario_type": "mentoring",
+  "last_scenario_date": "2026-02-15T19:01:00Z",
+  "trainee_level": 1,
+  "weak_areas": [],
+  "next_scenario_recommendation": "Continue with foundational mentoring or try a team building scenario"
+}
