@@ -1,0 +1,177 @@
+{
+  "name": "Senior Engineer",
+  "experience_level": "senior",
+  "experience_years": 8,
+  "role": "senior-engineer-lead",
+  "current_title": "Senior Software Engineer",
+  "aspiring_title": "Principal Engineer",
+  
+  "goals": [
+    "Transform my team of 5 juniors to an AI-first approach",
+    "Become a principal engineer within 18 months",
+    "Master AI tools and teach them company-wide",
+    "Build world-class code review and quality practices",
+    "Develop exceptional stakeholder communication skills",
+    "Make strategic tech debt and prioritization decisions",
+    "Create a culture of continuous learning"
+  ],
+  
+  "languages_familiar": [
+    "JavaScript",
+    "TypeScript", 
+    "Python",
+    "Java",
+    "Go"
+  ],
+  
+  "languages_to_learn": [
+    "Rust",
+    "Kotlin"
+  ],
+  
+  "focus_areas": [
+    "ai-mastery",
+    "team-leadership",
+    "stakeholder-communication",
+    "strategic-thinking",
+    "code-quality-at-scale"
+  ],
+  
+  "team_context": {
+    "team_size": 5,
+    "team_composition": {
+      "juniors": 3,
+      "mid_level": 2,
+      "senior": 0
+    },
+    "team_experience": [
+      "Alex - Junior (1 year exp) - enthusiastic but overconfident with AI",
+      "Priya - Junior (1 year exp) - cautious, resistant to AI tools",
+      "Jordan - Junior (0.5 years exp) - eager but easily overwhelmed",
+      "Sam - Mid-level (3 years exp) - strong fundamentals, promotion candidate",
+      "Taylor - Mid-level (2.5 years exp) - solid performer, imposter syndrome"
+    ],
+    "team_challenges": [
+      "Uneven AI adoption (some love it, some avoid it)",
+      "Code quality varies significantly between team members",
+      "Tech debt accumulating faster than we can address it",
+      "Knowledge silos forming around certain systems",
+      "Difficulty scaling team culture as we grow"
+    ]
+  },
+  
+  "stakeholder_context": {
+    "reports_to": "Engineering Manager (David)",
+    "works_with": [
+      "Product Manager (Sarah) - sometimes unrealistic deadlines",
+      "VP Engineering (Jennifer) - strategic, data-driven",
+      "Design team (Alex leads) - wants pixel-perfect implementations",
+      "Security team (Sam leads) - concerned about AI-generated code",
+      "DevOps team (Chris leads) - infrastructure partners"
+    ],
+    "common_challenges": [
+      "Balancing feature requests with tech debt",
+      "Explaining technical complexity to non-technical stakeholders",
+      "Negotiating realistic timelines under pressure",
+      "Getting buy-in for AI tools and practices",
+      "Managing expectations when things go wrong"
+    ]
+  },
+  
+  "current_challenges": [
+    "AI adoption resistance from some team members",
+    "Tech debt in core systems slowing velocity 40%",
+    "Recent production bug from AI-generated code hurt trust",
+    "Junior developers need more structured mentoring",
+    "Stakeholders don't understand why things take time",
+    "Team culture fraying as we scale from 3 to 5 people",
+    "No clear process for AI code review and quality gates",
+    "Balancing my own coding time with leadership responsibilities"
+  ],
+  
+  "strengths": [
+    "Strong technical fundamentals and architecture knowledge",
+    "Care deeply about code quality and best practices",
+    "Good at debugging complex problems",
+    "Willing to learn and experiment with new tools",
+    "Committed to team growth and success"
+  ],
+  
+  "growth_areas": [
+    "Delegating effectively without micromanaging",
+    "Saying 'no' to stakeholders constructively",
+    "Mentoring juniors patiently when under pressure",
+    "Presenting technical ideas to executives",
+    "Making quick decisions with incomplete information",
+    "Building consensus when team disagrees",
+    "Managing my time between coding and leadership"
+  ],
+  
+  "ai_experience": {
+    "tools_used": [
+      "GitHub Copilot (3 months, daily use)",
+      "ChatGPT (6 months, occasional use)",
+      "Claude (1 month, experimenting)"
+    ],
+    "comfort_level": "intermediate",
+    "success_stories": [
+      "Used AI to refactor 5k lines of legacy code successfully",
+      "Generated comprehensive test suite that caught 3 bugs",
+      "Wrote documentation 3x faster with AI assistance"
+    ],
+    "concerns": [
+      "AI-generated bug in production damaged team trust",
+      "Some team members using AI without understanding code",
+      "Security team worried about IP leakage",
+      "Uncertainty about when to use vs not use AI"
+    ]
+  },
+  
+  "learning_style": {
+    "preferences": [
+      "Hands-on practice over theory",
+      "Real-world examples from actual codebases",
+      "Step-by-step guides with clear outcomes",
+      "Scenario-based learning (simulations)",
+      "Immediate application to my team"
+    ],
+    "best_times": [
+      "Early morning (7-9 AM) for focused learning",
+      "Lunch break (30-45 min) for quick exercises",
+      "Friday afternoons for reflection and planning"
+    ],
+    "motivated_by": [
+      "Seeing my team succeed and grow",
+      "Measurable progress and achievements",
+      "Recognition from leadership",
+      "Building something that lasts",
+      "Becoming the leader my team deserves"
+    ]
+  },
+  
+  "training_goals": {
+    "short_term": [
+      "Complete AI Tools Mastery module (1 month)",
+      "Handle next difficult stakeholder conversation successfully",
+      "Implement AI code review process with team",
+      "Mentor junior through complete feature (pair programming)"
+    ],
+    "medium_term": [
+      "Get entire team confidently using AI tools (3 months)",
+      "Reduce tech debt by 30% (6 months)",
+      "Complete all core training modules (4 months)",
+      "Present technical strategy to VP Engineering successfully"
+    ],
+    "long_term": [
+      "Achieve Level 15+ (AI Expert) (6 months)",
+      "Transform team into high-performing AI-first unit (6 months)",
+      "Be recognized as AI champion across organization (9 months)",
+      "Get promoted to Principal Engineer (18 months)",
+      "Train 2 other senior engineers to lead their own teams (12 months)"
+    ]
+  },
+  
+  "time_commitment": "5-8 hours per week",
+  "start_date": "2026-02-15",
+  "completion_target": "2026-08-15"
+}
