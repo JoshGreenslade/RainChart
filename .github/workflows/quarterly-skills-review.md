@@ -71,6 +71,10 @@ Create one issue per contributor with the following structure:
 ### Issue Title
 `[Skills Review Q{Quarter} {Year}] {Contributor Name}`
 
+Example: `[Skills Review Q1 2024] Josh Greenslade`
+- Quarter should be Q1, Q2, Q3, or Q4
+- Year should be the 4-digit year
+
 ### Issue Body
 
 ```markdown
@@ -159,4 +163,4 @@ Before submitting each review, verify:
 - ✅ Growth recommendations are relevant to the actual codebase
 - ✅ Tone is positive, encouraging, and constructive
 - ✅ Links and references are accurate
-- ✅ Issue is labeled correctly with [skills-review, quarterly-report]
+- ✅ Issue is labeled correctly with both "skills-review" and "quarterly-report" labels
