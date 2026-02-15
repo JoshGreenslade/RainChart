@@ -1,0 +1,26 @@
+{
+  "senior_engineer_name": "Senior Engineer",
+  "level": 1,
+  "total_xp": 0,
+  "current_xp": 0,
+  "xp_to_next_level": 100,
+  "badges": [],
+  "completed_modules": [],
+  "active_challenges": [],
+  "streaks": {
+    "current_daily_streak": 0,
+    "longest_daily_streak": 0,
+    "last_activity_date": null
+  },
+  "module_scores": {},
+  "achievement_history": [],
+  "skill_tree": {
+    "ai_mastery": 0,
+    "code_quality": 0,
+    "leadership": 0,
+    "communication": 0,
+    "technical_strategy": 0
+  },
+  "program_started": "2026-02-15T19:06:48.748Z",
+  "last_updated": "2026-02-15T19:06:48.748Z"
+}
