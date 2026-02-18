@@ -28,6 +28,149 @@ let simulationControls;
 let baseRenderer;
 
 /**
+ * Show a temporary notification to the user
+ * @param {string} message - The notification message
+ * @param {string} type - Type of notification ('info' or 'warning')
+ * @param {number} duration - Duration in milliseconds (0 = persistent)
+ */
+function showNotification(message, type = 'info', duration = 3000) {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        max-width: 400px;
+        padding: 16px;
+        background: ${type === 'warning' ? '#f39c12' : '#3498db'};
+        color: white;
+        border-radius: 4px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    if (duration > 0) {
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, duration);
+    }
+}
+
+/**
+ * Show loading indicator for WebGPU initialization
+ * @param {string} containerId - The container to append the loading indicator to
+ * @returns {HTMLElement} The loading indicator element
+ */
+function showLoadingIndicator(containerId) {
+    const container = document.getElementById(containerId);
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = 'renderer-loading';
+    loadingDiv.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #fff;
+        font-family: monospace;
+        font-size: 14px;
+        background: rgba(0,0,0,0.7);
+        padding: 20px;
+        border-radius: 8px;
+    `;
+    loadingDiv.textContent = 'Initializing WebGPU...';
+    container.appendChild(loadingDiv);
+    return loadingDiv;
+}
+
+/**
+ * Remove loading indicator
+ * @param {HTMLElement} loadingDiv - The loading indicator element to remove
+ */
+function removeLoadingIndicator(loadingDiv) {
+    if (loadingDiv && loadingDiv.parentNode) {
+        loadingDiv.parentNode.removeChild(loadingDiv);
+    }
+}
+
+/**
+ * Initialize renderer with loading indicator and fallback support
+ * @param {string} containerId - Container element ID
+ * @param {string} renderMode - Desired render mode ('canvas', 'svg', 'webgpu')
+ * @param {*} backgroundColor - Background color
+ * @returns {Promise<BaseRenderer>} Initialized renderer
+ */
+async function initializeRendererWithFallback(containerId, renderMode, backgroundColor) {
+    let renderer = new BaseRenderer(containerId, {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        renderMode: renderMode,
+        background: backgroundColor,
+    });
+    
+    // Show loading state for WebGPU (Canvas/SVG are instant)
+    let loadingDiv = null;
+    if (renderMode === 'webgpu') {
+        loadingDiv = showLoadingIndicator(containerId);
+    }
+    
+    try {
+        await renderer.waitForReady();
+        if (loadingDiv) {
+            removeLoadingIndicator(loadingDiv);
+        }
+        return renderer;
+    } catch (err) {
+        if (loadingDiv) {
+            removeLoadingIndicator(loadingDiv);
+        }
+        
+        console.error('Renderer initialization failed:', err);
+        
+        // If WebGPU failed, fall back to Canvas
+        if (renderMode === 'webgpu') {
+            console.warn('Falling back to Canvas renderer');
+            
+            showNotification(
+                'WebGPU not available - using Canvas mode instead. ' +
+                'For best performance with 10k+ objects, use a WebGPU-compatible browser.',
+                'warning',
+                5000
+            );
+            
+            // Recreate renderer in Canvas mode
+            renderer = new BaseRenderer(containerId, {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                renderMode: 'canvas',
+                background: backgroundColor,
+            });
+            
+            // Update dropdown to reflect actual mode
+            const rendererModeElement = document.getElementById('renderer-mode');
+            if (rendererModeElement) {
+                rendererModeElement.value = 'canvas';
+            }
+            
+            return renderer;
+        }
+        
+        // For other renderers, re-throw the error
+        throw err;
+    }
+}
+
+/**
  * Helper function to convert HSL color to HSLA with transparency
  */
 function toTransparentColor(hslColor, alpha = 0.85) {
@@ -85,15 +228,14 @@ async function initSimulation() {
     // Get background color from config (if available)
     const backgroundColor = simulationConfig?.renderer?.backgroundColor;
     
-    // Create base renderer with full window size
+    // Create base renderer with full window size using helper with fallback
     const rendererModeElement = document.getElementById('renderer-mode');
     const renderMode = (rendererModeElement && rendererModeElement.value) || moduleConfig.defaultRenderMode;
-    baseRenderer = new BaseRenderer(moduleConfig.containerId, {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        renderMode: renderMode,
-        background: backgroundColor,
-    });
+    baseRenderer = await initializeRendererWithFallback(
+        moduleConfig.containerId,
+        renderMode,
+        backgroundColor
+    );
     
     // Update controls background to match color scheme
     updateControlsBackground();
@@ -195,18 +337,22 @@ function handleControlAction(action, event) {
             const renderMode = event.target.value;
             const backgroundColor = simulationConfig?.renderer?.backgroundColor;
             const containerId = simulationConfig.module.containerId;
-            baseRenderer = new BaseRenderer(containerId, {
-                width: window.innerWidth,
-                height: window.innerHeight,
-                renderMode: renderMode,
-                background: backgroundColor
-            });
             
-            // Update background colors
-            updateControlsBackground();
-            
-            // Re-render using interface method
-            simulation.render(baseRenderer);
+            // Use the helper function with fallback support
+            initializeRendererWithFallback(containerId, renderMode, backgroundColor)
+                .then(renderer => {
+                    baseRenderer = renderer;
+                    
+                    // Update background colors
+                    updateControlsBackground();
+                    
+                    // Re-render using interface method
+                    simulation.render(baseRenderer);
+                })
+                .catch(err => {
+                    console.error('Failed to switch renderer:', err);
+                    showNotification('Failed to switch renderer mode', 'warning', 3000);
+                });
             break;
         }
         
