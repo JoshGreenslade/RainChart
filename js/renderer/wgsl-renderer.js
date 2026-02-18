@@ -2,6 +2,11 @@
  * WGSL Renderer - WebGPU-based renderer for high-performance visualization
  * Capable of rendering 10,000+ objects using GPU acceleration
  * 
+ * Performance Optimizations:
+ * - No opacity support: reduces vertex data size by 12.5% (28 bytes vs 32 bytes per circle)
+ * - No alpha blending: improves GPU pipeline performance
+ * - Dark navy blue background (#1a2332) for better visibility
+ * 
  * Note: This renderer implements a subset of the IRenderer interface
  * focused on high-performance primitive rendering (circles primarily)
  */
