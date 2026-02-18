@@ -106,6 +106,7 @@ export class WGSLRenderer {
                 entryPoint: 'vertexMain',
                 buffers: [{
                     arrayStride: 32, // 8 floats * 4 bytes
+                    stepMode: 'instance', // Per-instance data
                     attributes: [
                         { shaderLocation: 0, offset: 0, format: 'float32x2' },  // position
                         { shaderLocation: 1, offset: 8, format: 'float32' },     // radius
@@ -385,7 +386,7 @@ export class WGSLRenderer {
             
             renderPass.setPipeline(this.pipeline);
             renderPass.setVertexBuffer(0, vertexBuffer);
-            renderPass.draw(6, circlesToRender.length); // 6 vertices per circle instance
+            renderPass.draw(6, circlesToRender.length, 0, 0); // vertexCount=6, instanceCount=circlesToRender.length
             renderPass.end();
             
             this.device.queue.submit([commandEncoder.finish()]);
