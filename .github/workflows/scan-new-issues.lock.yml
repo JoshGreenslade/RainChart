@@ -22,11 +22,12 @@
 # For more information: https://github.github.com/gh-aw/introduction/overview/
 #
 # This workflow scans for open issues labeled "new" that don't have the "design" label,
-# and adds the "design" label to track that they've been processed.
+# dispatches the requirements-to-technical-story workflow for each one, and adds
+# the "design" label to track that they've been processed.
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"c33c4df35e12557d0ead8f6ecddac232d45af2de31a51af4b547bd65834d1d40","compiler_version":"v0.46.1"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"da3371c6989b5c06917cf74ba49eab0830f46a84f0c825f4977103c654e8fbc4","compiler_version":"v0.46.1"}
 
-name: "Scan New Issues and Add Design Label"
+name: "Scan New Issues and Dispatch Technical Story Workflow"
 "on":
   schedule:
   - cron: "36 21 * * 1-5"
@@ -41,7 +42,7 @@ permissions: {}
 concurrency:
   group: "gh-aw-${{ github.workflow }}"
 
-run-name: "Scan New Issues and Add Design Label"
+run-name: "Scan New Issues and Dispatch Technical Story Workflow"
 
 jobs:
   activation:
@@ -235,6 +236,7 @@ jobs:
     needs: activation
     runs-on: ubuntu-latest
     permissions:
+      actions: read
       contents: read
       issues: read
     concurrency:
@@ -306,7 +308,7 @@ jobs:
               version: "",
               agent_version: "0.0.411",
               cli_version: "v0.46.1",
-              workflow_name: "Scan New Issues and Add Design Label",
+              workflow_name: "Scan New Issues and Dispatch Technical Story Workflow",
               experimental: false,
               supports_tools_allowlist: true,
               run_id: context.runId,
@@ -363,7 +365,7 @@ jobs:
           mkdir -p /tmp/gh-aw/safeoutputs
           mkdir -p /tmp/gh-aw/mcp-logs/safeoutputs
           cat > /opt/gh-aw/safeoutputs/config.json << 'GH_AW_SAFE_OUTPUTS_CONFIG_EOF'
-          {"add_labels":{"max":20},"missing_data":{},"missing_tool":{},"noop":{"max":1}}
+          {"add_labels":{"max":20},"dispatch_workflow":{"max":20,"workflow_files":{"requirements-to-technical-story":".lock.yml"},"workflows":["requirements-to-technical-story"]},"missing_data":{},"missing_tool":{},"noop":{"max":1}}
           GH_AW_SAFE_OUTPUTS_CONFIG_EOF
           cat > /opt/gh-aw/safeoutputs/tools.json << 'GH_AW_SAFE_OUTPUTS_TOOLS_EOF'
           [
@@ -456,6 +458,24 @@ jobs:
                 "type": "object"
               },
               "name": "missing_data"
+            },
+            {
+              "_workflow_name": "requirements-to-technical-story",
+              "description": "Dispatch the 'requirements-to-technical-story' workflow with workflow_dispatch trigger. This workflow must support workflow_dispatch and be in .github/workflows/ directory in the same repository.",
+              "inputSchema": {
+                "additionalProperties": false,
+                "properties": {
+                  "issue_number": {
+                    "description": "Issue #",
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "issue_number"
+                ],
+                "type": "object"
+              },
+              "name": "requirements_to_technical_story"
             }
           ]
           GH_AW_SAFE_OUTPUTS_TOOLS_EOF
@@ -584,7 +604,7 @@ jobs:
                   "GITHUB_LOCKDOWN_MODE": "$GITHUB_MCP_LOCKDOWN",
                   "GITHUB_PERSONAL_ACCESS_TOKEN": "\${GITHUB_MCP_SERVER_TOKEN}",
                   "GITHUB_READ_ONLY": "1",
-                  "GITHUB_TOOLSETS": "issues"
+                  "GITHUB_TOOLSETS": "issues,actions"
                 }
               },
               "safeoutputs": {
@@ -784,6 +804,7 @@ jobs:
     if: (always()) && (needs.agent.result != 'skipped')
     runs-on: ubuntu-slim
     permissions:
+      actions: write
       contents: read
       issues: write
       pull-requests: write
@@ -813,7 +834,7 @@ jobs:
         env:
           GH_AW_AGENT_OUTPUT: ${{ env.GH_AW_AGENT_OUTPUT }}
           GH_AW_NOOP_MAX: 1
-          GH_AW_WORKFLOW_NAME: "Scan New Issues and Add Design Label"
+          GH_AW_WORKFLOW_NAME: "Scan New Issues and Dispatch Technical Story Workflow"
         with:
           github-token: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
@@ -826,7 +847,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           GH_AW_AGENT_OUTPUT: ${{ env.GH_AW_AGENT_OUTPUT }}
-          GH_AW_WORKFLOW_NAME: "Scan New Issues and Add Design Label"
+          GH_AW_WORKFLOW_NAME: "Scan New Issues and Dispatch Technical Story Workflow"
         with:
           github-token: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
@@ -839,7 +860,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           GH_AW_AGENT_OUTPUT: ${{ env.GH_AW_AGENT_OUTPUT }}
-          GH_AW_WORKFLOW_NAME: "Scan New Issues and Add Design Label"
+          GH_AW_WORKFLOW_NAME: "Scan New Issues and Dispatch Technical Story Workflow"
           GH_AW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GH_AW_AGENT_CONCLUSION: ${{ needs.agent.result }}
           GH_AW_WORKFLOW_ID: "scan-new-issues"
@@ -857,7 +878,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           GH_AW_AGENT_OUTPUT: ${{ env.GH_AW_AGENT_OUTPUT }}
-          GH_AW_WORKFLOW_NAME: "Scan New Issues and Add Design Label"
+          GH_AW_WORKFLOW_NAME: "Scan New Issues and Dispatch Technical Story Workflow"
           GH_AW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GH_AW_AGENT_CONCLUSION: ${{ needs.agent.result }}
           GH_AW_NOOP_MESSAGE: ${{ steps.noop.outputs.noop_message }}
@@ -905,8 +926,8 @@ jobs:
       - name: Setup threat detection
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
-          WORKFLOW_NAME: "Scan New Issues and Add Design Label"
-          WORKFLOW_DESCRIPTION: "This workflow scans for open issues labeled \"new\" that don't have the \"design\" label,\nand adds the \"design\" label to track that they've been processed."
+          WORKFLOW_NAME: "Scan New Issues and Dispatch Technical Story Workflow"
+          WORKFLOW_DESCRIPTION: "This workflow scans for open issues labeled \"new\" that don't have the \"design\" label,\ndispatches the requirements-to-technical-story workflow for each one, and adds\nthe \"design\" label to track that they've been processed."
           HAS_PATCH: ${{ needs.agent.outputs.has_patch }}
         with:
           script: |
@@ -997,7 +1018,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           GH_AW_SKIP_QUERY: "is:issue is:open label:new -label:design"
-          GH_AW_WORKFLOW_NAME: "Scan New Issues and Add Design Label"
+          GH_AW_WORKFLOW_NAME: "Scan New Issues and Dispatch Technical Story Workflow"
           GH_AW_SKIP_MIN_MATCHES: "1"
         with:
           script: |
@@ -1013,6 +1034,7 @@ jobs:
     if: ((!cancelled()) && (needs.agent.result != 'skipped')) && (needs.detection.outputs.success == 'true')
     runs-on: ubuntu-slim
     permissions:
+      actions: write
       contents: read
       issues: write
       pull-requests: write
@@ -1020,7 +1042,7 @@ jobs:
     env:
       GH_AW_ENGINE_ID: "copilot"
       GH_AW_WORKFLOW_ID: "scan-new-issues"
-      GH_AW_WORKFLOW_NAME: "Scan New Issues and Add Design Label"
+      GH_AW_WORKFLOW_NAME: "Scan New Issues and Dispatch Technical Story Workflow"
     outputs:
       create_discussion_error_count: ${{ steps.process_safe_outputs.outputs.create_discussion_error_count }}
       create_discussion_errors: ${{ steps.process_safe_outputs.outputs.create_discussion_errors }}
@@ -1047,7 +1069,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           GH_AW_AGENT_OUTPUT: ${{ env.GH_AW_AGENT_OUTPUT }}
-          GH_AW_SAFE_OUTPUTS_HANDLER_CONFIG: "{\"add_labels\":{\"max\":20},\"missing_data\":{},\"missing_tool\":{}}"
+          GH_AW_SAFE_OUTPUTS_HANDLER_CONFIG: "{\"add_labels\":{\"max\":20},\"dispatch_workflow\":{\"max\":20,\"workflow_files\":{\"requirements-to-technical-story\":\".lock.yml\"},\"workflows\":[\"requirements-to-technical-story\"]},\"missing_data\":{},\"missing_tool\":{}}"
         with:
           github-token: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
