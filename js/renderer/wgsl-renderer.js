@@ -35,20 +35,12 @@ export class WGSLRenderer {
         
         // Initialize WebGPU asynchronously
         // Note: Constructor completes synchronously, but rendering won't work until initialized
+        // Expose initialization promise so callers can wait for readiness
         this.initPromise = this._initWebGPU().catch(err => {
             console.error('Failed to initialize WebGPU:', err);
             this.initError = err;
             // WebGPU initialization failed - renderer will be non-functional
-            throw err; // Re-throw so waitForReady() can catch it
         });
-    }
-    
-    /**
-     * Wait for WebGPU initialization to complete
-     * @returns {Promise<void>} Resolves when initialized, rejects if initialization fails
-     */
-    async waitForReady() {
-        return this.initPromise;
     }
     
     /**
@@ -122,6 +114,7 @@ export class WGSLRenderer {
                 entryPoint: 'vertexMain',
                 buffers: [{
                     arrayStride: 32, // 8 floats * 4 bytes
+                    stepMode: 'instance', // Per-instance data
                     attributes: [
                         { shaderLocation: 0, offset: 0, format: 'float32x2' },  // position
                         { shaderLocation: 1, offset: 8, format: 'float32' },     // radius
@@ -228,6 +221,25 @@ export class WGSLRenderer {
                 return vec4f(input.color.rgb, input.color.a * alpha);
             }
         `;
+    }
+    
+    /**
+     * Check if the renderer is ready to render
+     * @returns {boolean} True if initialized and no errors, false otherwise
+     */
+    isReady() {
+        return this.initialized && !this.initError;
+    }
+    
+    /**
+     * Wait for renderer initialization to complete
+     * @returns {Promise<void>} Resolves when initialized, rejects if initialization failed
+     */
+    async waitForReady() {
+        await this.initPromise;
+        if (this.initError) {
+            throw this.initError;
+        }
     }
     
     /**
@@ -401,7 +413,7 @@ export class WGSLRenderer {
             
             renderPass.setPipeline(this.pipeline);
             renderPass.setVertexBuffer(0, vertexBuffer);
-            renderPass.draw(6, circlesToRender.length); // 6 vertices per circle instance
+            renderPass.draw(6, circlesToRender.length, 0, 0); // vertexCount=6, instanceCount=circlesToRender.length
             renderPass.end();
             
             this.device.queue.submit([commandEncoder.finish()]);

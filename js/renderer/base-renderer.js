@@ -135,15 +135,29 @@ export class BaseRenderer {
     }
     
     /**
-     * Wait for the renderer to be ready (useful for async initialization like WebGPU)
-     * @returns {Promise<void>} Resolves when the renderer is ready
+     * Check if the renderer is ready to render
+     * Canvas and D3 renderers are immediately ready (synchronous initialization)
+     * WebGPU renderer may need time to initialize (asynchronous)
+     * @returns {boolean} True if ready to render, false otherwise
+     */
+    isReady() {
+        // Canvas and D3 are immediately ready
+        if (this.renderMode === 'canvas' || this.renderMode === 'svg') {
+            return true;
+        }
+        // WebGPU might still be initializing
+        return this.renderer.isReady ? this.renderer.isReady() : false;
+    }
+    
+    /**
+     * Wait for renderer to be ready
+     * Returns immediately for Canvas/D3, waits for WebGPU initialization
+     * @returns {Promise<void>} Resolves when ready, rejects if initialization failed
      */
     async waitForReady() {
-        // Only WebGPU renderer needs async initialization
         if (this.renderer.waitForReady) {
-            return this.renderer.waitForReady();
+            await this.renderer.waitForReady();
         }
-        // Canvas and D3 renderers are instantly ready
-        return Promise.resolve();
+        // Canvas/D3 have no waitForReady - they're sync
     }
 }
