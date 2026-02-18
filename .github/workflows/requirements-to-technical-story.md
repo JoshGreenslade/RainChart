@@ -8,6 +8,7 @@ description: |
 on:
   issues:
     types: [opened, labeled]
+  skip-if-no-match: 'is:issue is:open label:new'
 
 roles: all
 
@@ -38,12 +39,15 @@ You are a senior engineer with expertise in translating vague requirements into 
 
 ## Trigger Conditions
 
-Only process issues that:
+**Note:** The workflow includes a pre-activation check (via `skip-if-no-match`) that ensures the issue is both open and has the label "new". If these conditions aren't met, the workflow won't run at all.
+
+**Additional Processing Conditions:**
+Only process issues that also:
 - Have the label "needs-tech-story" OR
 - Are newly opened and contain phrases like "requirement", "feature request", "user story", or "need"
 - Have NOT already been processed (check for your comment or "technical-story" label)
 
-If the issue doesn't meet these criteria, use the `noop` safe output.
+If the issue passes the pre-activation check but doesn't meet the additional conditions, use the `noop` safe output.
 
 ## Six-Phase Process
 
