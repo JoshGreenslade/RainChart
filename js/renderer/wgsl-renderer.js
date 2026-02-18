@@ -13,7 +13,7 @@ export class WGSLRenderer {
         this.containerId = containerId;
         this.width = options.width || 800;
         this.height = options.height || 600;
-        this.background = options.background || '#000000';
+        this.background = options.background || '#1a2332'; // Dark navy blue
         
         // WebGPU state
         this.device = null;
@@ -106,13 +106,12 @@ export class WGSLRenderer {
                 module: shaderModule,
                 entryPoint: 'vertexMain',
                 buffers: [{
-                    arrayStride: 32, // 8 floats * 4 bytes
+                    arrayStride: 28, // 7 floats * 4 bytes (removed opacity)
                     stepMode: 'instance', // Per-instance data
                     attributes: [
                         { shaderLocation: 0, offset: 0, format: 'float32x2' },  // position
                         { shaderLocation: 1, offset: 8, format: 'float32' },     // radius
-                        { shaderLocation: 2, offset: 12, format: 'float32x4' },  // color
-                        { shaderLocation: 3, offset: 28, format: 'float32' }     // opacity
+                        { shaderLocation: 2, offset: 12, format: 'float32x4' }   // color
                     ]
                 }]
             },
@@ -120,19 +119,7 @@ export class WGSLRenderer {
                 module: shaderModule,
                 entryPoint: 'fragmentMain',
                 targets: [{
-                    format: presentationFormat,
-                    blend: {
-                        color: {
-                            srcFactor: 'src-alpha',
-                            dstFactor: 'one-minus-src-alpha',
-                            operation: 'add'
-                        },
-                        alpha: {
-                            srcFactor: 'one',
-                            dstFactor: 'one-minus-src-alpha',
-                            operation: 'add'
-                        }
-                    }
+                    format: presentationFormat
                 }]
             },
             primitive: {
@@ -155,7 +142,6 @@ export class WGSLRenderer {
                 @location(0) position: vec2f,
                 @location(1) radius: f32,
                 @location(2) color: vec4f,
-                @location(3) opacity: f32,
                 @builtin(vertex_index) vertexIndex: u32
             };
             
@@ -194,7 +180,7 @@ export class WGSLRenderer {
                     1.0
                 );
                 
-                output.color = vec4f(input.color.rgb, input.color.a * input.opacity);
+                output.color = input.color;
                 output.circlePos = vertexOffset;
                 output.radius = 1.0;
                 
@@ -211,7 +197,7 @@ export class WGSLRenderer {
                 // Smooth antialiasing
                 let alpha = 1.0 - smoothstep(input.radius - 0.1, input.radius, dist);
                 
-                return vec4f(input.color.rgb, input.color.a * alpha);
+                return vec4f(input.color.rgb, alpha);
             }
         `;
     }
@@ -262,6 +248,7 @@ export class WGSLRenderer {
     /**
      * Add a circle to the scene
      * Note: Returns 'pending' if WebGPU is still initializing
+     * Note: Opacity is not supported in WGSL renderer for performance
      */
     addCircle(x, y, radius, style = {}) {
         if (!this.initialized) {
@@ -270,10 +257,9 @@ export class WGSLRenderer {
         }
         
         const color = this._parseColor(style.fill || '#ffffff');
-        const opacity = style.opacity !== undefined ? style.opacity : 1.0;
         
         this.circles.push({
-            x, y, radius, color, opacity
+            x, y, radius, color
         });
         
         return `circle-${this.circles.length - 1}`;
@@ -367,11 +353,11 @@ export class WGSLRenderer {
                 return;
             }
             
-            // Prepare vertex data (8 floats per circle)
-            const vertexData = new Float32Array(circlesToRender.length * 8);
+            // Prepare vertex data (7 floats per circle - removed opacity)
+            const vertexData = new Float32Array(circlesToRender.length * 7);
             for (let i = 0; i < circlesToRender.length; i++) {
                 const circle = circlesToRender[i];
-                const offset = i * 8;
+                const offset = i * 7;
                 vertexData[offset + 0] = circle.x;
                 vertexData[offset + 1] = circle.y;
                 vertexData[offset + 2] = circle.radius;
@@ -379,7 +365,6 @@ export class WGSLRenderer {
                 vertexData[offset + 4] = circle.color[1];
                 vertexData[offset + 5] = circle.color[2];
                 vertexData[offset + 6] = circle.color[3];
-                vertexData[offset + 7] = circle.opacity;
             }
             
             const vertexBuffer = this.device.createBuffer({
