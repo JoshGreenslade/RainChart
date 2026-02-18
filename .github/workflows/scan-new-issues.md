@@ -1,66 +1,50 @@
 ---
 description: |
-  This workflow scans for open issues labeled "new", dispatches the
-  requirements-to-technical-story workflow for each one, and updates
-  labels by removing "new" and adding "design".
+  This workflow scans for open issues labeled "new" that don't have the "design" label,
+  and adds the "design" label to track that they've been processed.
 
 on:
   schedule: daily on weekdays
   workflow_dispatch:
+  skip-if-no-match:
+    query: "is:issue is:open label:new -label:design"
+    min: 1
 
 permissions:
   contents: read
   issues: read
-  actions: read
 
 network: defaults
 
 tools:
   github:
-    toolsets: [issues, actions]
+    toolsets: [issues]
 
 safe-outputs:
-  remove-labels:
-    max: 20
   add-labels:
-    max: 20
-  dispatch-workflow:
-    workflows:
-      - requirements-to-technical-story
     max: 20
 ---
 
-# Scan New Issues and Dispatch Technical Story Workflow
+# Scan New Issues and Add Design Label
 
-Your task is to process issues labeled "new" by dispatching them to the requirements-to-technical-story workflow and updating their labels.
+Your task is to process issues labeled "new" (that don't already have "design" label) and add the "design" label to them.
 
 ## Process
 
-1. **Find Issues with "new" Label**
-   - Search for open issues with the label "new"
+1. **Find Issues with "new" Label (without "design" label)**
+   - Search for open issues with the label "new" that don't have "design" label
    - Get the list of all matching issues
 
 2. **For Each Issue Found**
-   - Dispatch the "requirements-to-technical-story" workflow
-   - Pass the issue number as input to the workflow dispatch
-   - Remove the "new" label from the issue
-   - Add the "design" label to the issue
+   - Add the "design" label to the issue (keep the "new" label)
 
 3. **Handle Edge Cases**
-   - If no issues with "new" label are found, log that information
-   - If workflow dispatch fails, continue with other issues but log the failure
-   - Ensure labels are updated only after successful workflow dispatch
-
-## Workflow Dispatch Details
-
-When dispatching the "requirements-to-technical-story" workflow:
-- Workflow name: `requirements-to-technical-story`
-- Input parameter: `issue_number` (the number of the issue being processed)
-- Use the workflow dispatch safe output to trigger the workflow
+   - If no matching issues are found, the workflow will be skipped (via skip-if-no-match)
+   - Continue processing all matching issues even if one fails
 
 ## Output Format
 
 Provide a brief summary at the end including:
-- Number of issues found with "new" label
-- Number of workflows successfully dispatched
+- Number of issues found with "new" label (without "design")
+- Number of issues successfully labeled with "design"
 - Any errors or issues encountered
