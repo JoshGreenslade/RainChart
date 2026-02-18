@@ -35,11 +35,20 @@ export class WGSLRenderer {
         
         // Initialize WebGPU asynchronously
         // Note: Constructor completes synchronously, but rendering won't work until initialized
-        this._initWebGPU().catch(err => {
+        this.initPromise = this._initWebGPU().catch(err => {
             console.error('Failed to initialize WebGPU:', err);
             this.initError = err;
             // WebGPU initialization failed - renderer will be non-functional
+            throw err; // Re-throw so waitForReady() can catch it
         });
+    }
+    
+    /**
+     * Wait for WebGPU initialization to complete
+     * @returns {Promise<void>} Resolves when initialized, rejects if initialization fails
+     */
+    async waitForReady() {
+        return this.initPromise;
     }
     
     /**
@@ -49,7 +58,11 @@ export class WGSLRenderer {
     async _initWebGPU() {
         // Check for WebGPU support
         if (!navigator.gpu) {
-            throw new Error('WebGPU is not supported in this browser');
+            throw new Error(
+                'WebGPU is not supported in this browser. ' +
+                'Please use Chrome 113+, Edge 113+, or Firefox 128+. ' +
+                'Switching to Canvas mode...'
+            );
         }
         
         // Get container element
@@ -72,7 +85,10 @@ export class WGSLRenderer {
         // Request adapter and device
         const adapter = await navigator.gpu.requestAdapter();
         if (!adapter) {
-            throw new Error('No WebGPU adapter found');
+            throw new Error(
+                'No compatible GPU found. Your hardware may not support WebGPU. ' +
+                'Switching to Canvas mode...'
+            );
         }
         
         this.device = await adapter.requestDevice();

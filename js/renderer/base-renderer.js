@@ -133,4 +133,17 @@ export class BaseRenderer {
     getColorScheme() {
         return this.renderer.getColorScheme();
     }
+    
+    /**
+     * Wait for the renderer to be ready (useful for async initialization like WebGPU)
+     * @returns {Promise<void>} Resolves when the renderer is ready
+     */
+    async waitForReady() {
+        // Only WebGPU renderer needs async initialization
+        if (this.renderer.waitForReady) {
+            return this.renderer.waitForReady();
+        }
+        // Canvas and D3 renderers are instantly ready
+        return Promise.resolve();
+    }
 }
