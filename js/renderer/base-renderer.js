@@ -23,6 +23,33 @@ export class BaseRenderer {
     }
     
     /**
+     * Check if the renderer is ready to render
+     * Canvas and D3 renderers are immediately ready (synchronous initialization)
+     * WebGPU renderer may need time to initialize (asynchronous)
+     * @returns {boolean} True if ready to render, false otherwise
+     */
+    isReady() {
+        // Canvas and D3 are immediately ready
+        if (this.renderMode === 'canvas' || this.renderMode === 'svg') {
+            return true;
+        }
+        // WebGPU might still be initializing
+        return this.renderer.isReady();
+    }
+    
+    /**
+     * Wait for renderer to be ready
+     * Returns immediately for Canvas/D3, waits for WebGPU initialization
+     * @returns {Promise<void>} Resolves when ready, rejects if initialization failed
+     */
+    async waitForReady() {
+        if (this.renderer.waitForReady) {
+            await this.renderer.waitForReady();
+        }
+        // Canvas/D3 have no waitForReady - they're sync
+    }
+    
+    /**
      * Add a circle to the scene
      * @param {number} x - X coordinate
      * @param {number} y - Y coordinate
