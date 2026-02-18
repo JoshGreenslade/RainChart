@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Renderer Readiness</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #2a2a2a;
+        }
+        .success {
+            color: #4caf50;
+        }
+        .error {
+            color: #f44336;
+        }
+        .info {
+            color: #2196f3;
+        }
+        #test-container {
+            width: 400px;
+            height: 300px;
+            margin: 10px 0;
+            border: 1px solid #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Renderer Readiness Test</h1>
+    <p>This page tests the new renderer readiness check functionality.</p>
+    
+    <div id="test-container"></div>
+    
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <script type="module">
+        import { BaseRenderer } from './js/renderer/base-renderer.js';
+
+        const results = document.getElementById('results');
+
+        function log(message, type = 'info') {
+            const p = document.createElement('p');
+            p.className = type;
+            p.textContent = message;
+            results.appendChild(p);
+        }
+
+        async function testRenderer(mode, name) {
+            log(`\n--- Testing ${name} Renderer ---`, 'info');
+            
+            try {
+                const renderer = new BaseRenderer('test-container', {
+                    width: 400,
+                    height: 300,
+                    renderMode: mode
+                });
+
+                log(`✓ ${name} renderer created`, 'success');
+                
+                // Check isReady before waiting
+                const readyBefore = renderer.isReady();
+                log(`  isReady() before wait: ${readyBefore}`, 'info');
+                
+                // Wait for readiness
+                const startTime = Date.now();
+                await renderer.waitForReady();
+                const waitTime = Date.now() - startTime;
+                
+                log(`✓ waitForReady() resolved in ${waitTime}ms`, 'success');
+                
+                // Check isReady after waiting
+                const readyAfter = renderer.isReady();
+                log(`  isReady() after wait: ${readyAfter}`, 'info');
+                
+                // Try to render something
+                renderer.addCircle(200, 150, 20, { fill: '#3498db' });
+                renderer.clear();
+                log(`✓ Rendering works`, 'success');
+                
+            } catch (err) {
+                log(`✗ ${name} renderer error: ${err.message}`, 'error');
+            }
+        }
+
+        async function runTests() {
+            log('Starting renderer readiness tests...', 'info');
+            
+            // Test Canvas renderer
+            await testRenderer('canvas', 'Canvas');
+            
+            // Test SVG renderer
+            await testRenderer('svg', 'SVG');
+            
+            // Test WebGPU renderer (may fail if WebGPU not supported)
+            await testRenderer('webgpu', 'WebGPU');
+            
+            log('\nAll tests completed!', 'success');
+        }
+
+        // Run tests when page loads
+        runTests().catch(err => {
+            log(`Fatal error: ${err.message}`, 'error');
+        });
+    </script>
+</body>
+</html>
