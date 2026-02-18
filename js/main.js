@@ -95,6 +95,14 @@ async function initSimulation() {
         background: backgroundColor,
     });
     
+    // Wait for renderer to be ready before rendering
+    try {
+        await baseRenderer.waitForReady();
+    } catch (err) {
+        console.error('Renderer initialization failed:', err);
+        // Could show error UI here in future enhancement
+    }
+    
     // Update controls background to match color scheme
     updateControlsBackground();
     
@@ -164,7 +172,7 @@ function setupUIControls() {
 /**
  * Handle control actions (Generic - delegates to simulation interface methods)
  */
-function handleControlAction(action, event) {
+async function handleControlAction(action, event) {
     switch (action) {
         // Standard interface actions that all simulations must support
         case 'start':
@@ -201,6 +209,14 @@ function handleControlAction(action, event) {
                 renderMode: renderMode,
                 background: backgroundColor
             });
+            
+            // Wait for renderer to be ready before rendering
+            try {
+                await baseRenderer.waitForReady();
+            } catch (err) {
+                console.error('Renderer initialization failed:', err);
+                // Could show error UI here in future enhancement
+            }
             
             // Update background colors
             updateControlsBackground();

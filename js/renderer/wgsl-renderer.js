@@ -35,7 +35,8 @@ export class WGSLRenderer {
         
         // Initialize WebGPU asynchronously
         // Note: Constructor completes synchronously, but rendering won't work until initialized
-        this._initWebGPU().catch(err => {
+        // Expose initialization promise so callers can wait for readiness
+        this.initPromise = this._initWebGPU().catch(err => {
             console.error('Failed to initialize WebGPU:', err);
             this.initError = err;
             // WebGPU initialization failed - renderer will be non-functional
@@ -212,6 +213,25 @@ export class WGSLRenderer {
                 return vec4f(input.color.rgb, input.color.a * alpha);
             }
         `;
+    }
+    
+    /**
+     * Check if the renderer is ready to render
+     * @returns {boolean} True if initialized and no errors, false otherwise
+     */
+    isReady() {
+        return this.initialized && !this.initError;
+    }
+    
+    /**
+     * Wait for renderer initialization to complete
+     * @returns {Promise<void>} Resolves when initialized, rejects if initialization failed
+     */
+    async waitForReady() {
+        await this.initPromise;
+        if (this.initError) {
+            throw this.initError;
+        }
     }
     
     /**
